@@ -6,18 +6,18 @@ const HeroContent = () => {
   return (
     <>
     <div className="flex flex-col items-center py-16">
-      <img
+      {/* <img
         className="h-10 mb-14"
         src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=806890&theme=light&t=1737565356562"
         alt=""
-      />
-      <h3 className="text-black/80 leading-0 text-4xl font-bold">
-        Components crafted for
+      /> */}
+      <h3 className="text-white  leading-0 text-4xl font-bold">
+        Welcome to My P☺️rtfolio
       </h3>
-      <h1 className="text-black/80 text-[5.4rem] font-bold">Modern Websites</h1>
+      <h1 className="text-white text-[5.4rem] font-bold">Nishant  ❤️ Mogahaa</h1>
       <WrapButton href="#" className="mt-8">
         <Globe className="animate-spin" />
-        Get Started
+        Download CV
       </WrapButton>
       <svg
         width="100"
@@ -33,14 +33,14 @@ const HeroContent = () => {
         <path d="M48.101 37.7616C46.7404 38.8232 45.8267 40.2814 44.9163 41.7109C44.0407 43.0866 43.1365 44.4592 41.738 45.3434C42.1247 45.5019 42.5146 45.6321 42.9014 45.7908C42.1324 41.8051 41.04 37.8699 39.6781 34.0203C39.545 33.6589 39.0695 33.5191 38.7365 33.6553C38.3719 33.817 38.2385 34.2353 38.3716 34.5969C39.7209 38.3007 40.7404 42.1121 41.4904 46.009C41.6012 46.5703 42.1877 46.7512 42.6539 46.4565C45.5462 44.6124 46.3877 40.9506 49.0169 38.8748C49.7178 38.2884 48.8304 37.1784 48.101 37.7616ZM25.9671 13.1014C25.7028 16.2497 26.0758 19.3824 26.5091 22.4929C26.9645 25.6636 27.4166 28.863 27.872 32.0337C28.1346 33.8253 28.3971 35.6167 28.631 37.4051C28.7607 38.3151 30.1717 38.0968 30.042 37.1868C29.5866 34.016 29.1281 30.8738 28.7012 27.7062C28.2647 24.6242 27.7396 21.5612 27.449 18.4666C27.2943 16.7449 27.2283 15.0042 27.3653 13.2572C27.4671 12.3442 26.0404 12.1851 25.9671 13.1014Z"></path>
         <path d="M30.5625 27.3357C29.9525 30.7343 29.3425 34.133 28.704 37.5284C29.1225 37.4018 29.5411 37.2751 29.9882 37.1516C28.6034 35.0617 27.2504 32.9465 25.8655 30.8565C25.6406 30.5425 25.1523 30.517 24.8669 30.7451C24.5497 30.9987 24.5305 31.4299 24.7555 31.7439C26.1403 33.8338 27.4933 35.9491 28.8781 38.039C29.2489 38.6003 30.0417 38.2265 30.1624 37.6621C30.7724 34.2635 31.3824 30.8648 32.0209 27.4694C32.0908 27.1016 31.758 26.7178 31.3871 26.6765C30.9559 26.6573 30.6324 26.9679 30.5625 27.3357Z"></path>
       </svg>
-      <p className="text-black/60 text-xl">
-        To make your dream Website live by just{" "}
-        <span className="font-bold">Copy and paste </span>
+      <p className= "font-bold text-white text-xl">
+        Your {" "}
+        <span className="font-bold text-orange-500">Full Stack Developer , Graphic Designer, AI Developer, UI/UX Designer and ML Engineer</span>
       </p>
     </div>
 
-    <img className="absolute left-24 top-80 h-[700px]" src="https://skiper-ui.com/bg/bg_1.svg" alt="" />
-    <img className="absolute right-24 top-80 h-[500px]" src="https://skiper-ui.com/bg/bg_2.svg" alt="" />
+    <img className="absolute left-5 top-80 h-[100rem]" src="/images/NISHANT.svg" alt="" />
+    <img className="absolute right-5 top-80 h-[100rem]" src="/images/MOGAHAA.svg" alt="" />
     </>
   );
 };
