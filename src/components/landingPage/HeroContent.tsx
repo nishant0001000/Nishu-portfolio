@@ -1,23 +1,41 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import Image from "next/image";
 import WrapButton from "../ui/wrap-button";
+import ResumePopup from "../ui/resume-popup";
 import { Globe } from "lucide-react";
 
 const HeroContent = () => {
+  const [isResumePopupOpen, setIsResumePopupOpen] = useState(false);
+
+  const handleOpenResume = () => {
+    setIsResumePopupOpen(true);
+  };
+
+  const handleCloseResume = () => {
+    setIsResumePopupOpen(false);
+  };
+
   return (
     <>
-    <div className="flex flex-col items-center py-16">
-      {/* <img
+    <div className="flex flex-col items-center py-16 mt-25">
+    <WrapButton onClick={handleOpenResume} className="mt-8">
+        <Globe className="animate-spin" />
+        Founder Of Cybershoora
+      </WrapButton>
+    {/* <img
         className="h-10 mb-14"
         src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=806890&theme=light&t=1737565356562"
         alt=""
       /> */}
-      <h3 className="text-white  leading-0 text-4xl font-bold">
-        Welcome to My P☺️rtfolio
+      <h3 className="text-white  leading-0 text-4xl font-bold mt-25">
+        Welcome to My P🫣rtfolio
       </h3>
       <h1 className="text-white text-[5.4rem] font-bold">Nishant  ❤️ Mogahaa</h1>
-      <WrapButton href="#" className="mt-8">
+      <WrapButton onClick={handleOpenResume} className="mt-8">
         <Globe className="animate-spin" />
-        Download CV
+        View Resume
       </WrapButton>
       <svg
         width="100"
@@ -39,8 +57,15 @@ const HeroContent = () => {
       </p>
     </div>
 
-    <img className="absolute left-5 top-80 h-[100rem]" src="/images/NISHANT.svg" alt="" />
-    <img className="absolute right-5 top-80 h-[100rem]" src="/images/MOGAHAA.svg" alt="" />
+    <Image className="absolute left-0 top-150 h-[100rem]" src="/images/NISHANT.svg" alt="Nishant" width={400} height={1600} />
+    <Image className="absolute right-0 top-150 h-[100rem]" src="/images/MOGAHAA.svg" alt="Mogahaa" width={400} height={1600} />
+
+    {/* Resume Popup */}
+    <ResumePopup
+      isOpen={isResumePopupOpen}
+      onClose={handleCloseResume}
+      pdfUrl="/pdfs/Nishant_Mogahaa_CV.pdf"
+    />
     </>
   );
 };
