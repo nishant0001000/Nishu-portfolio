@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Download, Eye } from "lucide-react";
+import { X, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ResumePopupProps {

@@ -1,5 +1,4 @@
 import * as React from "react"
-import Image from "next/image"
 
 import { cn } from "@/lib/utils"
 
@@ -42,7 +41,7 @@ const MinimalCardImage = React.forwardRef<
       alt={alt}
       width={200}
       height={200}
-      className="rounded-[16px] object-cover absolute h-full w-full inset-0 "
+      className="rounded-[16px] object-cover absolute h-full w-full inset-0"
     />
     <div className="absolute inset-0 rounded-[16px]">
       <div

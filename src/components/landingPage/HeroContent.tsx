@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import WrapButton from "../ui/wrap-button";
 import ResumePopup from "../ui/resume-popup";
-import { Globe, ArrowRight } from "lucide-react";
+
 
 const HeroContent = () => {
   const [isResumePopupOpen, setIsResumePopupOpen] = useState(false);

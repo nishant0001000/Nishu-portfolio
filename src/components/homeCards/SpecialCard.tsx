@@ -57,19 +57,28 @@ export function SpecialCard() {
 
                   description="Make your app 🤌"
                   bgClass="lg:bg-gradient-to-tr"
-                  //  eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  //   @ts-ignore
-                                     image={{
+                  image={{
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step1light1: family as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step1light2: shiftCard as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step2light1: carousel as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step2light2: textureFull as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step3light: textureCard as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step4light: skiper as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step1dark1: family as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step1dark2: shiftCard as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step2dark1: carousel as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step2dark2: textureFull as any,
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                      step3dark: textureCard as any,
                      alt: "Something",
                    }}

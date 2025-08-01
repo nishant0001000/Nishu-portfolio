@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
 import MinimalCard, { MinimalCardDescription, MinimalCardImage, MinimalCardTitle } from '../ui/minimal-card'
-import BadgeButton from '../ui/badge-button'
 import { Badge } from "@/components/ui/badge"
 import { SparklesIcon } from "lucide-react"
 
@@ -12,24 +11,14 @@ const TemplateCard = () => {
     const [isDragging, setIsDragging] = useState(false);
     const [scrollbarPosition, setScrollbarPosition] = useState(0);
 
-    const scrollUp = () => {
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ top: -400, behavior: 'smooth' });
-        }
-    };
 
-    const scrollDown = () => {
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ top: 400, behavior: 'smooth' });
-        }
-    };
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
         e.preventDefault();
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = useCallback((e: MouseEvent) => {
         if (!isDragging || !scrollContainerRef.current || !scrollbarRef.current) return;
 
         const scrollbarTrack = scrollbarRef.current.parentElement;
@@ -52,7 +41,7 @@ const TemplateCard = () => {
         }
 
         setScrollbarPosition(newScrollbarTop);
-    };
+    }, [isDragging]);
 
     const handleMouseUp = () => {
         setIsDragging(false);
@@ -68,7 +57,7 @@ const TemplateCard = () => {
                 document.removeEventListener('mouseup', handleMouseUp);
             };
         }
-    }, [isDragging]);
+    }, [isDragging, handleMouseMove]);
 
     useEffect(() => {
         const handleScroll = () => {
