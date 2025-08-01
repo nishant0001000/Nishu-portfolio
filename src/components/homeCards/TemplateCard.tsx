@@ -1,8 +1,102 @@
-import React from 'react'
+'use client'
+
+import React, { useRef, useState, useEffect } from 'react'
 import MinimalCard, { MinimalCardDescription, MinimalCardImage, MinimalCardTitle } from '../ui/minimal-card'
 import BadgeButton from '../ui/badge-button'
+import { Badge } from "@/components/ui/badge"
+import { SparklesIcon } from "lucide-react"
 
 const TemplateCard = () => {
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const scrollbarRef = useRef<HTMLDivElement>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [scrollbarPosition, setScrollbarPosition] = useState(0);
+
+    const scrollUp = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ top: -400, behavior: 'smooth' });
+        }
+    };
+
+    const scrollDown = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ top: 400, behavior: 'smooth' });
+        }
+    };
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+        setIsDragging(true);
+        e.preventDefault();
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+        if (!isDragging || !scrollContainerRef.current || !scrollbarRef.current) return;
+
+        const scrollbarTrack = scrollbarRef.current.parentElement;
+        if (!scrollbarTrack) return;
+
+        const trackRect = scrollbarTrack.getBoundingClientRect();
+        const scrollbarHeight = 48; // Fixed height for scrollbar
+
+        const mouseY = e.clientY - trackRect.top;
+        const maxScrollbarTop = trackRect.height - scrollbarHeight;
+        const newScrollbarTop = Math.max(0, Math.min(mouseY - scrollbarHeight / 2, maxScrollbarTop));
+
+        const scrollPercentage = newScrollbarTop / maxScrollbarTop;
+        const maxScroll = scrollContainerRef.current.scrollHeight - scrollContainerRef.current.clientHeight;
+        const newScrollTop = scrollPercentage * maxScroll;
+
+        // Direct smooth scrolling without complex animation
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop = newScrollTop;
+        }
+
+        setScrollbarPosition(newScrollbarTop);
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    useEffect(() => {
+        if (isDragging) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+
+            return () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            };
+        }
+    }, [isDragging]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (scrollContainerRef.current && scrollbarRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+                const maxScroll = scrollHeight - clientHeight;
+                const scrollPercentage = maxScroll > 0 ? scrollTop / maxScroll : 0;
+
+                const scrollbarTrack = scrollbarRef.current.parentElement;
+                if (scrollbarTrack) {
+                    const trackHeight = scrollbarTrack.clientHeight;
+                    const scrollbarHeight = 48; // Fixed height for scrollbar
+                    const maxScrollbarTop = trackHeight - scrollbarHeight;
+                    const newScrollbarTop = scrollPercentage * maxScrollbarTop;
+
+                    // Immediate position update for better responsiveness
+                    setScrollbarPosition(newScrollbarTop);
+                }
+            }
+        };
+
+        const container = scrollContainerRef.current;
+        if (container) {
+            container.addEventListener('scroll', handleScroll, { passive: true });
+            return () => container.removeEventListener('scroll', handleScroll);
+        }
+    }, []);
+
     const cards = [
         {
             title: "Sick title",
@@ -22,33 +116,180 @@ const TemplateCard = () => {
                 "How to design with gestures and motion that feel intuitive and natural.",
             src: "https://pbs.twimg.com/media/GgCPjsQacAAWvm3?format=jpg&name=medium",
         },
+        {
+            title: "Sick title",
+            description:
+                "How to design with gestures and motion that feel intuitive and natural.",
+            src: "https://pbs.twimg.com/media/GgMiuRpa4AAoW2y?format=jpg&name=medium",
+        },
+        {
+            title: "Sick title",
+            description:
+                "How to design with gestures and motion that feel intuitive and natural.",
+            src: "https://pbs.twimg.com/media/GgHZJN0aoAA__92?format=jpg&name=medium",
+        },
+        {
+            title: "Sick title",
+            description:
+                "How to design with gestures and motion that feel intuitive and natural.",
+            src: "https://pbs.twimg.com/media/GgCPjsQacAAWvm3?format=jpg&name=medium",
+        },
+        {
+            title: "Sick title",
+            description:
+                "How to design with gestures and motion that feel intuitive and natural.",
+            src: "https://pbs.twimg.com/media/GgMiuRpa4AAoW2y?format=jpg&name=medium",
+        },
+        {
+            title: "Sick title",
+            description:
+                "How to design with gestures and motion that feel intuitive and natural.",
+            src: "https://pbs.twimg.com/media/GgHZJN0aoAA__92?format=jpg&name=medium",
+        },
+        {
+            title: "Sick title",
+            description:
+                "How to design with gestures and motion that feel intuitive and natural.",
+            src: "https://pbs.twimg.com/media/GgCPjsQacAAWvm3?format=jpg&name=medium",
+        },
     ]
+
     return (
-        <div>
-            <div className='w-[61.5%] p-2 my-20 rounded-3xl shadow bg-white mx-auto'>
-                <div className='h-full p-6 bg-[#f4f4f4] shadow rounded-3xl mx-auto'>
-                    <BadgeButton>Template</BadgeButton>
-                    <div className='flex justify-between items-center'>
-                        
-                                    {cards.map((card, index) => (
-                                        <MinimalCard className="m-2 w-[460px] " key={index}>
-                                            <MinimalCardImage
-                                                className="h-[160px]"
-                                                src={card.src}
-                                                alt={card.title}
-                                            />
-                                            <MinimalCardTitle>{card.title}</MinimalCardTitle>
-                                            <MinimalCardDescription>
-                                                {card.description}
-                                            </MinimalCardDescription>
-                                        </MinimalCard>
-                                    ))}
-                                
+
+        <div className="w-full flex flex-col items-center mt-[3rem] sm:mt-[4rem] lg:mt-[5rem]">
+
+            {/* Heading above TemplateCard */}
+            <div className="text-center mb-12 sm:mb-16 lg:mb-20 px-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white mb-2">Drag logo to scroll projects</h2>
+                <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-blue-500 via-pink-500 to-white mx-auto rounded-full"></div>
+            </div>
+
+            {/* Image below heading */}
+            <svg
+                width="100"
+                height="80"
+                viewBox="0 0 100 50"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="mt-[-3rem] mb-4 sm:mb-6 lg:mb-8 fill-black dark:fill-white sm:w-20 sm:h-10 lg:w-24 lg:h-12"
+            >
+                <path d="M68.6958 5.40679C67.3329 12.7082 68.5287 20.1216 68.5197 27.4583C68.5189 29.5382 68.404 31.6054 68.1147 33.682C67.9844 34.592 69.4111 34.751 69.5414 33.8411C70.5618 26.5016 69.2488 19.104 69.4639 11.7325C69.5218 9.65887 69.7222 7.6012 70.0939 5.56265C70.1638 5.1949 69.831 4.81112 69.4601 4.76976C69.0891 4.72841 68.7689 5.01049 68.6958 5.40679Z"></path>
+                <path d="M74.0117 26.1349C73.2662 27.1206 72.5493 28.1096 72.0194 29.235C71.5688 30.167 71.2007 31.137 70.7216 32.0658C70.4995 32.5033 70.252 32.9091 69.9475 33.3085C69.8142 33.4669 69.6779 33.654 69.5161 33.8093C69.4527 33.86 68.9199 34.2339 68.9167 34.2624C68.9263 34.1768 69.0752 34.3957 69.0055 34.2434C68.958 34.1515 68.8534 34.0531 68.8058 33.9612C68.6347 33.6821 68.4637 33.403 68.264 33.1208L67.1612 31.3512C66.3532 30.0477 65.5199 28.7126 64.7119 27.4093C64.5185 27.0699 63.9701 27.0666 63.7131 27.2979C63.396 27.5514 63.4053 27.9858 63.6018 28.2966C64.3845 29.5683 65.1956 30.8431 65.9783 32.1149L67.1572 33.9796C67.5025 34.5093 67.8225 35.2671 68.428 35.5368C69.6136 36.0446 70.7841 34.615 71.3424 33.7529C71.9992 32.786 72.4085 31.705 72.9035 30.6336C73.4842 29.3116 74.2774 28.1578 75.1306 26.9818C75.7047 26.2369 74.5573 25.3868 74.0117 26.1349ZM55.1301 12.2849C54.6936 18.274 54.6565 24.3076 55.0284 30.3003C55.1293 31.987 55.2555 33.7056 55.4419 35.4019C55.5431 36.3087 56.9541 36.0905 56.8529 35.1837C56.2654 29.3115 56.0868 23.3982 56.2824 17.4978C56.3528 15.8301 56.4263 14.1339 56.5537 12.4725C56.6301 11.5276 55.2034 11.3686 55.1301 12.2849Z"></path>
+                <path d="M59.2642 30.6571C58.8264 31.475 58.36 32.2896 57.9222 33.1075C57.7032 33.5164 57.4843 33.9253 57.2369 34.3311C57.0528 34.6861 56.8656 35.0697 56.6278 35.3898C56.596 35.4152 56.5611 35.4691 56.5294 35.4944C56.4881 35.6054 56.5041 35.4627 56.5548 35.5261C56.7481 35.6055 56.8337 35.6151 56.7545 35.5484L56.6784 35.4533C56.6023 35.3581 56.5263 35.263 56.4534 35.1393C56.1778 34.7619 55.8734 34.3814 55.5946 34.0324C55.0146 33.2744 54.4315 32.545 53.8515 31.787C53.2685 31.0576 52.1584 31.945 52.7415 32.6744C53.4229 33.5592 54.1042 34.4441 54.7888 35.3004C55.1184 35.7127 55.4321 36.2677 55.8569 36.6039C56.3069 36.9719 56.884 36.9784 57.3533 36.6551C57.7624 36.3542 57.9845 35.9167 58.2067 35.4792C58.4636 34.9878 58.746 34.5282 59.003 34.0369C59.5423 33.0859 60.0563 32.1032 60.5957 31.1522C60.7765 30.8257 60.5104 30.3627 60.2092 30.2135C59.8161 30.112 59.4451 30.3305 59.2642 30.6571ZM44.5918 10.1569L42.2324 37.5406C42.0032 40.1151 41.8057 42.6641 41.5764 45.2386C41.5032 46.1549 42.9299 46.314 43.0032 45.3977L45.3626 18.014C45.5918 15.4396 45.7893 12.8905 46.0186 10.316C46.1235 9.37433 44.6968 9.21532 44.5918 10.1569Z"></path>
+                <path d="M48.101 37.7616C46.7404 38.8232 45.8267 40.2814 44.9163 41.7109C44.0407 43.0866 43.1365 44.4592 41.738 45.3434C42.1247 45.5019 42.5146 45.6321 42.9014 45.7908C42.1324 41.8051 41.04 37.8699 39.6781 34.0203C39.545 33.6589 39.0695 33.5191 38.7365 33.6553C38.3719 33.817 38.2385 34.2353 38.3716 34.5969C39.7209 38.3007 40.7404 42.1121 41.4904 46.009C41.6012 46.5703 42.1877 46.7512 42.6539 46.4565C45.5462 44.6124 46.3877 40.9506 49.0169 38.8748C49.7178 38.2884 48.8304 37.1784 48.101 37.7616ZM25.9671 13.1014C25.7028 16.2497 26.0758 19.3824 26.5091 22.4929C26.9645 25.6636 27.4166 28.863 27.872 32.0337C28.1346 33.8253 28.3971 35.6167 28.631 37.4051C28.7607 38.3151 30.1717 38.0968 30.042 37.1868C29.5866 34.016 29.1281 30.8738 28.7012 27.7062C28.2647 24.6242 27.7396 21.5612 27.449 18.4666C27.2943 16.7449 27.2283 15.0042 27.3653 13.2572C27.4671 12.3442 26.0404 12.1851 25.9671 13.1014Z"></path>
+                <path d="M30.5625 27.3357C29.9525 30.7343 29.3425 34.133 28.704 37.5284C29.1225 37.4018 29.5411 37.2751 29.9882 37.1516C28.6034 35.0617 27.2504 32.9465 25.8655 30.8565C25.6406 30.5425 25.1523 30.517 24.8669 30.7451C24.5497 30.9987 24.5305 31.4299 24.7555 31.7439C26.1403 33.8338 27.4933 35.9491 28.8781 38.039C29.2489 38.6003 30.0417 38.2265 30.1624 37.6621C30.7724 34.2635 31.3824 30.8648 32.0209 27.4694C32.0908 27.1016 31.758 26.7178 31.3871 26.6765C30.9559 26.6573 30.6324 26.9679 30.5625 27.3357Z"></path>
+            </svg>
+
+            <div className="mx-auto w-full max-w-7xl rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] border border-white/20 p-1 sm:p-2 shadow-sm md:rounded-t-[32px] lg:md:rounded-t-[44px]">
+
+                <div className="relative mx-auto flex w-full flex-col rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] border border-black/5 bg-[#21212156] p-1 sm:p-2 shadow-sm md:items-start md:gap-6 lg:md:gap-8 md:rounded-b-[16px] lg:md:rounded-b-[20px] md:rounded-t-[32px] lg:md:rounded-t-[40px]">
+
+                    <Badge
+                        variant="outline"
+                        className="absolute left-3 sm:left-4 top-4 sm:top-6 rounded-[12px] sm:rounded-[14px] border border-black/10 text-sm sm:text-base md:left-6"
+                    >
+                        <SparklesIcon className="fill-[#EEBDE0] stroke-1 text-neutral-800" />{" "}
+                        Latest
+                    </Badge>
+
+                    <div className="flex flex-col justify-center pb-2 pl-3 sm:pl-4 pt-10 sm:pt-12 lg:pt-14 md:items-center">
+                        <div className="flex gap-2">
+                            <div>
+                                <h3 className="text-2xl sm:text-3xl lg:text-4xl opacity-85 font-bold tracking-tight text-black dark:text-white">
+                                    All Projects
+                                </h3>
+                                <p className="text-sm sm:text-base text-black/70 dark:text-white/70">Our All Projects</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        ref={scrollContainerRef}
+                        className="flex flex-nowrap sm:flex-wrap items-center justify-start sm:justify-center gap-2 sm:gap-3 lg:gap-4 max-h-[800px] sm:max-h-[1000px] lg:max-h-[1200px] overflow-x-auto sm:overflow-y-auto [&::-webkit-scrollbar]:hidden scroll-smooth px-4 sm:px-6 lg:px-8"
+                        style={{
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
+                            scrollBehavior: 'smooth'
+                        }}
+                    >
+                        {cards.map((card, index) => (
+                            <MinimalCard
+                                className="ml-0 mr-2 sm:m-2 w-[300px] sm:w-[320px] lg:w-[350px] flex-shrink-0 transform transition-all duration-700 ease-out hover:scale-105 hover:rotate-1"
+                                key={index}
+                                style={{
+                                    animationDelay: `${index * 100}ms`,
+                                    filter: 'sepia(0.1) contrast(1.1) brightness(0.95)'
+                                }}
+                            >
+                                <MinimalCardImage
+                                    className="h-[200px] sm:h-[280px] lg:h-[320px]"
+                                    src={card.src}
+                                    alt={card.title}
+                                />
+                                <MinimalCardTitle>{card.title}</MinimalCardTitle>
+                                <MinimalCardDescription>
+                                    {card.description}
+                                </MinimalCardDescription>
+                                <div className="flex flex-wrap gap-2 mt-3 px-1">
+                                    <span className="px-2 py-1 text-xs bg-blue-500/10 text-blue-500 rounded-md">React</span>
+                                    <span className="px-2 py-1 text-xs bg-green-500/10 text-green-500 rounded-md">TypeScript</span>
+                                    <span className="px-2 py-1 text-xs bg-purple-500/10 text-purple-500 rounded-md">Tailwind</span>
+                                    <span className="px-2 py-1 text-xs bg-orange-500/10 text-orange-500 rounded-md">Node.js</span>
+                                </div>
+
+                                {/* Details Button with Liquid Glass Effect */}
+                                <div className="mt-4 px-1">
+                                    <button className="relative w-full h-10 bg-gradient-to-r from-black/10 dark:from-white/10 to-black/5 dark:to-white/5 backdrop-blur-sm border border-black/20 dark:border-white/20 rounded-[15px] mb-1 cursor-pointer transition-all duration-300 hover:from-black/20 dark:hover:from-white/20 hover:to-black/10 dark:hover:to-white/10 group overflow-hidden">
+                                        <span className="relative z-10 text-black dark:text-white font-medium text-sm">Details</span>
+                                        {/* Shimmer Effect */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/20 dark:via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+                                    </button>
+                                </div>
+                            </MinimalCard>
+                        ))}
+                    </div>
+
+                    {/* Custom Draggable Scrollbar - Right Side */}
+                    <div className="absolute right-8 sm:right-8 lg:right-8 top-32 sm:top-36 lg:top-40 bottom-6 sm:bottom-8 lg:bottom-10 w-2 sm:w-3 bg-white/5 rounded-full hidden sm:block">
+                        <div
+                            ref={scrollbarRef}
+                            className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 rounded-full cursor-pointer transition-all duration-300 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl group"
+                            style={{
+                                top: `${scrollbarPosition}px`,
+                                position: 'absolute',
+                                left: '50%',
+                                transform: 'translateX(-50%)'
+                            }}
+                            onMouseDown={handleMouseDown}
+                        >
+                            <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-full">
+                                <img src="/images/m-logo.svg" alt="Logo" className="w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 relative z-10" />
+                                {/* Shimmer Effect */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Custom Draggable Scrollbar - Left Side */}
+                    <div className="absolute left-8 sm:left-8 lg:left-8 top-32 sm:top-36 lg:top-40 bottom-6 sm:bottom-8 lg:bottom-10 w-2 sm:w-3 bg-white/5 rounded-full hidden sm:block">
+                        <div
+                            className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 rounded-full cursor-pointer transition-all duration-300 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl group"
+                            style={{
+                                top: `${scrollbarPosition}px`,
+                                position: 'absolute',
+                                left: '50%',
+                                transform: 'translateX(-50%)'
+                            }}
+                            onMouseDown={handleMouseDown}
+                        >
+                            <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-full">
+                                <img src="/images/m-logo.svg" alt="Logo" className="w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 relative z-10" />
+                                {/* Shimmer Effect */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-
         </div>
     )
 }

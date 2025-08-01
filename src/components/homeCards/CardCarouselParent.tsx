@@ -4,7 +4,7 @@ import { CardCarousel } from '../ui/card-carousel'
 const CardCarouselParent = () => {
 
     const images = [
-        {src:'/images/card1.webp',alt:"Image 1"},
+        {src:'/images/card12.png',alt:"Image 1"},
         {src:'/images/card2.webp',alt:"Image 2"},
         {src:'/images/card3.webp',alt:"Image 3"},
     ]

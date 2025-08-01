@@ -149,6 +149,8 @@ export function SkiperCard({
             "-translate-x-36 opacity-0 rounded-2xl": step > 0,
           })}
           src={image.step1light1}
+          width={400}
+          height={300}
           style={{
             position: "absolute",
             userSelect: "none",
@@ -161,6 +163,8 @@ export function SkiperCard({
             "-translate-x-24 opacity-0 rounded-2xl": step > 0,
           })}
           src={image.step1light2}
+          width={400}
+          height={300}
           style={{
             position: "absolute",
             userSelect: "none",
@@ -178,6 +182,8 @@ export function SkiperCard({
             { "-translate-x-36 opacity-0": step > 1 }
           )}
           src={image.step2light1}
+          width={400}
+          height={300}
           style={{
             position: "absolute",
             userSelect: "none",
@@ -193,6 +199,8 @@ export function SkiperCard({
             { "-translate-x-24 opacity-0": step > 1 }
           )}
           src={image.step2light2}
+          width={400}
+          height={300}
           style={{
             position: "absolute",
             userSelect: "none",
@@ -210,6 +218,8 @@ export function SkiperCard({
             { "opacity-90": step === 2 }
           )}
           src={image.step3light}
+          width={400}
+          height={300}
           style={{
             position: "absolute",
             userSelect: "none",

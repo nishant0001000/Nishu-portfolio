@@ -56,8 +56,8 @@ function useAutoResizeTextarea({
   return { textareaRef, adjustHeight }
 }
 
-const MIN_HEIGHT = 48
-const MAX_HEIGHT = 164
+const MIN_HEIGHT = 56
+const MAX_HEIGHT = 180
 
 const AnimatedPlaceholder = ({ showSearch }: { showSearch: boolean }) => (
   <AnimatePresence mode="wait">
@@ -69,7 +69,7 @@ const AnimatedPlaceholder = ({ showSearch }: { showSearch: boolean }) => (
       transition={{ duration: 0.1 }}
       className="pointer-events-none w-[150px] text-sm absolute text-black/70 dark:text-white/70"
     >
-      {showSearch ? "Search the web..." : "Ask Skiper Ai..."}
+      {showSearch ? "Search about me..." : "Ask Nishant..."}
     </motion.p>
   </AnimatePresence>
 )
@@ -113,9 +113,9 @@ export default function AiInput() {
     }
   }, [imagePreview])
   return (
-    <div className="w-full py-4">
-      <div className="relative max-w-xl border rounded-[22px] border-black/5 p-1 w-full mx-auto">
-        <div className="relative rounded-2xl border border-black/5 bg-neutral-800/5 flex flex-col">
+    <div className="w-full py-4 sm:py-6">
+      <div className="relative max-w-lg sm:max-w-xl lg:max-w-2xl border rounded-[22px] border-black/10 dark:border-white/10 p-1 sm:p-2 w-full mx-auto">
+        <div className="relative rounded-2xl border border-black/10 dark:border-white/10 bg-white/5 dark:bg-black/5 flex flex-col">
           <div
             className="overflow-y-auto"
             style={{ maxHeight: `${MAX_HEIGHT}px` }}
@@ -125,7 +125,7 @@ export default function AiInput() {
                 id="ai-input-04"
                 value={value}
                 placeholder=""
-                className="w-full rounded-2xl rounded-b-none px-4 py-3 bg-black/5 dark:bg-white/5 border-none dark:text-white resize-none focus-visible:ring-0 leading-[1.2]"
+                className="w-full rounded-2xl rounded-b-none px-4 py-3 bg-white/5 dark:bg-black/5 border-none text-black dark:text-white resize-none focus-visible:ring-0 leading-[1.2]"
                 ref={textareaRef}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
@@ -146,14 +146,14 @@ export default function AiInput() {
             </div>
           </div>
 
-          <div className="h-12 bg-black/5 dark:bg-white/5 rounded-b-xl">
+          <div className="h-24 w-full bg-white/5 dark:bg-black/5 rounded-b-xl">
             <div className="absolute left-3 bottom-3 flex items-center gap-2">
               <label
                 className={cn(
-                  "cursor-pointer relative rounded-full p-2 bg-black/5 dark:bg-white/5",
+                  "cursor-pointer relative rounded-full p-2 bg-white/5 dark:bg-black/5",
                   imagePreview
                     ? "bg-[#ff3f17]/15 border border-[#ff3f17] text-[#ff3f17]"
-                    : "bg-black/5 dark:bg-white/5 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
+                    : "bg-white/5 dark:bg-black/5 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
                 )}
               >
                 <input
@@ -195,7 +195,7 @@ export default function AiInput() {
                   "rounded-full transition-all flex items-center gap-2 px-1.5 py-1 border h-8",
                   showSearch
                     ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
-                    : "bg-black/5 dark:bg-white/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
+                    : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
                 )}
               >
                 <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
@@ -253,7 +253,7 @@ export default function AiInput() {
                   "rounded-full p-2 transition-colors",
                   value
                     ? "bg-[#ff3f17]/15 text-[#ff3f17]"
-                    : "bg-black/5 dark:bg-white/5 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
+                    : "bg-white/5 dark:bg-black/5 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
                 )}
               >
                 <Send className="w-4 h-4" />

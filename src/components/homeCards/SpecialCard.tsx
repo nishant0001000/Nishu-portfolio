@@ -1,24 +1,36 @@
-import React from 'react'
-import { SkiperCard } from '../ui/skiper-card'
-import BadgeButton from '../ui/badge-button'
-import card4 from '/public/images/card4.webp'
-import card5 from '/public/images/card5.webp'
-import card6 from '/public/images/card6.webp'
-import card7 from '/public/images/card7.webp'
-import card8 from '/public/images/card8.webp'
-import { cn } from '@/lib/utils'
+import { SparklesIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { SkiperCard } from "../ui/skiper-card"
 
-const SpecialCard = () => {
-    return (
-        <div className='my-20'>
-            <div className='w-[61.5%] mx-auto'>
-                <BadgeButton>Component Preview</BadgeButton>
-                <h2 className='text-black/80 text-center font-bold text-6xl mt-8'>Tailwind + Framer + React</h2>
-                <h5 className='text-black/80 text-center font-bold text-3xl mb-8'>Everything you need to ship</h5>
+// Using available images from public/images directory
+const shiftCard = "/images/card1.webp"
+const family = "/images/card2.webp"
+const carousel = "/images/card3.webp"
+const textureFull = "/images/card4.webp"
+const skiper = "/images/card5.webp"
+const textureCard = "/images/card6.webp"
+
+export function SpecialCard() {
+  return (
+    <section className="relative my-14 w-full overflow-hidden " id="features">
+      <div className=" p-2">
+        <div className="mb-8 mx-auto pt-4 md:container">
+          <div className=" mx-auto">
+            <div className="flex w-full items-center justify-center">
+              <Badge
+                variant="outline"
+                className="mb-8 rounded-[14px] border border-black/10 bg-white text-base dark:border dark:border-white/10 dark:bg-transparent md:left-6"
+              >
+                <SparklesIcon className="  fill-[#EEBDE0] stroke-1 text-neutral-800" />{" "}
+                Component Preview
+              </Badge>
+            </div>
+
+            <div className=" mx-auto max-w-4xl rounded-[34px] bg-neutral-700">
+              <div className="relative z-10 grid w-full gap-8 rounded-[28px] bg-neutral-950 p-2">
                 <SkiperCard
-                    title='Component that pop'
-                    description='Make your app 🤌'
-                    step1img1Class={cn(
+                  step1img1Class={cn(
                     "pointer-events-none w-[50%] border border-stone-100/10 transition-all duration-500 dark:border-stone-700/50",
                     "left-1/4 top-[57%] rounded-[24px] max-md:scale-[160%] max-md:rounded-[24px] md:left-[35px] md:top-[29%]",
                     "md:group-hover:translate-y-2"
@@ -43,24 +55,31 @@ const SpecialCard = () => {
                     "left-[5%] top-[50%] md:left-1/2 md:left-[68px] md:top-[30%]"
                   )}
 
-                    image={{
-                        step1dark1: card4,
-                        step1dark2: card5,
-                        step1light1: card4,
-                        step1light2: card5,
-                        step2dark1: card6,
-                        step2dark2: card7,
-                        step2light1: card6,
-                        step2light2: card7,
-                        step3dark: card8,
-                        step3light: card8,
-                        step4light: card8,
-                        alt: "Something",
-                    }}
+                  description="Make your app 🤌"
+                  bgClass="lg:bg-gradient-to-tr"
+                  //  eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  //   @ts-ignore
+                                     image={{
+                     step1light1: family as any,
+                     step1light2: shiftCard as any,
+                     step2light1: carousel as any,
+                     step2light2: textureFull as any,
+                     step3light: textureCard as any,
+                     step4light: skiper as any,
+                     step1dark1: family as any,
+                     step1dark2: shiftCard as any,
+                     step2dark1: carousel as any,
+                     step2dark2: textureFull as any,
+                     step3dark: textureCard as any,
+                     alt: "Something",
+                   }}
+                  title="Components that pop"
                 />
+              </div>
             </div>
+          </div>
         </div>
-    )
+      </div>
+    </section>
+  )
 }
-
-export default SpecialCard

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import WrapButton from "../ui/wrap-button";
 import ResumePopup from "../ui/resume-popup";
-import { Globe } from "lucide-react";
+import { Globe, ArrowRight } from "lucide-react";
 
 const HeroContent = () => {
   const [isResumePopupOpen, setIsResumePopupOpen] = useState(false);
@@ -19,31 +19,32 @@ const HeroContent = () => {
 
   return (
     <>
-    <div className="flex flex-col items-center py-16 mt-25">
-    <WrapButton onClick={handleOpenResume} className="mt-8">
-        <Globe className="animate-spin" />
-        Founder Of Cybershoora
-      </WrapButton>
-    {/* <img
-        className="h-10 mb-14"
-        src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=806890&theme=light&t=1737565356562"
-        alt=""
-      /> */}
-      <h3 className="text-white  leading-0 text-4xl font-bold mt-25">
-        Welcome to My P🫣rtfolio
+    <div className="relative overflow-hidden flex flex-col items-center py-8 sm:py-12 lg:py-16 w-full">
+    <div className="w-full flex justify-center">
+        <WrapButton className="mt-6 sm:mt-8 lg:mt-10" href="/docs/components/card-carousel" >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse sm:w-6 sm:h-6">
+                <circle cx="12" cy="8" r="5"/>
+                <path d="M20 21a8 8 0 0 0-16 0"/>
+            </svg>
+            <span className="text-sm sm:text-base">Founder Of Cybershoora</span>
+        </WrapButton>
+    </div>
+      <h3 className="text-black dark:text-white leading-tight text-2xl sm:text-3xl lg:text-4xl font-bold mt-20 sm:mt-32 lg:mt-40 text-center px-4">
+        Welcome to My P<span className="inline-block animate-bounce" style={{animation: 'shy 2s infinite'}}>🫣</span>rtfolio
       </h3>
-      <h1 className="text-white text-[5.4rem] font-bold">Nishant  ❤️ Mogahaa</h1>
-      <WrapButton onClick={handleOpenResume} className="mt-8">
-        <Globe className="animate-spin" />
-        View Resume
-      </WrapButton>
+      <h1 className="text-black dark:text-white text-3xl sm:text-4xl md:text-5xl lg:text-[5.4rem] font-bold text-center px-4">Nishant<span className="inline-block text-red-500" style={{animation: 'heartbeat 1s infinite'}}>❤️</span>Mogahaa</h1>
+             <div className="w-full flex justify-center">
+         <WrapButton onClick={handleOpenResume} className="mt-6 sm:mt-8 lg:mt-10">
+             View Resume
+         </WrapButton>
+     </div>
       <svg
-        width="100"
-        height="50"
+        width="80"
+        height="40"
         viewBox="0 0 100 50"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="mt-2 mb-8 fill-black dark:fill-white"
+        className="mt-2 mb-6 sm:mb-8 fill-black dark:fill-white sm:w-20 sm:h-10 lg:w-24 lg:h-12"
       >
         <path d="M68.6958 5.40679C67.3329 12.7082 68.5287 20.1216 68.5197 27.4583C68.5189 29.5382 68.404 31.6054 68.1147 33.682C67.9844 34.592 69.4111 34.751 69.5414 33.8411C70.5618 26.5016 69.2488 19.104 69.4639 11.7325C69.5218 9.65887 69.7222 7.6012 70.0939 5.56265C70.1638 5.1949 69.831 4.81112 69.4601 4.76976C69.0891 4.72841 68.7689 5.01049 68.6958 5.40679Z"></path>
         <path d="M74.0117 26.1349C73.2662 27.1206 72.5493 28.1096 72.0194 29.235C71.5688 30.167 71.2007 31.137 70.7216 32.0658C70.4995 32.5033 70.252 32.9091 69.9475 33.3085C69.8142 33.4669 69.6779 33.654 69.5161 33.8093C69.4527 33.86 68.9199 34.2339 68.9167 34.2624C68.9263 34.1768 69.0752 34.3957 69.0055 34.2434C68.958 34.1515 68.8534 34.0531 68.8058 33.9612C68.6347 33.6821 68.4637 33.403 68.264 33.1208L67.1612 31.3512C66.3532 30.0477 65.5199 28.7126 64.7119 27.4093C64.5185 27.0699 63.9701 27.0666 63.7131 27.2979C63.396 27.5514 63.4053 27.9858 63.6018 28.2966C64.3845 29.5683 65.1956 30.8431 65.9783 32.1149L67.1572 33.9796C67.5025 34.5093 67.8225 35.2671 68.428 35.5368C69.6136 36.0446 70.7841 34.615 71.3424 33.7529C71.9992 32.786 72.4085 31.705 72.9035 30.6336C73.4842 29.3116 74.2774 28.1578 75.1306 26.9818C75.7047 26.2369 74.5573 25.3868 74.0117 26.1349ZM55.1301 12.2849C54.6936 18.274 54.6565 24.3076 55.0284 30.3003C55.1293 31.987 55.2555 33.7056 55.4419 35.4019C55.5431 36.3087 56.9541 36.0905 56.8529 35.1837C56.2654 29.3115 56.0868 23.3982 56.2824 17.4978C56.3528 15.8301 56.4263 14.1339 56.5537 12.4725C56.6301 11.5276 55.2034 11.3686 55.1301 12.2849Z"></path>
@@ -51,14 +52,43 @@ const HeroContent = () => {
         <path d="M48.101 37.7616C46.7404 38.8232 45.8267 40.2814 44.9163 41.7109C44.0407 43.0866 43.1365 44.4592 41.738 45.3434C42.1247 45.5019 42.5146 45.6321 42.9014 45.7908C42.1324 41.8051 41.04 37.8699 39.6781 34.0203C39.545 33.6589 39.0695 33.5191 38.7365 33.6553C38.3719 33.817 38.2385 34.2353 38.3716 34.5969C39.7209 38.3007 40.7404 42.1121 41.4904 46.009C41.6012 46.5703 42.1877 46.7512 42.6539 46.4565C45.5462 44.6124 46.3877 40.9506 49.0169 38.8748C49.7178 38.2884 48.8304 37.1784 48.101 37.7616ZM25.9671 13.1014C25.7028 16.2497 26.0758 19.3824 26.5091 22.4929C26.9645 25.6636 27.4166 28.863 27.872 32.0337C28.1346 33.8253 28.3971 35.6167 28.631 37.4051C28.7607 38.3151 30.1717 38.0968 30.042 37.1868C29.5866 34.016 29.1281 30.8738 28.7012 27.7062C28.2647 24.6242 27.7396 21.5612 27.449 18.4666C27.2943 16.7449 27.2283 15.0042 27.3653 13.2572C27.4671 12.3442 26.0404 12.1851 25.9671 13.1014Z"></path>
         <path d="M30.5625 27.3357C29.9525 30.7343 29.3425 34.133 28.704 37.5284C29.1225 37.4018 29.5411 37.2751 29.9882 37.1516C28.6034 35.0617 27.2504 32.9465 25.8655 30.8565C25.6406 30.5425 25.1523 30.517 24.8669 30.7451C24.5497 30.9987 24.5305 31.4299 24.7555 31.7439C26.1403 33.8338 27.4933 35.9491 28.8781 38.039C29.2489 38.6003 30.0417 38.2265 30.1624 37.6621C30.7724 34.2635 31.3824 30.8648 32.0209 27.4694C32.0908 27.1016 31.758 26.7178 31.3871 26.6765C30.9559 26.6573 30.6324 26.9679 30.5625 27.3357Z"></path>
       </svg>
-      <p className= "font-bold text-white text-xl">
+      <p className="font-bold text-black dark:text-white text-base sm:text-lg lg:text-xl text-center px-4">
         Your {" "}
-        <span className="font-bold text-orange-500">Full Stack Developer , Graphic Designer, AI Developer, UI/UX Designer and ML Engineer</span>
+        <span className="font-bold text-orange-500">Full Stack Developer, Graphic Designer, AI Developer, UI/UX Designer and ML Engineer</span>
       </p>
     </div>
 
-    <Image className="absolute left-0 top-150 h-[100rem]" src="/images/NISHANT.svg" alt="Nishant" width={400} height={1600} />
-    <Image className="absolute right-0 top-150 h-[100rem]" src="/images/MOGAHAA.svg" alt="Mogahaa" width={400} height={1600} />
+    {/* Nishant Image - Theme Responsive */}
+    <Image className="hidden md:hidden lg:block absolute left-0 top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[30rem] lg:h-[50rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
+           src="/images/NISHANT.svg" 
+           alt="Nishant" 
+           width={400} 
+           height={1600}
+    />
+    
+    {/* Nishant Image for Light Theme - Add your image here */}
+    <Image className="hidden md:hidden lg:block absolute left-0 top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[30rem] lg:h-[50rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
+           src="/images/NISHANT-black.svg" 
+           alt="Nishant Light" 
+           width={400} 
+           height={1600}
+    />
+    
+    {/* Mogahaa Image - Theme Responsive */}
+    <Image className="hidden md:hidden lg:block absolute right-0 top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[30rem] lg:h-[50rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
+           src="/images/MOGAHAA.svg" 
+           alt="Mogahaa" 
+           width={400} 
+           height={1600}
+    />
+    
+    {/* Mogahaa Image for Light Theme - Add your image here */}
+    <Image className="hidden md:hidden lg:block absolute right-0 top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[30rem] lg:h-[50rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
+           src="/images/MOGAHAA-black.svg" 
+           alt="Mogahaa Light" 
+           width={400} 
+           height={1600}
+    />
 
     {/* Resume Popup */}
     <ResumePopup
