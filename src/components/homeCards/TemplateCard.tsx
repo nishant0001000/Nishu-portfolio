@@ -148,9 +148,9 @@ const TemplateCard = () => {
         <div className="w-full flex flex-col items-center mt-[3rem] sm:mt-[4rem] lg:mt-[5rem]">
 
             {/* Heading above TemplateCard */}
-            <div className="text-center mb-12 sm:mb-16 lg:mb-20 px-4">
-                <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white mb-2">Drag logo to scroll projects</h2>
-                <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-blue-500 via-pink-500 to-white mx-auto rounded-full"></div>
+            <div className="px-4 mb-12 text-center sm:mb-16 lg:mb-20">
+                <h2 className="mb-2 text-xl font-bold text-black sm:text-2xl dark:text-white">Drag logo to scroll projects</h2>
+                <div className="mx-auto w-12 h-1 bg-gradient-to-r from-blue-500 via-pink-500 to-white rounded-full sm:w-16"></div>
             </div>
 
             {/* Image below heading */}
@@ -181,10 +181,10 @@ const TemplateCard = () => {
                         Latest
                     </Badge>
 
-                    <div className="flex flex-col justify-center pb-2 pl-3 sm:pl-4 pt-10 sm:pt-12 lg:pt-14 md:items-center">
+                    <div className="flex flex-col justify-center pt-10 pb-2 pl-3 sm:pl-4 sm:pt-12 lg:pt-14 md:items-center">
                         <div className="flex gap-2">
                             <div>
-                                <h3 className="text-2xl sm:text-3xl lg:text-4xl opacity-85 font-bold tracking-tight text-black dark:text-white">
+                                <h3 className="text-2xl font-bold tracking-tight text-black sm:text-3xl lg:text-4xl opacity-85 dark:text-white">
                                     All Projects
                                 </h3>
                                 <p className="text-sm sm:text-base text-black/70 dark:text-white/70">Our All Projects</p>
@@ -218,19 +218,19 @@ const TemplateCard = () => {
                                 <MinimalCardDescription>
                                     {card.description}
                                 </MinimalCardDescription>
-                                <div className="flex flex-wrap gap-2 mt-3 px-1">
-                                    <span className="px-2 py-1 text-xs bg-blue-500/10 text-blue-500 rounded-md">React</span>
-                                    <span className="px-2 py-1 text-xs bg-green-500/10 text-green-500 rounded-md">TypeScript</span>
-                                    <span className="px-2 py-1 text-xs bg-purple-500/10 text-purple-500 rounded-md">Tailwind</span>
-                                    <span className="px-2 py-1 text-xs bg-orange-500/10 text-orange-500 rounded-md">Node.js</span>
+                                <div className="flex flex-wrap gap-2 px-1 mt-3">
+                                    <span className="px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10">React</span>
+                                    <span className="px-2 py-1 text-xs text-green-500 rounded-md bg-green-500/10">TypeScript</span>
+                                    <span className="px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-500/10">Tailwind</span>
+                                    <span className="px-2 py-1 text-xs text-orange-500 rounded-md bg-orange-500/10">Node.js</span>
                                 </div>
 
                                 {/* Details Button with Liquid Glass Effect */}
-                                <div className="mt-4 px-1">
+                                <div className="px-1 mt-4">
                                     <button className="relative w-full h-10 bg-gradient-to-r from-black/10 dark:from-white/10 to-black/5 dark:to-white/5 backdrop-blur-sm border border-black/20 dark:border-white/20 rounded-[15px] mb-1 cursor-pointer transition-all duration-300 hover:from-black/20 dark:hover:from-white/20 hover:to-black/10 dark:hover:to-white/10 group overflow-hidden">
-                                        <span className="relative z-10 text-black dark:text-white font-medium text-sm">Details</span>
+                                        <span className="relative z-10 text-sm font-medium text-black dark:text-white">Details</span>
                                         {/* Shimmer Effect */}
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/20 dark:via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent transition-transform duration-1000 ease-out -translate-x-full via-black/20 dark:via-white/20 group-hover:translate-x-full"></div>
                                     </button>
                                 </div>
                             </MinimalCard>
@@ -238,10 +238,10 @@ const TemplateCard = () => {
                     </div>
 
                     {/* Custom Draggable Scrollbar - Right Side */}
-                    <div className="absolute right-8 sm:right-8 lg:right-8 top-32 sm:top-36 lg:top-40 bottom-6 sm:bottom-8 lg:bottom-10 w-2 sm:w-3 bg-white/5 rounded-full hidden sm:block">
+                    <div className="hidden absolute bottom-6 right-8 top-32 w-2 rounded-full sm:right-8 lg:right-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 bg-white/5 sm:block">
                         <div
                             ref={scrollbarRef}
-                            className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 rounded-full cursor-pointer transition-all duration-300 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl group"
+                            className="w-8 h-8 bg-gradient-to-br rounded-full border shadow-lg backdrop-blur-sm transition-all duration-300 cursor-pointer sm:w-10 sm:h-10 lg:w-12 lg:h-12 from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 border-white/20 hover:shadow-xl group"
                             style={{
                                 top: `${scrollbarPosition}px`,
                                 position: 'absolute',
@@ -250,18 +250,18 @@ const TemplateCard = () => {
                             }}
                             onMouseDown={handleMouseDown}
                         >
-                            <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-full">
-                                <img src="/images/m-logo.svg" alt="Logo" className="w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 relative z-10" />
+                            <div className="flex overflow-hidden relative justify-center items-center w-full h-full rounded-full">
+                                <img src="/images/m-logo.svg" alt="Logo" className="relative z-10 w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7" />
                                 {/* Shimmer Effect */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent transition-transform duration-1000 ease-out -translate-x-full via-white/20 group-hover:translate-x-full"></div>
                             </div>
                         </div>
                     </div>
 
                     {/* Custom Draggable Scrollbar - Left Side */}
-                    <div className="absolute left-8 sm:left-8 lg:left-8 top-32 sm:top-36 lg:top-40 bottom-6 sm:bottom-8 lg:bottom-10 w-2 sm:w-3 bg-white/5 rounded-full hidden sm:block">
+                    <div className="hidden absolute bottom-6 left-8 top-32 w-2 rounded-full sm:left-8 lg:left-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 bg-white/5 sm:block">
                         <div
-                            className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 rounded-full cursor-pointer transition-all duration-300 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl group"
+                            className="w-8 h-8 bg-gradient-to-br rounded-full border shadow-lg backdrop-blur-sm transition-all duration-300 cursor-pointer sm:w-10 sm:h-10 lg:w-12 lg:h-12 from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 border-white/20 hover:shadow-xl group"
                             style={{
                                 top: `${scrollbarPosition}px`,
                                 position: 'absolute',
@@ -270,10 +270,10 @@ const TemplateCard = () => {
                             }}
                             onMouseDown={handleMouseDown}
                         >
-                            <div className="w-full h-full flex items-center justify-center relative overflow-hidden rounded-full">
-                                <img src="/images/m-logo.svg" alt="Logo" className="w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7 relative z-10" />
+                            <div className="flex overflow-hidden relative justify-center items-center w-full h-full rounded-full">
+                                <img src="/images/m-logo.svg" alt="Logo" className="relative z-10 w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7" />
                                 {/* Shimmer Effect */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent transition-transform duration-1000 ease-out -translate-x-full via-white/20 group-hover:translate-x-full"></div>
                             </div>
                         </div>
                     </div>
