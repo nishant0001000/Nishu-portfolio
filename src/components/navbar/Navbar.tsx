@@ -77,12 +77,12 @@ const Navbar = () => {
             stiffness: 300,
             damping: 20
           }}
-          className="flex relative justify-center items-center pt-2 w-12 h-12 bg-white rounded-full backdrop-blur-md dark:bg-black"
+          className="flex relative justify-center items-center pt-2 w-12 h-12 bg-black rounded-full backdrop-blur-md dark:bg-white"
         >
           {/* Logo */}
           <div className="w-8 h-8">
             <video 
-              src="/videos/m-logolight1.mp4"
+              src="/videos/m-logodark1.mp4"
               width={32} 
               height={32}
               autoPlay 
@@ -92,7 +92,7 @@ const Navbar = () => {
               className="rounded-full dark:hidden"
             />
             <video 
-              src="/videos/m-logodark1.mp4"
+              src="/videos/m-logolight1.mp4"
               width={32} 
               height={32}
               autoPlay 
@@ -112,9 +112,9 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="absolute -top-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
+            className="absolute -top-12 left-1/2 whitespace-nowrap transform -translate-x-1/2"
           >
-            <span className="text-xs font-medium text-white dark:text-black bg-gray-600 dark:bg-white px-2 py-1 rounded-full backdrop-blur-sm">
+            <span className="px-2 py-1 text-xs font-medium text-white bg-gray-600 rounded-full backdrop-blur-sm dark:text-black dark:bg-white">
               {quotes[currentQuoteIndex]}
             </span>
           </motion.div>
