@@ -102,7 +102,7 @@ export default function ChatResponse({
                    <div className="w-3 h-3 rounded-full bg-[#ff3f17]"></div>
                    <div>
                      <div className="text-sm font-medium text-[#ff3f17]">Local AI</div>
-                     <div className="text-xs text-black/60 dark:text-white/60">Portfolio information & Nishant's details</div>
+                     <div className="text-xs text-black/60 dark:text-white/60">Portfolio information &amp; Nishant&apos;s details</div>
                    </div>
                                        </button>
                                              <button

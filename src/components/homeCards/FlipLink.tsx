@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils"
 import { FlipLink } from "../ui/text-effect-flipper"
 
 const Icons = {
-  linkedin: (props: any) => (
+  linkedin: () => (
     <div className="w-[25px] h-[25px] md:w-[60px] md:h-[60px] rounded-[4px] md:rounded-[10px] bg-[#D9D9D9] transition-all duration-500 ease-in-out group-hover:bg-accent flex items-center justify-center">
       <Image
         src="/images/linkedin.svg"
@@ -25,7 +25,7 @@ const Icons = {
       />
     </div>
   ),
-  github: (props: any) => (
+  github: () => (
     <div className="w-[25px] h-[25px] md:w-[60px] md:h-[60px] rounded-[4px] md:rounded-[10px] bg-[#D9D9D9] transition-all duration-500 ease-in-out group-hover:bg-accent flex items-center justify-center">
       <Image
         src="/images/github.svg"
@@ -36,7 +36,7 @@ const Icons = {
       />
     </div>
   ),
-  instagram: (props: any) => (
+  instagram: () => (
     <div className="w-[25px] h-[25px] md:w-[60px] md:h-[60px] rounded-[4px] md:rounded-[10px] bg-[#D9D9D9] transition-all duration-500 ease-in-out group-hover:bg-accent flex items-center justify-center">
       <Image
         src="/images/instagram.svg"
@@ -107,7 +107,7 @@ export function MouseTrailDemo() {
                
                <div className="flex gap-4 justify-center items-center group">
                  <FlipLink href="https://github.com/nishant0001000/">Github</FlipLink>
-                 <Icons.github fill="red" />
+                 <Icons.github />
                </div>
                <div className="flex gap-4 justify-center items-center group">
                  <Icons.instagram />
@@ -318,7 +318,7 @@ export function MouseTrailDemo() {
                                if (filteredCountries.length === 0) {
                                  return (
                                    <div className="px-3 py-4 text-sm text-center text-gray-500 dark:text-gray-400">
-                                     No countries found matching "{countrySearchTerm}"
+                                     No countries found matching &quot;{countrySearchTerm}&quot;
                                    </div>
                                  )
                                }
