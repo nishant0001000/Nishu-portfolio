@@ -98,7 +98,7 @@ const ResumePopup: React.FC<ResumePopupProps> = ({ isOpen, onClose, pdfUrl }) =>
                                  </svg>
                                </div>
                                <h3 className="mb-2 text-lg font-semibold text-black dark:text-white">Resume Preview Unavailable</h3>
-                               <p className="mb-4 text-sm text-black/70 dark:text-neutral-300">The resume preview couldn't be loaded. Please open in browser to view.</p>
+                               <p className="mb-4 text-sm text-black/70 dark:text-neutral-300">The resume preview couldn&apos;t be loaded. Please open in browser to view.</p>
                                <button
                                  onClick={() => window.open(pdfUrl, '_blank')}
                                  className="flex gap-2 justify-center items-center px-6 py-3 text-sm font-medium text-black rounded-full border backdrop-blur-sm transition-all duration-300 dark:text-white bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 border-black/20 dark:border-white/20"
