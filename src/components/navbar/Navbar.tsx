@@ -1,21 +1,27 @@
 "use client"
 
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import NavPart1 from './NavPart1'
 import NavPart2 from './NavPart2'
 import { CustomColorDemo } from './Navmiddle'
 
 const Navbar = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const handleSearchToggle = (expanded: boolean) => {
     setIsSearchExpanded(expanded);
   };
 
+  const toggleMobileNav = () => {
+    setIsMobileNavOpen(!isMobileNavOpen);
+  };
+
   return (
-    <>
+    <div className="sticky top-0 z-50 bg-transparent navbar-transparent">
       {/* Main navbar */}
-      <div className='relative flex justify-between items-center py-3 px-3 sm:px-6 lg:px-8 xl:px-12 2xl:px-16'>
+      <div className='flex relative justify-between items-center px-3 py-3 bg-transparent sm:px-6 lg:px-8 xl:px-12 2xl:px-16'>
         
         {/* Left side - Logo */}
         <div className="flex-shrink-0">
@@ -37,21 +43,107 @@ const Navbar = () => {
         </div>
       </div>
       
-      {/* Mobile Navmiddle - fixed bottom navigation with liquid glass */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="flex justify-center py-3">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              <div className="relative p-1">
-                <CustomColorDemo />
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Mobile Navigation - Circle with Logo */}
+      <div className="fixed bottom-6 right-7 z-50 sm:hidden">
+        <motion.button
+          onClick={toggleMobileNav}
+          whileTap={{ scale: 0.9 }}
+          animate={{
+            scale: isMobileNavOpen ? 1.1 : 1,
+            rotate: isMobileNavOpen ? 360 : 0
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 20
+          }}
+                     className="flex relative justify-center items-center pt-2 w-12 h-12 bg-white rounded-full backdrop-blur-md dark:bg-black"
+        >
+          {/* Logo */}
+          <div className="w-8 h-8">
+            <video 
+              src="/videos/m-logolight1.mp4"
+              width={32} 
+              height={32}
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              className="rounded-full dark:hidden"
+            />
+            <video 
+              src="/videos/m-logodark1.mp4"
+              width={32} 
+              height={32}
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              className="hidden rounded-full dark:block"
+            />
+                     </div>
+         </motion.button>
+
+        {/* Nav Middle Panel */}
+        <AnimatePresence>
+          {isMobileNavOpen && (
+                         <motion.div
+               initial={{ 
+                 scale: 0,
+                 opacity: 0,
+                 y: 50,
+                 borderRadius: "50%"
+               }}
+               animate={{ 
+                 scale: 1,
+                 opacity: 1,
+                 y: 0,
+                 borderRadius: "16px"
+               }}
+               exit={{ 
+                 scale: 0,
+                 opacity: 0,
+                 y: 50,
+                 borderRadius: "50%"
+               }}
+               transition={{
+                 type: "spring",
+                 stiffness: 200,
+                 damping: 15,
+                 mass: 0.8
+               }}
+               className="fixed bottom-4 left-1/2 z-40 transform -translate-x-1/2"
+             >
+                               <motion.div 
+                  className="relative"
+                  initial={{ 
+                    scale: 0.3
+                  }}
+                  animate={{ 
+                    scale: 1
+                  }}
+                  exit={{ 
+                    scale: 0.3
+                  }}
+                  transition={{ 
+                    delay: 0.2, 
+                    type: "spring", 
+                    stiffness: 150,
+                    damping: 12
+                  }}
+                >
+                
+                  <div className="absolute inset-0"></div>
+                  <div className="relative p-3">
+                    <CustomColorDemo />
+                  </div>
+                
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </>
+    </div>
   )
 }
 

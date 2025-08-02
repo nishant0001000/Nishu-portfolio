@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion"
 
 import { Badge } from "@/components/ui/badge"
 import { SlideButton } from "./SlideButton"
+
 import { cn } from "@/lib/utils"
 
 import { FlipLink } from "../ui/text-effect-flipper"
@@ -83,7 +84,7 @@ export function MouseTrailDemo() {
   }, [])
 
   return (
-         <div className="grid grid-cols-1 gap-8 px-4 pb-40 mx-auto my-20 max-w-7xl md:grid-cols-2">
+         <div className="grid grid-cols-1 gap-8 px-4 pb-4 mx-auto my-20 max-w-7xl md:grid-cols-2">
       {/* Left Column - Original FlipLink Style */}
       <section className="h-4xl mx-auto w-full rounded-[24px] border border-black/5 p-2 shadow-sm dark:border-white/5 md:rounded-t-[44px]">
         <div className="relative mx-auto w-full rounded-[24px] border border-black/5 bg-neutral-800/5 shadow-sm dark:border-white/5 md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px]">
@@ -118,9 +119,9 @@ export function MouseTrailDemo() {
       </section>
 
       {/* Right Column - Contact Form */}
-      <section className="flex flex-col justify-center">
-        <div className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm rounded-[24px] border border-black/10 dark:border-white/10 p-8 shadow-lg">
-          <h3 className="mb-6 text-2xl font-semibold text-center text-black dark:text-white">
+      <section className="h-4xl mx-auto w-full rounded-[24px] border border-black/5 p-2 shadow-sm dark:border-white/5 md:rounded-t-[44px]">
+        <div className="relative mx-auto w-full rounded-[24px] border border-black/5 bg-white/80 dark:bg-neutral-800/5 backdrop-blur-sm shadow-sm dark:border-white/5 md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px] p-8">
+          <h3 className="p-8 mb-6 text-2xl font-semibold text-center text-black border-b dark:text-white border-black/10 dark:border-white/10">
             Get In Touch
           </h3>
           
@@ -757,6 +758,8 @@ export function MouseTrailDemo() {
           </form>
         </div>
       </section>
+    
     </div>
+    
   )
 }

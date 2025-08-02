@@ -13,11 +13,11 @@ const textureCard = "/images/card6.webp"
 
 export function SpecialCard() {
   return (
-    <section className="relative my-14 w-full overflow-hidden " id="features">
-      <div className=" p-2">
-        <div className="mb-8 mx-auto pt-4 md:container">
-          <div className=" mx-auto">
-            <div className="flex w-full items-center justify-center">
+    <section className="overflow-hidden relative my-14 w-full" id="features">
+      <div className="p-2">
+        <div className="pt-4 mx-auto mb-8 md:container">
+          <div className="mx-auto">
+            <div className="flex justify-center items-center w-full">
               <Badge
                 variant="outline"
                 className="mb-8 rounded-[14px] border border-black/10 bg-white text-base dark:border dark:border-white/10 dark:bg-transparent md:left-6"

@@ -61,13 +61,13 @@ function FeatureCard({
     >
       <div
         className={cn(
-          "group relative w-full overflow-hidden rounded-3xl border border-black/10  bg-gradient-to-b from-neutral-900/90 to-stone-800 transition duration-300 dark:from-neutral-950/90 dark:to-neutral-800/90",
+          "overflow-hidden relative w-full bg-gradient-to-b rounded-3xl border transition duration-300 group border-black/10 from-neutral-900/90 to-stone-800 dark:from-neutral-950/90 dark:to-neutral-800/90",
           "md:hover:border-transparent",
           bgClass
         )}
       >
         <div className="m-10 min-h-[550px] w-full">
-          <div className="flex w-4/6 flex-col gap-3">
+          <div className="flex flex-col gap-3 w-4/6">
             <h2 className="text-xl font-bold tracking-tight text-white md:text-2xl">
               {title}
             </h2>
@@ -226,13 +226,13 @@ export function SkiperCard({
             maxWidth: "unset",
           }}
         />
-        <div className="absolute left-48 top-5 z-50 size-full cursor-pointer md:left-0">
+        <div className="absolute top-5 left-48 z-50 cursor-pointer size-full md:left-0">
           <Steps current={step} onChange={() => {}} steps={steps} />
         </div>
       </>
 
       <div
-        className="absolute right-0 top-0 z-50 size-full cursor-pointer md:left-0"
+        className="absolute top-0 right-0 z-50 cursor-pointer size-full md:left-0"
         onClick={() => increment()}
       />
     </FeatureCard>
@@ -261,9 +261,9 @@ interface StepsProps {
 
 export function Steps({ steps, current, onChange }: StepsProps) {
   return (
-    <nav aria-label="Progress" className="flex justify-center px-4 ">
+    <nav aria-label="Progress" className="flex justify-center px-4">
       <ol
-        className="flex w-full flex-wrap items-start justify-start gap-2  sm:justify-center md:w-10/12 md:divide-y-0"
+        className="flex flex-wrap gap-2 justify-start items-start w-full sm:justify-center md:w-10/12 md:divide-y-0"
         role="list"
       >
         {steps.map((step, stepIdx) => {
@@ -273,7 +273,7 @@ export function Steps({ steps, current, onChange }: StepsProps) {
           return (
             <li
               className={cn(
-                "relative z-50 rounded-full px-3 py-1  transition-all duration-300 ease-in-out md:flex",
+                "relative z-50 px-3 py-1 rounded-full transition-all duration-300 ease-in-out md:flex",
                 isCompleted ? "bg-neutral-500/20" : "bg-neutral-500/10"
               )}
               key={`${step.name}-${stepIdx}`}
@@ -285,7 +285,7 @@ export function Steps({ steps, current, onChange }: StepsProps) {
                 )}
                 onClick={() => onChange(stepIdx)}
               >
-                <span className="flex items-center gap-2 text-sm font-medium">
+                <span className="flex gap-2 items-center text-sm font-medium">
                   <span
                     className={cn(
                       "flex shrink-0 items-center justify-center rounded-full duration-300",

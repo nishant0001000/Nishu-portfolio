@@ -84,7 +84,7 @@ export const CardCarousel: React.FC<CarouselProps> = ({
     <section className="w-full">
       <style>{css}</style>
              <div className="mx-auto w-full max-w-4xl rounded-[24px] border border-gary/5 p-2 shadow-sm md:rounded-t-[44px] sm:max-w-5xl">
-         <div className="relative mx-auto flex w-full flex-col rounded-[24px] border border-[#0c0c0c] bg-[#0c0c0c] p-2 shadow-sm md:items-start md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px] md:p-2">
+         <div className="relative mx-auto flex w-full flex-col rounded-[24px] border border-black/5 bg-white dark:bg-[#0c0c0c] dark:border-white/20 p-2 shadow-sm md:items-start md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px] md:p-2">
                      <Badge
              variant="outline"
              className="absolute left-4 top-6 rounded-[14px] border border-black/10 text-base md:left-6"

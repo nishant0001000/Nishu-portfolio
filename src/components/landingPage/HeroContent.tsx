@@ -19,8 +19,8 @@ const HeroContent = () => {
 
   return (
     <>
-    <div className="relative overflow-hidden flex flex-col items-center py-8 sm:py-12 lg:py-16 w-full">
-    <div className="w-full flex justify-center">
+    <div className="flex overflow-hidden relative flex-col items-center py-8 w-full sm:py-12 lg:py-16">
+    <div className="flex justify-center w-full">
         <WrapButton className="mt-6 sm:mt-8 lg:mt-10" href="/docs/components/card-carousel" >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse sm:w-6 sm:h-6">
                 <circle cx="12" cy="8" r="5"/>
@@ -29,11 +29,11 @@ const HeroContent = () => {
             <span className="text-sm sm:text-base">Founder Of Cybershoora</span>
         </WrapButton>
     </div>
-      <h3 className="text-black dark:text-white leading-tight text-2xl sm:text-3xl lg:text-4xl font-bold mt-20 sm:mt-32 lg:mt-40 text-center px-4">
+      <h3 className="px-4 mt-20 text-2xl font-bold leading-tight text-center text-black dark:text-white sm:text-3xl lg:text-4xl sm:mt-32 lg:mt-40">
         Welcome to My P<span className="inline-block animate-bounce" style={{animation: 'shy 2s infinite'}}>🫣</span>rtfolio
       </h3>
       <h1 className="text-black dark:text-white text-3xl sm:text-4xl md:text-5xl lg:text-[5.4rem] font-bold text-center px-4">Nishant<span className="inline-block text-red-500" style={{animation: 'heartbeat 1s infinite'}}>❤️</span>Mogahaa</h1>
-             <div className="w-full flex justify-center">
+             <div className="flex justify-center w-full">
          <WrapButton onClick={handleOpenResume} className="mt-6 sm:mt-8 lg:mt-10">
              View Resume
          </WrapButton>
@@ -52,7 +52,7 @@ const HeroContent = () => {
         <path d="M48.101 37.7616C46.7404 38.8232 45.8267 40.2814 44.9163 41.7109C44.0407 43.0866 43.1365 44.4592 41.738 45.3434C42.1247 45.5019 42.5146 45.6321 42.9014 45.7908C42.1324 41.8051 41.04 37.8699 39.6781 34.0203C39.545 33.6589 39.0695 33.5191 38.7365 33.6553C38.3719 33.817 38.2385 34.2353 38.3716 34.5969C39.7209 38.3007 40.7404 42.1121 41.4904 46.009C41.6012 46.5703 42.1877 46.7512 42.6539 46.4565C45.5462 44.6124 46.3877 40.9506 49.0169 38.8748C49.7178 38.2884 48.8304 37.1784 48.101 37.7616ZM25.9671 13.1014C25.7028 16.2497 26.0758 19.3824 26.5091 22.4929C26.9645 25.6636 27.4166 28.863 27.872 32.0337C28.1346 33.8253 28.3971 35.6167 28.631 37.4051C28.7607 38.3151 30.1717 38.0968 30.042 37.1868C29.5866 34.016 29.1281 30.8738 28.7012 27.7062C28.2647 24.6242 27.7396 21.5612 27.449 18.4666C27.2943 16.7449 27.2283 15.0042 27.3653 13.2572C27.4671 12.3442 26.0404 12.1851 25.9671 13.1014Z"></path>
         <path d="M30.5625 27.3357C29.9525 30.7343 29.3425 34.133 28.704 37.5284C29.1225 37.4018 29.5411 37.2751 29.9882 37.1516C28.6034 35.0617 27.2504 32.9465 25.8655 30.8565C25.6406 30.5425 25.1523 30.517 24.8669 30.7451C24.5497 30.9987 24.5305 31.4299 24.7555 31.7439C26.1403 33.8338 27.4933 35.9491 28.8781 38.039C29.2489 38.6003 30.0417 38.2265 30.1624 37.6621C30.7724 34.2635 31.3824 30.8648 32.0209 27.4694C32.0908 27.1016 31.758 26.7178 31.3871 26.6765C30.9559 26.6573 30.6324 26.9679 30.5625 27.3357Z"></path>
       </svg>
-      <p className="font-bold text-black dark:text-white text-base sm:text-lg lg:text-xl text-center px-4">
+      <p className="px-4 text-base font-bold text-center text-black dark:text-white sm:text-lg lg:text-xl">
         Your {" "}
         <span className="font-bold text-orange-500">Full Stack Developer, Graphic Designer, AI Developer, UI/UX Designer and ML Engineer</span>
       </p>

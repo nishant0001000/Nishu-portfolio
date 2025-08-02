@@ -184,7 +184,7 @@ const TemplateCard = () => {
 
             <div className="mx-auto w-full max-w-7xl rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] border border-white/20 p-1 sm:p-2 shadow-sm md:rounded-t-[32px] lg:md:rounded-t-[44px]">
 
-                <div className="relative mx-auto flex w-full flex-col rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] border border-black/5 bg-[#21212156] p-1 sm:p-2 shadow-sm md:items-start md:gap-6 lg:md:gap-8 md:rounded-b-[16px] lg:md:rounded-b-[20px] md:rounded-t-[32px] lg:md:rounded-t-[40px]">
+                <div className="relative mx-auto flex w-full flex-col rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] border border-black/5 bg-white dark:bg-[#21212156] p-1 sm:p-2 shadow-sm md:items-start md:gap-6 lg:md:gap-8 md:rounded-b-[16px] lg:md:rounded-b-[20px] md:rounded-t-[32px] lg:md:rounded-t-[40px]">
 
                     <Badge
                         variant="outline"
@@ -336,7 +336,7 @@ const TemplateCard = () => {
                     </div>
 
                     {/* Custom Draggable Scrollbar - Right Side */}
-                    <div className="hidden absolute bottom-6 right-8 top-32 w-2 rounded-full sm:right-8 lg:right-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 bg-white/10 dark:bg-black/10 sm:block">
+                    <div className="hidden absolute bottom-6 right-8 top-32 w-2 bg-gray-100 rounded-full sm:right-8 lg:right-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 dark:bg-black/10 sm:block">
                         <div
                             ref={scrollbarRef}
                             className="w-8 h-8 bg-gradient-to-br rounded-full border shadow-lg backdrop-blur-sm transition-all duration-300 cursor-pointer sm:w-10 sm:h-10 lg:w-12 lg:h-12 from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 border-white/20 hover:shadow-xl group"
@@ -366,7 +366,7 @@ const TemplateCard = () => {
                     </div>
 
                     {/* Custom Draggable Scrollbar - Left Side */}
-                    <div className="hidden absolute bottom-6 left-8 top-32 w-2 rounded-full sm:left-8 lg:left-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 bg-white/10 dark:bg-black/10 sm:block">
+                    <div className="hidden absolute bottom-6 left-8 top-32 w-2 bg-gray-100 rounded-full sm:left-8 lg:left-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 dark:bg-black/10 sm:block">
                         <div
                             className="w-8 h-8 bg-gradient-to-br rounded-full border shadow-lg backdrop-blur-sm transition-all duration-300 cursor-pointer sm:w-10 sm:h-10 lg:w-12 lg:h-12 from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 border-white/20 hover:shadow-xl group"
                             style={{

@@ -45,7 +45,12 @@ type StatusIconProps = {
 const StatusIcon: React.FC<StatusIconProps> = ({ status }) => {
   const iconMap: Record<StatusIconProps["status"], JSX.Element> = useMemo(
     () => ({
-      loading: <Loader2 className="animate-spin" size={20} />,
+      loading: (
+        <div className="flex gap-2 items-center">
+          <span className="text-sm">sending</span>
+          <Loader2 className="animate-spin" size={20} />
+        </div>
+      ),
       success: <Check size={20} />,
       error: <X size={20} />,
     }),
@@ -125,11 +130,23 @@ const SlideButton = forwardRef<HTMLButtonElement, React.ComponentProps<typeof Bu
 
     const adjustedWidth = useTransform(springX, (x) => x + 10)
 
+    // Get button text based on status
+    const getButtonText = () => {
+      if (completed) {
+        if (status === "loading") return ""
+        if (status === "success") return ""
+        if (status === "error") return "error"
+        return ""
+      }
+      if (isDragging) return "sending"
+      return "slide to send"
+    }
+
     return (
       <motion.div
         animate={completed ? BUTTON_STATES.completed : BUTTON_STATES.initial}
         transition={ANIMATION_CONFIG.spring}
-        className="shadow-button-inset dark:shadow-button-inset-dark relative flex h-9 items-center justify-center rounded-full bg-gray-100"
+        className="flex relative justify-center items-center h-9 bg-gray-100 rounded-full shadow-button-inset dark:shadow-button-inset-dark"
       >
         {!completed && (
           <motion.div
@@ -139,6 +156,21 @@ const SlideButton = forwardRef<HTMLButtonElement, React.ComponentProps<typeof Bu
             className="absolute inset-y-0 left-0 z-0 rounded-full bg-accent"
           />
         )}
+        
+        {/* Text display */}
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={getButtonText()}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.2 }}
+            className="absolute text-sm font-medium text-gray-500 pointer-events-none z-5 dark:text-gray-400"
+          >
+            {getButtonText()}
+          </motion.span>
+        </AnimatePresence>
+
         <AnimatePresence>
           {!completed && (
             <motion.div
@@ -151,7 +183,7 @@ const SlideButton = forwardRef<HTMLButtonElement, React.ComponentProps<typeof Bu
               onDragEnd={handleDragEnd}
               onDrag={handleDrag}
               style={{ x: springX }}
-              className="absolute -left-4 z-10 flex cursor-grab items-center justify-start active:cursor-grabbing"
+              className="flex absolute -left-4 z-10 justify-start items-center cursor-grab active:cursor-grabbing"
             >
               <Button
                 ref={ref}
@@ -173,7 +205,7 @@ const SlideButton = forwardRef<HTMLButtonElement, React.ComponentProps<typeof Bu
         <AnimatePresence>
           {completed && (
             <motion.div
-              className="absolute inset-0 flex items-center justify-center"
+              className="flex absolute inset-0 justify-center items-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -183,7 +215,7 @@ const SlideButton = forwardRef<HTMLButtonElement, React.ComponentProps<typeof Bu
                 disabled={status === "loading"}
                 {...props}
                 className={cn(
-                  "size-full rounded-full transition-all duration-300",
+                  "rounded-full transition-all duration-300 size-full",
                   className
                 )}
               >

@@ -7,20 +7,20 @@ import { TextScrollDemo } from '@/components/homeCards/TextScroll'
 import { MouseTrailDemo } from '@/components/homeCards/FlipLink'
 import HeroContent from '@/components/landingPage/HeroContent'
 import Navbar from '@/components/navbar/Navbar'
+import { Footer } from '@/components/footer/footer'
 import React from 'react'
 
 const page = () => {
   return (
     <div className="overflow-x-hidden min-h-screen bg-white dark:bg-black">
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <Navbar />
+       
         <HeroContent />
         <CardCarouselParent />
         <TemplateCard />
         <SpecialCard />
         <AiInputCard />
-        <TextScrollDemo/>
-        <MouseTrailDemo/>
+    
       </div>
     </div>
   )

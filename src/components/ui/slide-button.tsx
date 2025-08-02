@@ -19,7 +19,7 @@ import {
 import { Check, Loader2, SendHorizontal, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Button, ButtonProps } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 
 const DRAG_CONSTRAINTS = { left: 0, right: 155 }
 const DRAG_THRESHOLD = 0.9
@@ -31,7 +31,7 @@ const BUTTON_STATES = {
 
 const ANIMATION_CONFIG = {
   spring: {
-    type: "spring",
+    type: "spring" as const,
     stiffness: 400,
     damping: 40,
     mass: 0.8,
@@ -81,7 +81,7 @@ const useButtonStatus = (resolveTo: "success" | "error") => {
   return { status, handleSubmit }
 }
 
-const SlideButton = forwardRef<HTMLButtonElement, ButtonProps>(
+const SlideButton = forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>>(
   ({ className, ...props }, ref) => {
     const [isDragging, setIsDragging] = useState(false)
     const [completed, setCompleted] = useState(false)
@@ -201,4 +201,4 @@ const SlideButton = forwardRef<HTMLButtonElement, ButtonProps>(
 
 SlideButton.displayName = "SlideButton"
 
-export SlideButton
+export { SlideButton }
