@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import NavPart1 from './NavPart1'
 import NavPart2 from './NavPart2'
@@ -9,6 +9,26 @@ import { CustomColorDemo } from './Navmiddle'
 const Navbar = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+
+  // Quotes array
+  const quotes = [
+    "Click for nav",
+    "Explore more",
+    "Discover features",
+    "Open menu",
+    "Navigation here",
+    "Tap to expand"
+  ];
+
+  // Rotate quotes every 2 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [quotes.length]);
 
   const handleSearchToggle = (expanded: boolean) => {
     setIsSearchExpanded(expanded);
@@ -57,7 +77,7 @@ const Navbar = () => {
             stiffness: 300,
             damping: 20
           }}
-                     className="flex relative justify-center items-center pt-2 w-12 h-12 bg-white rounded-full backdrop-blur-md dark:bg-black"
+          className="flex relative justify-center items-center pt-2 w-12 h-12 bg-white rounded-full backdrop-blur-md dark:bg-black"
         >
           {/* Logo */}
           <div className="w-8 h-8">
@@ -81,63 +101,77 @@ const Navbar = () => {
               playsInline
               className="hidden rounded-full dark:block"
             />
-                     </div>
-         </motion.button>
+          </div>
+        </motion.button>
+
+        {/* Rotating Quote Text */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentQuoteIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="absolute -top-12 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
+          >
+            <span className="text-xs font-medium text-white dark:text-black bg-gray-600 dark:bg-white px-2 py-1 rounded-full backdrop-blur-sm">
+              {quotes[currentQuoteIndex]}
+            </span>
+          </motion.div>
+        </AnimatePresence>
 
         {/* Nav Middle Panel */}
         <AnimatePresence>
           {isMobileNavOpen && (
-                         <motion.div
-               initial={{ 
-                 scale: 0,
-                 opacity: 0,
-                 y: 50,
-                 borderRadius: "50%"
-               }}
-               animate={{ 
-                 scale: 1,
-                 opacity: 1,
-                 y: 0,
-                 borderRadius: "16px"
-               }}
-               exit={{ 
-                 scale: 0,
-                 opacity: 0,
-                 y: 50,
-                 borderRadius: "50%"
-               }}
-               transition={{
-                 type: "spring",
-                 stiffness: 200,
-                 damping: 15,
-                 mass: 0.8
-               }}
-               className="fixed bottom-4 left-1/2 z-40 transform -translate-x-1/2"
-             >
-                               <motion.div 
-                  className="relative"
-                  initial={{ 
-                    scale: 0.3
-                  }}
-                  animate={{ 
-                    scale: 1
-                  }}
-                  exit={{ 
-                    scale: 0.3
-                  }}
-                  transition={{ 
-                    delay: 0.2, 
-                    type: "spring", 
-                    stiffness: 150,
-                    damping: 12
-                  }}
-                >
-                
-                  <div className="absolute inset-0"></div>
-                  <div className="relative p-3">
-                    <CustomColorDemo />
-                  </div>
-                
+            <motion.div
+              initial={{ 
+                scale: 0,
+                opacity: 0,
+                y: 50,
+                borderRadius: "50%"
+              }}
+              animate={{ 
+                scale: 1,
+                opacity: 1,
+                y: 0,
+                borderRadius: "16px"
+              }}
+              exit={{ 
+                scale: 0,
+                opacity: 0,
+                y: 50,
+                borderRadius: "50%"
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 200,
+                damping: 15,
+                mass: 0.8
+              }}
+              className="fixed bottom-4 left-1/2 z-40 transform -translate-x-1/2"
+            >
+              <motion.div 
+                className="relative"
+                initial={{ 
+                  scale: 0.3
+                }}
+                animate={{ 
+                  scale: 1
+                }}
+                exit={{ 
+                  scale: 0.3
+                }}
+                transition={{ 
+                  delay: 0.2, 
+                  type: "spring", 
+                  stiffness: 150,
+                  damping: 12
+                }}
+              >
+                <div className="absolute inset-0"></div>
+                <div className="relative p-3">
+                  <CustomColorDemo />
+                </div>
               </motion.div>
             </motion.div>
           )}
