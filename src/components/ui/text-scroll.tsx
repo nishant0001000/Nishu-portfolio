@@ -32,7 +32,7 @@ export const wrap = (min: number, max: number, v: number) => {
 
 export const TextScroll: React.FC<TextScrollProps> = ({
   text,
-  default_velocity = 1,
+  default_velocity = 5,
   className,
 }) => {
   const ParallaxText: React.FC<ParallaxProps> = ({
@@ -106,7 +106,7 @@ export const TextScroll: React.FC<TextScrollProps> = ({
   }
 
   return (
-    <section className="relative px-0 -mx-8 w-screen min-w-screen max-w-screen">
+    <section className="relative w-full">
       <ParallaxText baseVelocity={default_velocity} className={className}>
         {text}
       </ParallaxText>

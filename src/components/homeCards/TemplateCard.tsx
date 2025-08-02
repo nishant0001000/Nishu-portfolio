@@ -10,6 +10,7 @@ const TemplateCard = () => {
     const scrollbarRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [scrollbarPosition, setScrollbarPosition] = useState(0);
+    const [horizontalScrollProgress, setHorizontalScrollProgress] = useState(0);
 
 
 
@@ -61,21 +62,33 @@ const TemplateCard = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (scrollContainerRef.current && scrollbarRef.current) {
-                const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
-                const maxScroll = scrollHeight - clientHeight;
-                const scrollPercentage = maxScroll > 0 ? scrollTop / maxScroll : 0;
+            if (scrollContainerRef.current) {
+                const { scrollTop, scrollHeight, clientHeight, scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+                
+                // Handle vertical scrolling for desktop
+                if (scrollbarRef.current) {
+                    const maxScroll = scrollHeight - clientHeight;
+                    const scrollPercentage = maxScroll > 0 ? scrollTop / maxScroll : 0;
 
-                const scrollbarTrack = scrollbarRef.current.parentElement;
-                if (scrollbarTrack) {
-                    const trackHeight = scrollbarTrack.clientHeight;
-                    const scrollbarHeight = 48; // Fixed height for scrollbar
-                    const maxScrollbarTop = trackHeight - scrollbarHeight;
-                    const newScrollbarTop = scrollPercentage * maxScrollbarTop;
+                    const scrollbarTrack = scrollbarRef.current.parentElement;
+                    if (scrollbarTrack) {
+                        const trackHeight = scrollbarTrack.clientHeight;
+                        const scrollbarHeight = 48; // Fixed height for scrollbar
+                        const maxScrollbarTop = trackHeight - scrollbarHeight;
+                        const newScrollbarTop = scrollPercentage * maxScrollbarTop;
 
-                    // Immediate position update for better responsiveness
-                    setScrollbarPosition(newScrollbarTop);
+                        // Immediate position update for better responsiveness
+                        setScrollbarPosition(newScrollbarTop);
+                    }
                 }
+
+                // Handle horizontal scrolling for mobile
+                const maxHorizontalScroll = scrollWidth - clientWidth;
+                const horizontalScrollPercentage = maxHorizontalScroll > 0 ? scrollLeft / maxHorizontalScroll : 0;
+                // Invert direction: when cards scroll left, logo moves right
+                const invertedProgress = 100 - (horizontalScrollPercentage * 100);
+                setHorizontalScrollProgress(invertedProgress);
+
             }
         };
 
@@ -193,7 +206,7 @@ const TemplateCard = () => {
                     </div>
                     <div
                         ref={scrollContainerRef}
-                        className="flex flex-nowrap sm:flex-wrap items-center justify-start sm:justify-center gap-2 sm:gap-3 lg:gap-4 max-h-[800px] sm:max-h-[1000px] lg:max-h-[1200px] overflow-x-auto sm:overflow-y-auto [&::-webkit-scrollbar]:hidden scroll-smooth px-4 sm:px-6 lg:px-8"
+                        className="flex flex-nowrap sm:flex-wrap items-center justify-start sm:justify-center gap-2 sm:gap-3 lg:gap-4 max-h-[800px] sm:max-h-[1000px] lg:max-h-[1200px] overflow-x-auto sm:overflow-y-auto scroll-smooth px-4 sm:px-6 lg:px-8 [&::-webkit-scrollbar]:hidden"
                         style={{
                             scrollbarWidth: 'none',
                             msOverflowStyle: 'none',
@@ -237,8 +250,93 @@ const TemplateCard = () => {
                         ))}
                     </div>
 
+                    {/* Simple Horizontal Scrollbar for Mobile */}
+                    <div className="block px-4 mt-4 sm:hidden">
+                        <div className="relative w-full h-12">
+                            {/* Logo handle */}
+                            <div
+                                className="absolute top-2 w-8 h-8 bg-gradient-to-r from-[#000000] to-[#000000] rounded-full cursor-pointer hover:from-[#D4A5C7] hover:to-[#EEBDE0] transition-all duration-300 shadow-sm hover:shadow-md"
+                                style={{
+                                    left: `${Math.max(0, Math.min(horizontalScrollProgress, 100 - 8))}%`
+                                }}
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    
+                                    const scrollbarTrack = e.currentTarget.parentElement;
+                                    if (!scrollbarTrack || !scrollContainerRef.current) return;
+                                    
+                                    const trackRect = scrollbarTrack.getBoundingClientRect();
+                                    const logoWidth = 32; // 8 * 4 (w-8 = 32px)
+                                    
+                                    const handleMouseMove = (e: MouseEvent) => {
+                                        const mouseX = e.clientX - trackRect.left;
+                                        const maxScrollbarLeft = trackRect.width - logoWidth;
+                                        const newScrollbarLeft = Math.max(0, Math.min(mouseX - logoWidth / 2, maxScrollbarLeft));
+                                        
+                                        // Invert the scroll direction to match logo movement
+                                        const scrollPercentage = 1 - (newScrollbarLeft / maxScrollbarLeft);
+                                        const maxScroll = scrollContainerRef.current!.scrollWidth - scrollContainerRef.current!.clientWidth;
+                                        scrollContainerRef.current!.scrollLeft = scrollPercentage * maxScroll;
+                                    };
+                                    
+                                    const handleMouseUp = () => {
+                                        document.removeEventListener('mousemove', handleMouseMove);
+                                        document.removeEventListener('mouseup', handleMouseUp);
+                                    };
+                                    
+                                    document.addEventListener('mousemove', handleMouseMove);
+                                    document.addEventListener('mouseup', handleMouseUp);
+                                }}
+                                onTouchStart={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    
+                                    const scrollbarTrack = e.currentTarget.parentElement;
+                                    if (!scrollbarTrack || !scrollContainerRef.current) return;
+                                    
+                                    const trackRect = scrollbarTrack.getBoundingClientRect();
+                                    const logoWidth = 32; // 8 * 4 (w-8 = 32px)
+                                    
+                                    const handleTouchMove = (e: TouchEvent) => {
+                                        e.preventDefault();
+                                        const touchX = e.touches[0].clientX - trackRect.left;
+                                        const maxScrollbarLeft = trackRect.width - logoWidth;
+                                        const newScrollbarLeft = Math.max(0, Math.min(touchX - logoWidth / 2, maxScrollbarLeft));
+                                        
+                                        // Invert the scroll direction to match logo movement
+                                        const scrollPercentage = 1 - (newScrollbarLeft / maxScrollbarLeft);
+                                        const maxScroll = scrollContainerRef.current!.scrollWidth - scrollContainerRef.current!.clientWidth;
+                                        scrollContainerRef.current!.scrollLeft = scrollPercentage * maxScroll;
+                                    };
+                                    
+                                    const handleTouchEnd = () => {
+                                        document.removeEventListener('touchmove', handleTouchMove);
+                                        document.removeEventListener('touchend', handleTouchEnd);
+                                    };
+                                    
+                                    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+                                    document.addEventListener('touchend', handleTouchEnd);
+                                }}
+                            >
+                                <div className="flex justify-center items-center w-full h-full">
+                                    <video
+                                        src="/videos/m-logo.mp4"
+                                        width={28}
+                                        height={28}
+                                        autoPlay
+                                        loop
+                                        muted
+                                        playsInline
+                                        className="rounded-lg"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Custom Draggable Scrollbar - Right Side */}
-                    <div className="hidden absolute bottom-6 right-8 top-32 w-2 rounded-full sm:right-8 lg:right-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 bg-white/5 sm:block">
+                    <div className="hidden absolute bottom-6 right-8 top-32 w-2 rounded-full sm:right-8 lg:right-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 bg-white/10 dark:bg-black/10 sm:block">
                         <div
                             ref={scrollbarRef}
                             className="w-8 h-8 bg-gradient-to-br rounded-full border shadow-lg backdrop-blur-sm transition-all duration-300 cursor-pointer sm:w-10 sm:h-10 lg:w-12 lg:h-12 from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 border-white/20 hover:shadow-xl group"
@@ -250,8 +348,17 @@ const TemplateCard = () => {
                             }}
                             onMouseDown={handleMouseDown}
                         >
-                            <div className="flex overflow-hidden relative justify-center items-center w-full h-full rounded-full">
-                                <img src="/images/m-logo.svg" alt="Logo" className="relative z-10 w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7" />
+                            <div className="flex overflow-hidden relative justify-center items-center w-full h-full bg-black rounded-full">
+                                <video
+                                    src="/videos/m-logo.mp4"
+                                    width={35}
+                                    height={35}
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    className={`rounded-lg`}
+                                />
                                 {/* Shimmer Effect */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent transition-transform duration-1000 ease-out -translate-x-full via-white/20 group-hover:translate-x-full"></div>
                             </div>
@@ -259,7 +366,7 @@ const TemplateCard = () => {
                     </div>
 
                     {/* Custom Draggable Scrollbar - Left Side */}
-                    <div className="hidden absolute bottom-6 left-8 top-32 w-2 rounded-full sm:left-8 lg:left-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 bg-white/5 sm:block">
+                    <div className="hidden absolute bottom-6 left-8 top-32 w-2 rounded-full sm:left-8 lg:left-8 sm:top-36 lg:top-40 sm:bottom-8 lg:bottom-10 sm:w-3 bg-white/10 dark:bg-black/10 sm:block">
                         <div
                             className="w-8 h-8 bg-gradient-to-br rounded-full border shadow-lg backdrop-blur-sm transition-all duration-300 cursor-pointer sm:w-10 sm:h-10 lg:w-12 lg:h-12 from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 border-white/20 hover:shadow-xl group"
                             style={{
@@ -270,8 +377,17 @@ const TemplateCard = () => {
                             }}
                             onMouseDown={handleMouseDown}
                         >
-                            <div className="flex overflow-hidden relative justify-center items-center w-full h-full rounded-full">
-                                <img src="/images/m-logo.svg" alt="Logo" className="relative z-10 w-4 h-4 sm:w-5 sm:h-5 lg:w-7 lg:h-7" />
+                             <div className="flex overflow-hidden relative justify-center items-center w-full h-full bg-black rounded-full">
+                                <video
+                                    src="/videos/m-logo.mp4"
+                                    width={35}
+                                    height={35}
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    className={`rounded-lg`}
+                                />
                                 {/* Shimmer Effect */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent transition-transform duration-1000 ease-out -translate-x-full via-white/20 group-hover:translate-x-full"></div>
                             </div>

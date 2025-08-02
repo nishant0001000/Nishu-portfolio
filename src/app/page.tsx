@@ -4,6 +4,7 @@ import CardCarouselParent from '@/components/homeCards/CardCarouselParent'
 import { SpecialCard } from '@/components/homeCards/SpecialCard'
 import TemplateCard from '@/components/homeCards/TemplateCard'
 import { TextScrollDemo } from '@/components/homeCards/TextScroll'
+import { MouseTrailDemo } from '@/components/homeCards/FlipLink'
 import HeroContent from '@/components/landingPage/HeroContent'
 import Navbar from '@/components/navbar/Navbar'
 import React from 'react'
@@ -19,6 +20,7 @@ const page = () => {
         <SpecialCard />
         <AiInputCard />
         <TextScrollDemo/>
+        <MouseTrailDemo/>
       </div>
     </div>
   )

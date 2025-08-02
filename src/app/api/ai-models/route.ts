@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     console.log('🔍 AI Models API Request:', message, 'Model:', modelType);
     
     // OpenRouter API Key
-    const openRouterKey = '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';
+    const openRouterKey = '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';
     
     console.log('🔑 OpenRouter API Key exists:', !!openRouterKey);
     console.log('🔑 OpenRouter API Key length:', openRouterKey?.length);
@@ -44,11 +44,11 @@ export async function POST(request: NextRequest) {
     let modelName, modelDisplayName;
 
     if (modelType === 'perplexity') {
-      // Perplexity model via OpenRouter
-      modelName = 'perplexity/sonar-deep-research';
+      // Free model for deep research
+      modelName = 'mistralai/mistral-7b-instruct:free';
       modelDisplayName = 'Nishu 2.0 (Deep Research)';
     } else {
-      // Mistral model via OpenRouter
+      // Free model for general AI
       modelName = 'mistralai/mistral-7b-instruct:free';
       modelDisplayName = 'Nishu AI';
     }
@@ -68,6 +68,8 @@ export async function POST(request: NextRequest) {
       top_p: 0.9
     });
 
+
+
     console.log('✅ OpenRouter API Success:', {
       tokens: completion.usage?.total_tokens,
       model: completion.model,
@@ -84,6 +86,11 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('AI Models API Server Error:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace',
+      name: error instanceof Error ? error.name : 'Unknown error type'
+    });
     return NextResponse.json(
       { 
         success: false,
