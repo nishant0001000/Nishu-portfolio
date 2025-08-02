@@ -94,7 +94,7 @@ const HeroContent = () => {
     <ResumePopup
       isOpen={isResumePopupOpen}
       onClose={handleCloseResume}
-      pdfUrl="/pdfs/Nishant_Mogahaa_CV.pdf"
+      pdfUrl="/pdfs/NishantResume.pdf"
     />
     </>
   );
