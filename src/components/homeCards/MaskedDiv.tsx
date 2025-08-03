@@ -1,25 +1,64 @@
 "use client"
-import React from "react"
+import React, { useState, useEffect } from "react"
 import MaskedDiv from "../ui/masked-div"
 
 function MaskedDivDemo() {
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  const getDayName = (date: Date) => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    return days[date.getDay()]
+  }
+
+  const getMonthName = (date: Date) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    return months[date.getMonth()]
+  }
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    })
+  }
+
   return (
     <>
     <div className="container">
       <div className="masked-video-container">
         <MaskedDiv maskType="type-3" className="masked-video">
-          <video
-            className="video-element"
-            autoPlay
-            loop
-            muted
-          >
-            <source
-              src="https://videos.pexels.com/video-files/18069166/18069166-uhd_2560_1440_24fps.mp4"
-              type="video/mp4"
-            />
-          </video>
+          <div className="video-wrapper">
+            <video
+              className="video-element"
+              autoPlay
+              loop
+              muted
+            >
+              <source
+                src="https://videos.pexels.com/video-files/18069166/18069166-uhd_2560_1440_24fps.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </div>
         </MaskedDiv>
+
+        {/* Date Time Rectangle positioned outside masked div at top center */}
+        <div className="datetime-container">
+          <div className="datetime-rectangle">
+          <div className="day-display">{getDayName(currentTime)}</div>
+            <div className="time-display">{formatTime(currentTime)}</div>
+            <div className="date-display">{getMonthName(currentTime)} {currentTime.getDate()}, {currentTime.getFullYear()}</div>
+          </div>
+        </div>
 
         {/* Orange Circle Button positioned at bottom-left of masked video */}
         <div className="button-container">
@@ -67,6 +106,12 @@ function MaskedDivDemo() {
           margin: 1rem 0;
         }
 
+        .video-wrapper {
+          position: relative;
+          width: 100%;
+          height: 100%;
+        }
+
         .video-element {
           transition: all 0.3s;
           cursor: pointer;
@@ -74,6 +119,46 @@ function MaskedDivDemo() {
 
         .video-element:hover {
           transform: scale(1.05);
+        }
+
+        .datetime-container {
+          position: absolute;
+        
+          left: 51%;
+          transform: translateX(-50%);
+          z-index: 20;
+        }
+
+        .datetime-rectangle {
+          background: #f97316;
+          border-radius: 8px;
+          padding: 0.1rem;
+          color: white;
+          text-align: center;
+          width: 4rem;
+          height: 1.3rem;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(10px);
+        }
+
+        .time-display {
+          font-size: 0.4rem;
+          font-weight: 400;
+          color: white;
+          margin-top: -0.1rem;
+        }
+
+        .day-display {
+          font-size: 0.29rem;
+          font-weight: 800;
+          color: white;
+         
+        }
+
+        .date-display {
+          font-size: 0.25rem;
+          color: white;
+          margin-top: -0.1rem;
         }
 
         .button-container {
@@ -97,7 +182,7 @@ function MaskedDivDemo() {
           border-radius: 50%;
           box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
           transition: all 0.3s;
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          
           cursor: pointer;
         }
 
@@ -128,6 +213,37 @@ function MaskedDivDemo() {
 
         /* Desktop Styles */
         @media (min-width: 640px) {
+          .datetime-container {
+            left: 51.5% !important;
+            transform: translateX(-50%) !important;
+            z-index: 20 !important;
+            margin-bottom: 5rem !important;
+             border-radius: 15rem !important;
+          }
+
+          .datetime-rectangle {
+            width: 13rem !important;
+            height: 5rem !important;
+            padding: 0.1rem !important;
+            border-radius: 15rem !important;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6) !important;
+          }
+
+          .time-display {
+            font-size: 1.5rem !important;
+             margin-top: -0.5rem !important;
+          }
+
+          .day-display {
+            font-size: 1.125rem !important;
+           
+          }
+
+          .date-display {
+            font-size: 0.875rem !important;
+            margin-top: -0.4rem !important;
+          }
+
           .button-container {
             left: 0rem !important;
             bottom: 3rem !important;
