@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, modelType = 'mistral' } = await request.json();
+    const { message, modelType = 'gemini' } = await request.json();
 
     if (!message || message.trim() === '') {
       return NextResponse.json(
@@ -14,12 +14,17 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 AI Models API Request:', message, 'Model:', modelType);
     
-    // OpenRouter API Key
-    const openRouterKey = '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';
+    // Debug environment variables
+    console.log('🔍 All environment variables:', Object.keys(process.env).filter(key => key.includes('OPENROUTER')));
+    console.log('🔍 OPENROUTER_API_KEY value:', process.env.OPENROUTER_API_KEY ? 'EXISTS' : 'NOT FOUND');
+    
+    // OpenRouter API Key from environment variable with fallback
+    const openRouterKey = process.env.OPENROUTER_API_KEY ;
     
     console.log('🔑 OpenRouter API Key exists:', !!openRouterKey);
     console.log('🔑 OpenRouter API Key length:', openRouterKey?.length);
     console.log('🔑 OpenRouter API Key starts with:', openRouterKey?.substring(0, 10) + '...');
+    console.log('🔑 Using environment variable:', !!process.env.OPENROUTER_API_KEY);
 
     if (!openRouterKey) {
       return NextResponse.json(
@@ -43,14 +48,21 @@ export async function POST(request: NextRequest) {
 
     let modelName, modelDisplayName;
 
-    if (modelType === 'perplexity') {
-      // Free model for deep research
-      modelName = 'mistralai/mistral-7b-instruct:free';
-      modelDisplayName = 'Nishu 2.0 (Deep Research)';
-    } else {
-      // Free model for general AI
-      modelName = 'mistralai/mistral-7b-instruct:free';
-      modelDisplayName = 'Nishu AI';
+    // Model selection based on modelType
+    switch (modelType) {
+      case 'gemini':
+        modelName = 'google/gemma-3n-e4b-it:free';
+        modelDisplayName = 'Nishu ';
+        break;
+      case 'deepseek':
+        modelName = 'deepseek/deepseek-r1-0528-qwen3-8b:free';
+        modelDisplayName = 'Nishu 2.0';
+        break;
+      case 'mistral':
+      default:
+        modelName = 'mistralai/mistral-7b-instruct:free';
+        modelDisplayName = 'Nishu 3.0';
+        break;
     }
 
     console.log('🚀 Using model:', modelName);
@@ -67,8 +79,6 @@ export async function POST(request: NextRequest) {
       temperature: 0.1,
       top_p: 0.9
     });
-
-
 
     console.log('✅ OpenRouter API Success:', {
       tokens: completion.usage?.total_tokens,

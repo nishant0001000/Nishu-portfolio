@@ -11,7 +11,7 @@ interface ChatResponseProps {
   errorMessage?: string
   modelUsed?: string
   showModelButtons?: boolean
-  onModelSelect?: (model: 'local' | 'llama' | 'perplexity') => void
+  onModelSelect?: (model: 'local' | 'gemini' | 'deepseek' | 'mistral') => void
 }
 
 export default function ChatResponse({ 
@@ -106,7 +106,7 @@ export default function ChatResponse({
                    </div>
                                        </button>
                                              <button
-                         onClick={() => onModelSelect('llama')}
+                         onClick={() => onModelSelect('gemini')}
                          className="flex gap-3 items-center p-3 text-left rounded-lg border transition-colors border-green-500/20 bg-green-500/5 hover:bg-green-500/10"
                        >
                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -116,13 +116,23 @@ export default function ChatResponse({
                          </div>
                        </button>
                        <button
-                         onClick={() => onModelSelect('perplexity')}
+                         onClick={() => onModelSelect('deepseek')}
                          className="flex gap-3 items-center p-3 text-left rounded-lg border transition-colors border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10"
                        >
                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                          <div>
                            <div className="text-sm font-medium text-blue-500">Nishu 2.0</div>
                            <div className="text-xs text-black/60 dark:text-white/60">Deep Research</div>
+                         </div>
+                       </button>
+                       <button
+                         onClick={() => onModelSelect('mistral')}
+                         className="flex gap-3 items-center p-3 text-left rounded-lg border transition-colors border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10"
+                       >
+                         <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                         <div>
+                           <div className="text-sm font-medium text-purple-500">Nishu 3.0</div>
+                           <div className="text-xs text-black/60 dark:text-white/60">Advanced Research</div>
                          </div>
                        </button>
                        

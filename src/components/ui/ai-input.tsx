@@ -69,7 +69,7 @@ function useAutoResizeTextarea({
 const MIN_HEIGHT = 56
 const MAX_HEIGHT = 180
 
-const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolean; selectedModel: 'local' | 'llama' | 'perplexity' | null }) => (
+const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolean; selectedModel: 'local' | 'gemini' | 'deepseek' | 'mistral' | null }) => (
   <AnimatePresence mode="wait">
     <motion.p
       key={showSearch ? "search" : "ask"}
@@ -79,7 +79,7 @@ const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolea
       transition={{ duration: 0.1 }}
       className="pointer-events-none w-[150px] text-sm absolute text-black/70 dark:text-white/70"
     >
-                                      {selectedModel === 'local' ? "Ask about Nishant..." : selectedModel === 'llama' ? "Ask anything with Nishu AI..." : selectedModel === 'perplexity' ? "Ask anything with Nishu 2.0..." : "Please select a model first..."}
+      {selectedModel === 'local' ? "Ask about Nishant..." : selectedModel === 'gemini' ? "Ask anything with Gemini 2.0..." : selectedModel === 'deepseek' ? "Ask anything with DeepSeek R1..." : selectedModel === 'mistral' ? "Ask anything with Mistral 7B..." : "Please select a model first..."}
     </motion.p>
   </AnimatePresence>
 )
@@ -115,7 +115,7 @@ export default function AiInput() {
     maxHeight: MAX_HEIGHT,
   })
   const [showSearch, setShowSearch] = useState(false)
-  const [selectedModel, setSelectedModel] = useState<'local' | 'llama' | 'perplexity' | null>(null)
+  const [selectedModel, setSelectedModel] = useState<'local' | 'gemini' | 'deepseek' | 'mistral' | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -145,7 +145,7 @@ export default function AiInput() {
 
   const handleSubmit = async () => {
     if (!value.trim()) return
-    
+
     // Check if model is selected
     if (!selectedModel) {
       const userMessage: ChatMessage = {
@@ -154,7 +154,7 @@ export default function AiInput() {
         content: value.trim(),
         timestamp: new Date()
       }
-      
+
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
@@ -163,32 +163,32 @@ export default function AiInput() {
         modelUsed: 'Agent Mode',
         showModelButtons: true
       }
-      
+
       setChatHistory(prev => [...prev, userMessage, aiMessage])
       setValue("")
       adjustHeight(true)
       return
     }
-    
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
       content: value.trim(),
       timestamp: new Date()
     }
-    
+
     setChatHistory(prev => [...prev, userMessage])
     setIsLoading(true)
     setIsError(false)
     setErrorMessage("")
-    
+
     try {
       let response: string
-      
+
       if (selectedModel === 'local') {
         // Use local AI responses about Nishant with Hindi support
         const hasHindiChars = /[\u0900-\u097F]/.test(value);
-        
+
         const localResponses = {
           'hello': 'Hello! I\'m Nishant\'s AI assistant. How can I help you learn about him today?',
           'hi': 'Hi there! I\'m Nishant\'s AI assistant. He\'s a talented developer with expertise in Next.js, React, TypeScript, and Tailwind CSS.',
@@ -202,7 +202,7 @@ export default function AiInput() {
           'best developer': 'Nishant is definitely one of the best developers! He specializes in Next.js, React, TypeScript, and Tailwind CSS.',
           'cybershoora': 'Cybershoora is a leading IT consultancy and graphics services company that offers comprehensive solutions including IT consultancy, graphics design, 3D modeling, and UI/UX services.',
           'it company': 'Cybershoora is an excellent IT consultancy and graphics services company! They specialize in IT consultancy, graphics design, 3D modeling, and UI/UX services.',
-          'default': hasHindiChars ? 
+          'default': hasHindiChars ?
             'मैं Nishant का AI assistant हूं! वह Next.js, React, TypeScript और Tailwind CSS में expert हैं। आप उनके skills, projects या experience के बारे में पूछ सकते हैं!' :
             'I\'m Nishant\'s AI assistant! He\'s a passionate developer who creates modern web applications using Next.js, React, TypeScript, and Tailwind CSS. Feel free to ask me about his skills, projects, or experience!'
         }
@@ -231,26 +231,26 @@ export default function AiInput() {
         } else {
           response = localResponses.default
         }
-        
+
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           type: 'ai',
           content: response,
           timestamp: new Date(),
           modelUsed: 'Local AI (Portfolio Info)'
-                };
+        };
         setChatHistory(prev => [...prev, aiMessage]);
-      } else if (selectedModel === 'llama') {
-        // ✅ Real Llama 3.1 Nemotron Ultra API call
-        console.log('Sending request to Llama 3.1 Nemotron Ultra API...');
-        
+      } else if (selectedModel === 'gemini') {
+        // ✅ Real Gemini 2.0 Flash API call
+        console.log('Sending request to Gemini 2.0 Flash API...');
+
         try {
           const apiResponse = await fetch('/api/ai-models', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message: value }),
+            body: JSON.stringify({ message: value, modelType: 'gemini' }),
           });
 
           console.log('API Response status:', apiResponse.status);
@@ -263,7 +263,7 @@ export default function AiInput() {
 
           const data = await apiResponse.json();
           console.log('API Response data:', data);
-          
+
           if (data.success) {
             response = data.response;
           } else {
@@ -274,33 +274,33 @@ export default function AiInput() {
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: data.model_used || 'Nishu AI (Free)'
+            modelUsed: data.model_used || 'Gemini 2.0 Flash (Google)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         } catch (error) {
-          console.error('Llama API failed:', error);
-          // Fallback response if Llama fails
-          response = "I'm sorry, I'm having trouble connecting to the Nishu AI API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
+          console.error('Gemini API failed:', error);
+          // Fallback response if Gemini fails
+          response = "I'm sorry, I'm having trouble connecting to the Gemini 2.0 Flash API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: 'Nishu AI (Fallback)'
+            modelUsed: 'Gemini 2.0 Flash (Fallback)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
-      } else if (selectedModel === 'perplexity') {
-        // ✅ Perplexity Sonar Deep Research API call
-        console.log('Sending request to Perplexity Sonar Deep Research API...');
-        
+      } else if (selectedModel === 'deepseek') {
+        // ✅ DeepSeek R1 API call
+        console.log('Sending request to DeepSeek R1 API...');
+
         try {
           const apiResponse = await fetch('/api/ai-models', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message: value, modelType: 'perplexity' }),
+            body: JSON.stringify({ message: value, modelType: 'deepseek' }),
           });
 
           console.log('API Response status:', apiResponse.status);
@@ -313,7 +313,7 @@ export default function AiInput() {
 
           const data = await apiResponse.json();
           console.log('API Response data:', data);
-          
+
           if (data.success) {
             response = data.response;
           } else {
@@ -324,19 +324,69 @@ export default function AiInput() {
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: data.model_used || 'Nishu 2.0 (Deep Research)'
+            modelUsed: data.model_used || 'DeepSeek R1 (DeepSeek)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         } catch (error) {
-          console.error('Perplexity API failed:', error);
-          // Fallback response if Perplexity fails
-          response = "I'm sorry, I'm having trouble connecting to the Nishu 2.0 API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
+          console.error('DeepSeek API failed:', error);
+          // Fallback response if DeepSeek fails
+          response = "I'm sorry, I'm having trouble connecting to the DeepSeek R1 API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: 'Nishu 2.0 (Fallback)'
+            modelUsed: 'DeepSeek R1 (Fallback)'
+          };
+          setChatHistory(prev => [...prev, aiMessage]);
+        }
+      } else if (selectedModel === 'mistral') {
+        // ✅ Mistral 7B API call
+        console.log('Sending request to Mistral 7B API...');
+
+        try {
+          const apiResponse = await fetch('/api/ai-models', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: value, modelType: 'mistral' }),
+          });
+
+          console.log('API Response status:', apiResponse.status);
+
+          if (!apiResponse.ok) {
+            const errorData = await apiResponse.json();
+            console.error('API Error Data:', errorData);
+            throw new Error(errorData.error || `API request failed with status ${apiResponse.status}`);
+          }
+
+          const data = await apiResponse.json();
+          console.log('API Response data:', data);
+
+          if (data.success) {
+            response = data.response;
+          } else {
+            throw new Error(data.error || 'API request failed');
+          }
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: response,
+            timestamp: new Date(),
+            modelUsed: data.model_used || 'Mistral 7B (Mistral AI)'
+          };
+          setChatHistory(prev => [...prev, aiMessage]);
+        } catch (error) {
+          console.error('Mistral API failed:', error);
+          // Fallback response if Mistral fails
+          response = "I'm sorry, I'm having trouble connecting to the Mistral 7B API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: response,
+            timestamp: new Date(),
+            modelUsed: 'Mistral 7B (Fallback)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
@@ -347,7 +397,7 @@ export default function AiInput() {
     } finally {
       setIsLoading(false)
     }
-    
+
     setValue("")
     adjustHeight(true)
   }
@@ -396,7 +446,7 @@ export default function AiInput() {
               Clear Chat
             </button>
           </div>
-          <div 
+          <div
             ref={chatContainerRef}
             className="overflow-y-auto pr-2 space-y-3 max-h-96"
           >
@@ -404,59 +454,63 @@ export default function AiInput() {
               <div key={message.id}>
                 {message.type === 'user' ? (
                   <UserMessage message={message} />
-                                            ) : (
-                              <ChatResponse 
-                                message={message.content} 
-                                modelUsed={message.modelUsed}
-                                showModelButtons={message.showModelButtons}
-                                onModelSelect={(model) => {
-                                  setSelectedModel(model)
-                                  // Add a confirmation message
-                                  let modelName = 'Local AI';
-                                  let modelUsed = 'Local AI';
-                                  let message = "Great! I've selected Local AI for you. Now you can ask me about Nishant's portfolio!";
-                                  
-                                  if (model === 'local') {
-                                    modelName = 'Local AI';
-                                    modelUsed = 'Local AI';
-                                    message = "Great! I've selected Local AI for you. Now you can ask me about Nishant's portfolio!";
-                                  } else if (model === 'llama') {
-                                    modelName = 'Nishu AI';
-                                    modelUsed = 'Nishu AI';
-                                    message = "Great! I've selected Nishu AI for you. Now you can do web search!";
-                                  } else if (model === 'perplexity') {
-                                    modelName = 'Nishu 2.0';
-                                    modelUsed = 'Nishu 2.0';
-                                    message = "Great! I've selected Nishu 2.0 for you. Now you can do Deep Research!";
-                                  }
-                                  
-                                  const confirmMessage: ChatMessage = {
-                                    id: (Date.now() + 2).toString(),
-                                    type: 'ai',
-                                    content: message,
-                                    timestamp: new Date(),
-                                    modelUsed: modelUsed
-                                  }
-                                  setChatHistory(prev => [...prev, confirmMessage])
-                                }}
-                              />
-                            )}
+                ) : (
+                  <ChatResponse
+                    message={message.content}
+                    modelUsed={message.modelUsed}
+                    showModelButtons={message.showModelButtons}
+                    onModelSelect={(model) => {
+                      setSelectedModel(model)
+                      // Add a confirmation message
+                      let modelName = 'Local AI';
+                      let modelUsed = 'Local AI';
+                      let message = "Great! I've selected Local AI for you. Now you can ask me about Nishant's portfolio!";
+
+                      if (model === 'local') {
+                        modelName = 'Local AI';
+                        modelUsed = 'Local AI';
+                        message = "Great! I've selected Local AI for you. Now you can ask me about Nishant's portfolio!";
+                      } else if (model === 'gemini') {
+                        modelName = 'Nishu AI';
+                        modelUsed = 'Nishu AI';
+                        message = "Great! I've selected Nishu AI for you. Now you can do web search!";
+                      } else if (model === 'deepseek') {
+                        modelName = 'Nishu 2.0';
+                        modelUsed = 'Nishu 2.0';
+                        message = "Great! I've selected Nishu 2.0 for you. Now you can do Deep Research!";
+                      } else if (model === 'mistral') {
+                        modelName = 'Nishu 2.0';
+                        modelUsed = 'Nishu 2.0';
+                        message = "Great! I've selected Nishu 2.0 for you. Now you can do Deep Research!";
+                      }
+
+                      const confirmMessage: ChatMessage = {
+                        id: (Date.now() + 2).toString(),
+                        type: 'ai',
+                        content: message,
+                        timestamp: new Date(),
+                        modelUsed: modelUsed
+                      }
+                      setChatHistory(prev => [...prev, confirmMessage])
+                    }}
+                  />
+                )}
               </div>
             ))}
             {isLoading && (
               <ChatResponse message="" isLoading={true} />
             )}
             {isError && (
-              <ChatResponse 
-                message="" 
-                isError={true} 
-                errorMessage={errorMessage} 
+              <ChatResponse
+                message=""
+                isError={true}
+                errorMessage={errorMessage}
               />
             )}
           </div>
         </div>
       )}
-      
+
       {/* AI Response Display (for single responses when no chat history) */}
       {chatHistory.length === 0 && (isLoading || isError) && (
         <div className="mx-auto mb-4 max-w-lg sm:max-w-xl lg:max-w-2xl">
@@ -468,7 +522,7 @@ export default function AiInput() {
           />
         </div>
       )}
-      
+
       <div className="relative max-w-lg sm:max-w-xl lg:max-w-2xl border rounded-[22px] border-black/10 dark:border-white/10 p-1 sm:p-2 w-full mx-auto">
         <div className="flex relative flex-col rounded-2xl border border-black/10 dark:border-white/10 bg-white/5 dark:bg-black/5">
           <div
@@ -493,11 +547,11 @@ export default function AiInput() {
                   adjustHeight()
                 }}
               />
-                             {!value && (
-                 <div className="absolute top-3 left-4">
-                   <AnimatedPlaceholder showSearch={showSearch} selectedModel={selectedModel} />
-                 </div>
-               )}
+              {!value && (
+                <div className="absolute top-3 left-4">
+                  <AnimatedPlaceholder showSearch={showSearch} selectedModel={selectedModel} />
+                </div>
+              )}
             </div>
           </div>
 
@@ -542,28 +596,30 @@ export default function AiInput() {
                 )}
               </label>
               <div className="relative" ref={dropdownRef}>
-                                 <button
-                   type="button"
-                   onClick={() => {
-                     setShowSearch(!showSearch)
-                   }}
-                   className={cn(
-                     "rounded-full transition-all flex items-center gap-2 px-3 py-1 border h-8",
-                     selectedModel === 'local' 
-                       ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
-                       : selectedModel === 'llama'
-                       ? "bg-green-500/15 border-green-500 text-green-500"
-                       : selectedModel === 'perplexity'
-                       ? "bg-blue-500/15 border-blue-500 text-blue-500"
-                       : showSearch
-                       ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
-                       : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
-                   )}
-                 >
-                                      <span className="text-xs font-medium">
-                     {selectedModel === 'local' ? 'Local AI' : selectedModel === 'llama' ? 'Nishu AI' : selectedModel === 'perplexity' ? 'Nishu 2.0' : 'Select Model'}
-                   </span>
-                   <div className="flex flex-shrink-0 justify-center items-center w-4 h-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSearch(!showSearch)
+                  }}
+                  className={cn(
+                    "rounded-full transition-all flex items-center gap-2 px-3 py-1 border h-8",
+                    selectedModel === 'local'
+                      ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
+                      : selectedModel === 'gemini'
+                        ? "bg-green-500/15 border-green-500 text-green-500"
+                        : selectedModel === 'deepseek'
+                          ? "bg-blue-500/15 border-blue-500 text-blue-500"
+                          : selectedModel === 'mistral'
+                            ? "bg-purple-500/15 border-purple-500 text-purple-500"
+                            : showSearch
+                              ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
+                              : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
+                  )}
+                >
+                  <span className="text-xs font-medium">
+                    {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'mistral' ? 'Nishu 3.0' : 'Select Model'}
+                  </span>
+                  <div className="flex flex-shrink-0 justify-center items-center w-4 h-4">
                     <motion.div
                       animate={{
                         rotate: showSearch ? 180 : 0,
@@ -604,19 +660,19 @@ export default function AiInput() {
                         transition={{ duration: 0.2 }}
                         className="text-sm overflow-hidden whitespace-nowrap text-[#ff3f17] flex-shrink-0"
                       >
-                                                 {selectedModel === 'local' ? 'Local AI' : selectedModel === 'llama' ? 'Nishu AI' : selectedModel === 'perplexity' ? 'Nishu 2.0' : 'Select Model'}
+                        {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'mistral' ? 'Nishu 2.0' : 'Select Model'}
                       </motion.span>
                     )}
                   </AnimatePresence>
                 </button>
-                
+
                 {/* Model Selection Dropdown */}
                 {showSearch && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 mt-2 bg-white dark:bg-black rounded-lg border border-black/10 dark:border-white/10 shadow-lg z-10 min-w-[120px]"
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute bottom-full left-0 mb-2 bg-white dark:bg-black rounded-lg border border-black/10 dark:border-white/10 shadow-lg z-10 min-w-[120px]"
                   >
                     <div className="p-1">
                       <button
@@ -635,18 +691,18 @@ export default function AiInput() {
                           <div className="w-2 h-2 rounded-full bg-[#ff3f17]"></div>
                           Local AI
                         </div>
-                                                 <div className="mt-1 text-xs text-black/60 dark:text-white/60">
-                           Portfolio Info
-                         </div>
+                        <div className="mt-1 text-xs text-black/60 dark:text-white/60">
+                          Portfolio Info
+                        </div>
                       </button>
                       <button
                         onClick={() => {
-                          setSelectedModel('llama')
+                          setSelectedModel('gemini')
                           setShowSearch(false)
                         }}
                         className={cn(
                           "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
-                          selectedModel === 'llama'
+                          selectedModel === 'gemini'
                             ? "bg-[#ff3f17]/15 text-[#ff3f17]"
                             : "text-black dark:text-white hover:bg-white/5 dark:hover:bg-black/5"
                         )}
@@ -655,29 +711,70 @@ export default function AiInput() {
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                           Nishu AI
                         </div>
-                                                            <div className="mt-1 text-xs text-black/60 dark:text-white/60">
-                                      For Web Search
-                                    </div>
+                        <div className="mt-1 text-xs text-black/60 dark:text-white/60">
+                          Google AI
+                        </div>
                       </button>
 
+                      <button
+                        onClick={() => {
+                          setSelectedModel('deepseek')
+                          setShowSearch(false)
+                        }}
+                        className={cn(
+                          "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
+                          selectedModel === 'deepseek'
+                            ? "bg-[#ff3f17]/15 text-[#ff3f17]"
+                            : "text-black dark:text-white hover:bg-white/5 dark:hover:bg-black/5"
+                        )}
+                      >
+                        <div className="flex gap-2 items-center">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          Nishu 2.0
+                        </div>
+                        <div className="mt-1 text-xs text-black/60 dark:text-white/60">
+                          Advanced Research
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setSelectedModel('mistral')
+                          setShowSearch(false)
+                        }}
+                        className={cn(
+                          "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
+                          selectedModel === 'mistral'
+                            ? "bg-[#ff3f17]/15 text-[#ff3f17]"
+                            : "text-black dark:text-white hover:bg-white/5 dark:hover:bg-black/5"
+                        )}
+                      >
+                        <div className="flex gap-2 items-center">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                          Nishu 3.0
+                        </div>
+                        <div className="mt-1 text-xs text-black/60 dark:text-white/60">
+                          Fast & Efficient
+                        </div>
+                      </button>
 
                     </div>
                   </motion.div>
                 )}
               </div>
-              
-              {/* Simple Perplexity Button */}
+
+              {/* Simple DeepSeek Button */}
               <button
                 type="button"
-                onClick={() => setSelectedModel('perplexity')}
+                onClick={() => setSelectedModel('deepseek')}
                 className={cn(
                   "rounded-full transition-all flex items-center gap-2 px-3 py-1 border h-8",
-                  selectedModel === 'perplexity'
+                  selectedModel === 'deepseek'
                     ? "bg-blue-500/15 border-blue-500 text-blue-500"
                     : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
                 )}
               >
-                <span className="text-xs font-medium">Nishu 2.0</span>
+                <span className="text-xs font-medium">Nishu 3.0</span>
               </button>
 
             </div>
