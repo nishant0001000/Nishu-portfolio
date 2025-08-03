@@ -146,29 +146,8 @@ export default function AiInput() {
   const handleSubmit = async () => {
     if (!value.trim()) return
 
-    // Check if model is selected
-    if (!selectedModel) {
-      const userMessage: ChatMessage = {
-        id: Date.now().toString(),
-        type: 'user',
-        content: value.trim(),
-        timestamp: new Date()
-      }
-
-      const aiMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        type: 'ai',
-        content: "Hi! I'm Nishu, your AI assistant. I recommend trying Nishu 2.0 for the best experience! It can help you with deep research and web search. Please select your preferred AI model:",
-        timestamp: new Date(),
-        modelUsed: 'Agent Mode',
-        showModelButtons: true
-      }
-
-      setChatHistory(prev => [...prev, userMessage, aiMessage])
-      setValue("")
-      adjustHeight(true)
-      return
-    }
+    // If no model is selected, use default model (mistral)
+    const modelToUse = selectedModel || 'mistral';
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -185,7 +164,7 @@ export default function AiInput() {
     try {
       let response: string
 
-      if (selectedModel === 'local') {
+      if (modelToUse === 'local') {
         // Use local AI responses about Nishant with Hindi support
         const hasHindiChars = /[\u0900-\u097F]/.test(value);
 
@@ -240,7 +219,7 @@ export default function AiInput() {
           modelUsed: 'Local AI (Portfolio Info)'
         };
         setChatHistory(prev => [...prev, aiMessage]);
-      } else if (selectedModel === 'gemini') {
+      } else if (modelToUse === 'gemini') {
         // ✅ Real Gemini 2.0 Flash API call
         console.log('Sending request to Gemini 2.0 Flash API...');
 
@@ -290,7 +269,7 @@ export default function AiInput() {
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
-      } else if (selectedModel === 'deepseek') {
+      } else if (modelToUse === 'deepseek') {
         // ✅ DeepSeek R1 API call
         console.log('Sending request to DeepSeek R1 API...');
 
@@ -340,7 +319,7 @@ export default function AiInput() {
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
-      } else if (selectedModel === 'mistral') {
+      } else if (modelToUse === 'mistral') {
         // ✅ Mistral 7B API call
         console.log('Sending request to Mistral 7B API...');
 
@@ -782,10 +761,10 @@ export default function AiInput() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isLoading || !value.trim() || !selectedModel}
+                disabled={isLoading || !value.trim()}
                 className={cn(
                   "rounded-full p-2 transition-colors",
-                  value && !isLoading && selectedModel
+                  value && !isLoading
                     ? "bg-[#ff3f17]/15 text-[#ff3f17] hover:bg-[#ff3f17]/20"
                     : "bg-white/5 dark:bg-black/5 text-black/40 dark:text-white/40"
                 )}
