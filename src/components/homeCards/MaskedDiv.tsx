@@ -4,13 +4,25 @@ import MaskedDiv from "../ui/masked-div"
 
 function MaskedDivDemo() {
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
 
-    return () => clearInterval(timer)
+    // Check screen size on mount and resize
+    const checkScreenSize = () => {
+      setIsDesktop(window.innerWidth >= 640)
+    }
+    
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+
+    return () => {
+      clearInterval(timer)
+      window.removeEventListener('resize', checkScreenSize)
+    }
   }, [])
 
   const getDayName = (date: Date) => {
@@ -52,13 +64,15 @@ function MaskedDivDemo() {
         </MaskedDiv>
 
         {/* Date Time Rectangle positioned outside masked div at top center */}
-        <div className="datetime-container">
-          <div className="datetime-rectangle">
-          <div className="day-display">{getDayName(currentTime)}</div>
-            <div className="time-display">{formatTime(currentTime)}</div>
-            <div className="date-display">{getMonthName(currentTime)} {currentTime.getDate()}, {currentTime.getFullYear()}</div>
+        {isDesktop && (
+          <div className="datetime-container">
+            <div className="datetime-rectangle">
+              <div className="day-display">{getDayName(currentTime)}</div>
+              <div className="time-display">{formatTime(currentTime)}</div>
+              <div className="date-display">{getMonthName(currentTime)} {currentTime.getDate()}, {currentTime.getFullYear()}</div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Orange Circle Button positioned at bottom-left of masked video */}
         <div className="button-container">
@@ -123,10 +137,11 @@ function MaskedDivDemo() {
 
         .datetime-container {
           position: absolute;
-        
-          left: 51%;
+          left: 51.5%;
           transform: translateX(-50%);
           z-index: 20;
+          margin-bottom: 5rem;
+          border-radius: 15rem;
         }
 
         .datetime-rectangle {
@@ -213,14 +228,6 @@ function MaskedDivDemo() {
 
         /* Desktop Styles */
         @media (min-width: 640px) {
-          .datetime-container {
-            left: 51.5% !important;
-            transform: translateX(-50%) !important;
-            z-index: 20 !important;
-            margin-bottom: 5rem !important;
-             border-radius: 15rem !important;
-          }
-
           .datetime-rectangle {
             width: 13rem !important;
             height: 5rem !important;
@@ -231,12 +238,11 @@ function MaskedDivDemo() {
 
           .time-display {
             font-size: 1.5rem !important;
-             margin-top: -0.5rem !important;
+            margin-top: -0.5rem !important;
           }
 
           .day-display {
             font-size: 1.125rem !important;
-           
           }
 
           .date-display {
