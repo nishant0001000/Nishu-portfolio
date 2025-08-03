@@ -11,7 +11,7 @@ interface ChatResponseProps {
   errorMessage?: string
   modelUsed?: string
   showModelButtons?: boolean
-  onModelSelect?: (model: 'local' | 'gemini' | 'deepseek' | 'mistral') => void
+  onModelSelect?: (model: 'local' | 'gemini' | 'deepseek' | 'grok') => void
 }
 
 export default function ChatResponse({ 
@@ -112,7 +112,7 @@ export default function ChatResponse({
                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                          <div>
                            <div className="text-sm font-medium text-green-500">Nishu AI</div>
-                           <div className="text-xs text-black/60 dark:text-white/60"> For Web Search</div>
+                           <div className="text-xs text-black/60 dark:text-white/60">Gemma 3N E2B</div>
                          </div>
                        </button>
                        <button
@@ -122,19 +122,20 @@ export default function ChatResponse({
                          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                          <div>
                            <div className="text-sm font-medium text-blue-500">Nishu 2.0</div>
-                           <div className="text-xs text-black/60 dark:text-white/60">Deep Research</div>
+                           <div className="text-xs text-black/60 dark:text-white/60">Mistral Small</div>
                          </div>
                        </button>
                        <button
-                         onClick={() => onModelSelect('mistral')}
+                         onClick={() => onModelSelect('grok')}
                          className="flex gap-3 items-center p-3 text-left rounded-lg border transition-colors border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10"
                        >
                          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                          <div>
                            <div className="text-sm font-medium text-purple-500">Nishu 3.0</div>
-                           <div className="text-xs text-black/60 dark:text-white/60">Advanced Research</div>
+                           <div className="text-xs text-black/60 dark:text-white/60">Qwen3 Coder</div>
                          </div>
                        </button>
+
                        
 
                 </div>

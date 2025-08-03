@@ -51,16 +51,16 @@ export async function POST(request: NextRequest) {
     // Model selection based on modelType
     switch (modelType) {
       case 'gemini':
-        modelName = 'google/gemma-3n-e4b-it:free';
-        modelDisplayName = 'Nishu ';
+        modelName = 'google/gemma-3n-e2b-it:free';
+        modelDisplayName = 'Nishu AI';
         break;
       case 'deepseek':
-        modelName = 'deepseek/deepseek-r1-0528-qwen3-8b:free';
+        modelName = 'mistralai/mistral-small-3.2-24b-instruct:free';
         modelDisplayName = 'Nishu 2.0';
         break;
-      case 'mistral':
+      case 'grok':
       default:
-        modelName = 'mistralai/mistral-7b-instruct:free';
+        modelName = 'qwen/qwen3-coder:free';
         modelDisplayName = 'Nishu 3.0';
         break;
     }

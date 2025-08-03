@@ -69,7 +69,7 @@ function useAutoResizeTextarea({
 const MIN_HEIGHT = 56
 const MAX_HEIGHT = 180
 
-const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolean; selectedModel: 'local' | 'gemini' | 'deepseek' | 'mistral' | null }) => (
+const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolean; selectedModel: 'local' | 'gemini' | 'deepseek' | 'grok' | null }) => (
   <AnimatePresence mode="wait">
     <motion.p
       key={showSearch ? "search" : "ask"}
@@ -79,7 +79,7 @@ const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolea
       transition={{ duration: 0.1 }}
       className="pointer-events-none w-[150px] text-sm absolute text-black/70 dark:text-white/70"
     >
-      {selectedModel === 'local' ? "Ask about Nishant..." : selectedModel === 'gemini' ? "Ask anything with Gemini 2.0..." : selectedModel === 'deepseek' ? "Ask anything with DeepSeek R1..." : selectedModel === 'mistral' ? "Ask anything with Mistral 7B..." : "Please select a model first..."}
+      {selectedModel === 'local' ? "Ask about Nishant..." : selectedModel === 'gemini' ? "Ask anything with Gemma 3N E2B..." : selectedModel === 'deepseek' ? "Ask anything with Mistral Small..." : selectedModel === 'grok' ? "Ask anything with Qwen3 Coder..." : "Please select a model first..."}
     </motion.p>
   </AnimatePresence>
 )
@@ -115,7 +115,7 @@ export default function AiInput() {
     maxHeight: MAX_HEIGHT,
   })
   const [showSearch, setShowSearch] = useState(false)
-  const [selectedModel, setSelectedModel] = useState<'local' | 'gemini' | 'deepseek' | 'mistral' | null>(null)
+  const [selectedModel, setSelectedModel] = useState<'local' | 'gemini' | 'deepseek' | 'grok' | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -241,8 +241,8 @@ export default function AiInput() {
         };
         setChatHistory(prev => [...prev, aiMessage]);
       } else if (selectedModel === 'gemini') {
-        // ✅ Real Gemini 2.0 Flash API call
-        console.log('Sending request to Gemini 2.0 Flash API...');
+        // ✅ Gemma 3N E2B API call
+        console.log('Sending request to Gemma 3N E2B API...');
 
         try {
           const apiResponse = await fetch('/api/ai-models', {
@@ -274,25 +274,25 @@ export default function AiInput() {
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: data.model_used || 'Gemini 2.0 Flash (Google)'
+            modelUsed: data.model_used || 'Gemma 3N E2B (Google)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         } catch (error) {
-          console.error('Gemini API failed:', error);
-          // Fallback response if Gemini fails
-          response = "I'm sorry, I'm having trouble connecting to the Gemini 2.0 Flash API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
+          console.error('Gemma API failed:', error);
+          // Fallback response if Gemma fails
+          response = "I'm sorry, I'm having trouble connecting to the Gemma 3N E2B API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: 'Gemini 2.0 Flash (Fallback)'
+            modelUsed: 'Gemma 3N E2B (Fallback)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
       } else if (selectedModel === 'deepseek') {
-        // ✅ DeepSeek R1 API call
-        console.log('Sending request to DeepSeek R1 API...');
+        // ✅ Mistral Small API call
+        console.log('Sending request to Mistral Small API...');
 
         try {
           const apiResponse = await fetch('/api/ai-models', {
@@ -324,25 +324,25 @@ export default function AiInput() {
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: data.model_used || 'DeepSeek R1 (DeepSeek)'
+            modelUsed: data.model_used || 'Mistral Small (Mistral AI)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         } catch (error) {
-          console.error('DeepSeek API failed:', error);
-          // Fallback response if DeepSeek fails
-          response = "I'm sorry, I'm having trouble connecting to the DeepSeek R1 API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
+          console.error('Mistral API failed:', error);
+          // Fallback response if Mistral fails
+          response = "I'm sorry, I'm having trouble connecting to the Mistral Small API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: 'DeepSeek R1 (Fallback)'
+            modelUsed: 'Mistral Small (Fallback)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
-      } else if (selectedModel === 'mistral') {
-        // ✅ Mistral 7B API call
-        console.log('Sending request to Mistral 7B API...');
+      } else if (selectedModel === 'grok') {
+        // ✅ Qwen3 Coder API call
+        console.log('Sending request to Qwen3 Coder API...');
 
         try {
           const apiResponse = await fetch('/api/ai-models', {
@@ -350,7 +350,7 @@ export default function AiInput() {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message: value, modelType: 'mistral' }),
+            body: JSON.stringify({ message: value, modelType: 'grok' }),
           });
 
           console.log('API Response status:', apiResponse.status);
@@ -374,19 +374,19 @@ export default function AiInput() {
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: data.model_used || 'Mistral 7B (Mistral AI)'
+            modelUsed: data.model_used || 'Qwen3 Coder (Qwen)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         } catch (error) {
-          console.error('Mistral API failed:', error);
-          // Fallback response if Mistral fails
-          response = "I'm sorry, I'm having trouble connecting to the Mistral 7B API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
+          console.error('Qwen API failed:', error);
+          // Fallback response if Qwen fails
+          response = "I'm sorry, I'm having trouble connecting to the Qwen3 Coder API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: 'Mistral 7B (Fallback)'
+            modelUsed: 'Qwen3 Coder (Fallback)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
@@ -478,10 +478,10 @@ export default function AiInput() {
                         modelName = 'Nishu 2.0';
                         modelUsed = 'Nishu 2.0';
                         message = "Great! I've selected Nishu 2.0 for you. Now you can do Deep Research!";
-                      } else if (model === 'mistral') {
-                        modelName = 'Nishu 2.0';
-                        modelUsed = 'Nishu 2.0';
-                        message = "Great! I've selected Nishu 2.0 for you. Now you can do Deep Research!";
+                      } else if (model === 'grok') {
+                        modelName = 'Nishu 3.0';
+                        modelUsed = 'Nishu 3.0';
+                        message = "Great! I've selected Nishu 3.0 for you. Now you can use X-AI Grok!";
                       }
 
                       const confirmMessage: ChatMessage = {
@@ -601,23 +601,23 @@ export default function AiInput() {
                   onClick={() => {
                     setShowSearch(!showSearch)
                   }}
-                  className={cn(
-                    "rounded-full transition-all flex items-center gap-2 px-3 py-1 border h-8",
-                    selectedModel === 'local'
-                      ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
-                      : selectedModel === 'gemini'
-                        ? "bg-green-500/15 border-green-500 text-green-500"
-                        : selectedModel === 'deepseek'
-                          ? "bg-blue-500/15 border-blue-500 text-blue-500"
-                          : selectedModel === 'mistral'
-                            ? "bg-purple-500/15 border-purple-500 text-purple-500"
-                            : showSearch
-                              ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
-                              : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
-                  )}
+                                      className={cn(
+                      "rounded-full transition-all flex items-center gap-2 px-3 py-1 border h-8",
+                      selectedModel === 'local'
+                        ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
+                        : selectedModel === 'gemini'
+                          ? "bg-green-500/15 border-green-500 text-green-500"
+                          : selectedModel === 'deepseek'
+                            ? "bg-blue-500/15 border-blue-500 text-blue-500"
+                                                          : selectedModel === 'grok'
+                                ? "bg-purple-500/15 border-purple-500 text-purple-500"
+                              : showSearch
+                                  ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
+                                  : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
+                    )}
                 >
                   <span className="text-xs font-medium">
-                    {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'mistral' ? 'Nishu 3.0' : 'Select Model'}
+                    {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'grok' ? 'Nishu 3.0' : 'Select Model'}
                   </span>
                   <div className="flex flex-shrink-0 justify-center items-center w-4 h-4">
                     <motion.div
@@ -660,7 +660,7 @@ export default function AiInput() {
                         transition={{ duration: 0.2 }}
                         className="text-sm overflow-hidden whitespace-nowrap text-[#ff3f17] flex-shrink-0"
                       >
-                        {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'mistral' ? 'Nishu 3.0' : 'Select Model'}
+                        {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'grok' ? 'Nishu 3.0' : 'Select Model'}
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -703,7 +703,7 @@ export default function AiInput() {
                         className={cn(
                           "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
                           selectedModel === 'gemini'
-                            ? "bg-[#ff3f17]/15 text-[#ff3f17]"
+                            ? "bg-green-500/15 text-green-500"
                             : "text-black dark:text-white hover:bg-white/5 dark:hover:bg-black/5"
                         )}
                       >
@@ -712,7 +712,7 @@ export default function AiInput() {
                           Nishu AI
                         </div>
                         <div className="mt-1 text-xs text-black/60 dark:text-white/60">
-                          Google AI
+                          Gemma 3N E2B
                         </div>
                       </button>
 
@@ -724,7 +724,7 @@ export default function AiInput() {
                         className={cn(
                           "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
                           selectedModel === 'deepseek'
-                            ? "bg-[#ff3f17]/15 text-[#ff3f17]"
+                            ? "bg-blue-500/15 text-blue-500"
                             : "text-black dark:text-white hover:bg-white/5 dark:hover:bg-black/5"
                         )}
                       >
@@ -733,19 +733,19 @@ export default function AiInput() {
                           Nishu 2.0
                         </div>
                         <div className="mt-1 text-xs text-black/60 dark:text-white/60">
-                          Advanced Research
+                          Mistral Small
                         </div>
                       </button>
 
                       <button
                         onClick={() => {
-                          setSelectedModel('mistral')
+                          setSelectedModel('grok')
                           setShowSearch(false)
                         }}
                         className={cn(
                           "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
-                          selectedModel === 'mistral'
-                            ? "bg-[#ff3f17]/15 text-[#ff3f17]"
+                          selectedModel === 'grok'
+                            ? "bg-purple-500/15 text-purple-500"
                             : "text-black dark:text-white hover:bg-white/5 dark:hover:bg-black/5"
                         )}
                       >
@@ -754,28 +754,32 @@ export default function AiInput() {
                           Nishu 3.0
                         </div>
                         <div className="mt-1 text-xs text-black/60 dark:text-white/60">
-                          Fast & Efficient
+                          Qwen3 Coder
                         </div>
                       </button>
+
+
 
                     </div>
                   </motion.div>
                 )}
               </div>
 
-              {/* Simple Mistral Button */}
+              {/* Simple Grok Button */}
               <button
                 type="button"
-                onClick={() => setSelectedModel('mistral')}
+                onClick={() => setSelectedModel('grok')}
                 className={cn(
                   "rounded-full transition-all flex items-center gap-2 px-3 py-1 border h-8",
-                  selectedModel === 'mistral'
+                  selectedModel === 'grok'
                     ? "bg-purple-500/15 border-purple-500 text-purple-500"
                     : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
                 )}
               >
                 <span className="text-xs font-medium">Nishu 3.0</span>
               </button>
+
+
 
             </div>
             <div className="absolute right-3 bottom-3">
