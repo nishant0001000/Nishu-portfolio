@@ -69,7 +69,7 @@ function useAutoResizeTextarea({
 const MIN_HEIGHT = 56
 const MAX_HEIGHT = 180
 
-const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolean; selectedModel: 'local' | 'gemini' | 'deepseek' | 'grok' | null }) => (
+const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolean; selectedModel: 'local' | 'gemini' | 'mistral' | 'qwen' | null }) => (
   <AnimatePresence mode="wait">
     <motion.p
       key={showSearch ? "search" : "ask"}
@@ -79,7 +79,7 @@ const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolea
       transition={{ duration: 0.1 }}
       className="pointer-events-none w-[150px] text-sm absolute text-black/70 dark:text-white/70"
     >
-      {selectedModel === 'local' ? "Ask about Nishant..." : selectedModel === 'gemini' ? "Ask anything with Gemma 3N E2B..." : selectedModel === 'deepseek' ? "Ask anything with Mistral Small..." : selectedModel === 'grok' ? "Ask anything with Qwen3 Coder..." : "Please select a model first..."}
+      {selectedModel === 'local' ? "Ask about Nishant..." : selectedModel === 'gemini' ? "Ask anything with Gemma 3N E2B..." : selectedModel === 'mistral' ? "Ask anything with Mistral Small..." : selectedModel === 'qwen' ? "Ask anything with Qwen3 Coder..." : "Please select a model first..."}
     </motion.p>
   </AnimatePresence>
 )
@@ -115,7 +115,7 @@ export default function AiInput() {
     maxHeight: MAX_HEIGHT,
   })
   const [showSearch, setShowSearch] = useState(false)
-  const [selectedModel, setSelectedModel] = useState<'local' | 'gemini' | 'deepseek' | 'grok' | null>(null)
+  const [selectedModel, setSelectedModel] = useState<'local' | 'gemini' | 'mistral' | 'qwen' | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -290,7 +290,7 @@ export default function AiInput() {
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
-      } else if (selectedModel === 'deepseek') {
+      } else if (selectedModel === 'mistral') {
         // ✅ Mistral Small API call
         console.log('Sending request to Mistral Small API...');
 
@@ -300,7 +300,7 @@ export default function AiInput() {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message: value, modelType: 'deepseek' }),
+            body: JSON.stringify({ message: value, modelType: 'mistral' }),
           });
 
           console.log('API Response status:', apiResponse.status);
@@ -340,7 +340,7 @@ export default function AiInput() {
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
-      } else if (selectedModel === 'grok') {
+      } else if (selectedModel === 'qwen') {
         // ✅ Qwen3 Coder API call
         console.log('Sending request to Qwen3 Coder API...');
 
@@ -350,7 +350,7 @@ export default function AiInput() {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message: value, modelType: 'grok' }),
+            body: JSON.stringify({ message: value, modelType: 'qwen' }),
           });
 
           console.log('API Response status:', apiResponse.status);
@@ -474,14 +474,14 @@ export default function AiInput() {
                         modelName = 'Nishu AI';
                         modelUsed = 'Nishu AI';
                         message = "Great! I've selected Nishu AI for you. Now you can do web search!";
-                      } else if (model === 'deepseek') {
+                      } else if (model === 'mistral') {
                         modelName = 'Nishu 2.0';
                         modelUsed = 'Nishu 2.0';
-                        message = "Great! I've selected Nishu 2.0 for you. Now you can do Deep Research!";
-                      } else if (model === 'grok') {
+                        message = "Great! I've selected Nishu 2.0 for you. Now you can use Mistral Small!";
+                      } else if (model === 'qwen') {
                         modelName = 'Nishu 3.0';
                         modelUsed = 'Nishu 3.0';
-                        message = "Great! I've selected Nishu 3.0 for you. Now you can use X-AI Grok!";
+                        message = "Great! I've selected Nishu 3.0 for you. Now you can use Qwen3 Coder!";
                       }
 
                       const confirmMessage: ChatMessage = {
@@ -607,17 +607,17 @@ export default function AiInput() {
                         ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
                         : selectedModel === 'gemini'
                           ? "bg-green-500/15 border-green-500 text-green-500"
-                          : selectedModel === 'deepseek'
-                            ? "bg-blue-500/15 border-blue-500 text-blue-500"
-                                                          : selectedModel === 'grok'
-                                ? "bg-purple-500/15 border-purple-500 text-purple-500"
+                                                        : selectedModel === 'mistral'
+                                ? "bg-blue-500/15 border-blue-500 text-blue-500"
+                                : selectedModel === 'qwen'
+                                  ? "bg-purple-500/15 border-purple-500 text-purple-500"
                               : showSearch
                                   ? "bg-[#ff3f17]/15 border-[#ff3f17] text-[#ff3f17]"
                                   : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
                     )}
                 >
                   <span className="text-xs font-medium">
-                    {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'grok' ? 'Nishu 3.0' : 'Select Model'}
+                    {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'mistral' ? 'Nishu 2.0' : selectedModel === 'qwen' ? 'Nishu 3.0' : 'Select Model'}
                   </span>
                   <div className="flex flex-shrink-0 justify-center items-center w-4 h-4">
                     <motion.div
@@ -660,7 +660,7 @@ export default function AiInput() {
                         transition={{ duration: 0.2 }}
                         className="text-sm overflow-hidden whitespace-nowrap text-[#ff3f17] flex-shrink-0"
                       >
-                        {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'grok' ? 'Nishu 3.0' : 'Select Model'}
+                        {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'mistral' ? 'Nishu 2.0' : selectedModel === 'qwen' ? 'Nishu 3.0' : 'Select Model'}
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -718,12 +718,12 @@ export default function AiInput() {
 
                       <button
                         onClick={() => {
-                          setSelectedModel('deepseek')
+                          setSelectedModel('mistral')
                           setShowSearch(false)
                         }}
                         className={cn(
                           "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
-                          selectedModel === 'deepseek'
+                          selectedModel === 'mistral'
                             ? "bg-blue-500/15 text-blue-500"
                             : "text-black dark:text-white hover:bg-white/5 dark:hover:bg-black/5"
                         )}
@@ -739,12 +739,12 @@ export default function AiInput() {
 
                       <button
                         onClick={() => {
-                          setSelectedModel('grok')
+                          setSelectedModel('qwen')
                           setShowSearch(false)
                         }}
                         className={cn(
                           "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
-                          selectedModel === 'grok'
+                          selectedModel === 'qwen'
                             ? "bg-purple-500/15 text-purple-500"
                             : "text-black dark:text-white hover:bg-white/5 dark:hover:bg-black/5"
                         )}
@@ -765,13 +765,13 @@ export default function AiInput() {
                 )}
               </div>
 
-              {/* Simple Grok Button */}
+              {/* Simple Qwen Button */}
               <button
                 type="button"
-                onClick={() => setSelectedModel('grok')}
+                onClick={() => setSelectedModel('qwen')}
                 className={cn(
                   "rounded-full transition-all flex items-center gap-2 px-3 py-1 border h-8",
-                  selectedModel === 'grok'
+                  selectedModel === 'qwen'
                     ? "bg-purple-500/15 border-purple-500 text-purple-500"
                     : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
                 )}
