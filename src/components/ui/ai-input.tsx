@@ -146,8 +146,29 @@ export default function AiInput() {
   const handleSubmit = async () => {
     if (!value.trim()) return
 
-    // If no model is selected, use default model (mistral)
-    const modelToUse = selectedModel || 'mistral';
+    // Check if model is selected
+    if (!selectedModel) {
+      const userMessage: ChatMessage = {
+        id: Date.now().toString(),
+        type: 'user',
+        content: value.trim(),
+        timestamp: new Date()
+      }
+
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: "Hi! I'm Nishu, your AI assistant. I recommend trying Nishu 2.0 for the best experience! It can help you with deep research and web search. Please select your preferred AI model:",
+        timestamp: new Date(),
+        modelUsed: 'Agent Mode',
+        showModelButtons: true
+      }
+
+      setChatHistory(prev => [...prev, userMessage, aiMessage])
+      setValue("")
+      adjustHeight(true)
+      return
+    }
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -164,7 +185,7 @@ export default function AiInput() {
     try {
       let response: string
 
-      if (modelToUse === 'local') {
+      if (selectedModel === 'local') {
         // Use local AI responses about Nishant with Hindi support
         const hasHindiChars = /[\u0900-\u097F]/.test(value);
 
@@ -219,7 +240,7 @@ export default function AiInput() {
           modelUsed: 'Local AI (Portfolio Info)'
         };
         setChatHistory(prev => [...prev, aiMessage]);
-      } else if (modelToUse === 'gemini') {
+      } else if (selectedModel === 'gemini') {
         // ✅ Real Gemini 2.0 Flash API call
         console.log('Sending request to Gemini 2.0 Flash API...');
 
@@ -269,7 +290,7 @@ export default function AiInput() {
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
-      } else if (modelToUse === 'deepseek') {
+      } else if (selectedModel === 'deepseek') {
         // ✅ DeepSeek R1 API call
         console.log('Sending request to DeepSeek R1 API...');
 
@@ -319,7 +340,7 @@ export default function AiInput() {
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
-      } else if (modelToUse === 'mistral') {
+      } else if (selectedModel === 'mistral') {
         // ✅ Mistral 7B API call
         console.log('Sending request to Mistral 7B API...');
 
@@ -639,7 +660,7 @@ export default function AiInput() {
                         transition={{ duration: 0.2 }}
                         className="text-sm overflow-hidden whitespace-nowrap text-[#ff3f17] flex-shrink-0"
                       >
-                        {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'mistral' ? 'Nishu 2.0' : 'Select Model'}
+                        {selectedModel === 'local' ? 'Local AI' : selectedModel === 'gemini' ? 'Nishu AI' : selectedModel === 'deepseek' ? 'Nishu 2.0' : selectedModel === 'mistral' ? 'Nishu 3.0' : 'Select Model'}
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -742,14 +763,14 @@ export default function AiInput() {
                 )}
               </div>
 
-              {/* Simple DeepSeek Button */}
+              {/* Simple Mistral Button */}
               <button
                 type="button"
-                onClick={() => setSelectedModel('deepseek')}
+                onClick={() => setSelectedModel('mistral')}
                 className={cn(
                   "rounded-full transition-all flex items-center gap-2 px-3 py-1 border h-8",
-                  selectedModel === 'deepseek'
-                    ? "bg-blue-500/15 border-blue-500 text-blue-500"
+                  selectedModel === 'mistral'
+                    ? "bg-purple-500/15 border-purple-500 text-purple-500"
                     : "bg-white/5 dark:bg-black/5 border-transparent text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
                 )}
               >
@@ -761,10 +782,10 @@ export default function AiInput() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isLoading || !value.trim()}
+                disabled={isLoading || !value.trim() || !selectedModel}
                 className={cn(
                   "rounded-full p-2 transition-colors",
-                  value && !isLoading
+                  value && !isLoading && selectedModel
                     ? "bg-[#ff3f17]/15 text-[#ff3f17] hover:bg-[#ff3f17]/20"
                     : "bg-white/5 dark:bg-black/5 text-black/40 dark:text-white/40"
                 )}
