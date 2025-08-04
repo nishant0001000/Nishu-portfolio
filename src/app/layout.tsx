@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     siteName: 'Nishant Mogahaa Portfolio',
     images: [
       {
-        url: '/images/NISHANT.svg',
+        url: '/images/m-logo.svg',
         width: 1200,
         height: 630,
         alt: 'Nishant Mogahaa - Full Stack Developer',
@@ -105,8 +105,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Structured Data for Person */}
+             <head>
+         {/* Google Analytics */}
+         <script async src="https://www.googletagmanager.com/gtag/js?id=G-VR7LRE7T1S"></script>
+         <script
+           dangerouslySetInnerHTML={{
+             __html: `
+               window.dataLayer = window.dataLayer || [];
+               function gtag(){dataLayer.push(arguments);}
+               gtag('js', new Date());
+               gtag('config', 'G-VR7LRE7T1S');
+             `
+           }}
+         />
+         
+         {/* Structured Data for Person */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -209,7 +222,7 @@ export default function RootLayout({
               "name": "Nishant Mogahaa - Full Stack Developer",
               "description": "Expert Full Stack Developer and AI Engineer providing web development, mobile app development, and IT consultancy services",
                              "url": "https://nishantportfolio.space",
-              "telephone": "+91-XXXXXXXXXX",
+              "telephone": "+91-9870691784",
               "email": "rajputvashu429@gmail.com",
               "address": {
                 "@type": "PostalAddress",

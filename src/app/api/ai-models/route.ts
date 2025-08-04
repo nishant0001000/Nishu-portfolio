@@ -96,10 +96,10 @@ export async function POST(request: NextRequest) {
     const openai = new OpenAI({
       baseURL: 'https://openrouter.ai/api/v1',
       apiKey: openRouterKey,
-      defaultHeaders: {
-        'HTTP-Referer': 'https://nishu-portfolio-seven.vercel.app',
-        'X-Title': 'Nishant Portfolio AI',
-      },
+             defaultHeaders: {
+         'HTTP-Referer': 'https://nishantportfolio.space',
+         'X-Title': 'Nishant Portfolio AI',
+       },
     });
 
     // Determine model based on modelType
