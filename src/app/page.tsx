@@ -21,11 +21,17 @@ const page = () => {
         <CardCarouselParent />
         <TemplateCard />
         <SpecialCard />
-        <AiInputCard />
-        
-        {/* SEO Content Section */}
-        <section className="py-16 mt-16 text-center bg-gray-50 dark:bg-gray-900">
-          <div className="max-w-4xl mx-auto">
+                 <AiInputCard  />
+         
+         {/* FlipLink and Contact Form Section */}
+         <MouseTrailDemo />
+         
+         {/* Footer */}
+         <Footer />
+         
+         {/* SEO Content Section - Hidden but working for SEO */}
+         <section className="py-0 mt-16 text-center bg-gray-50 sr-only dark:bg-gray-900">
+          <div className="mx-auto max-w-4xl">
             <h1 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">
               Nishant Mogahaa - Expert Full Stack Developer & AI Engineer
             </h1>
@@ -108,9 +114,9 @@ const page = () => {
             </div>
           </div>
         </section>
-    
       </div>
     </div>
+    
   )
 }
 

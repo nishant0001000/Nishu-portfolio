@@ -8,7 +8,7 @@ import { Heart } from "lucide-react"
 export function Footer() {
 
   return (
-    <footer className="relative w-full bg-gradient-to-r border-black/5 dark:border-white/5 mt-[-2rem] ">
+    <footer className="relative w-full bg-gradient-to-r border-black/5 dark:border-white/5 mt-[2rem] mb-0">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-5 dark:opacity-10">
 
