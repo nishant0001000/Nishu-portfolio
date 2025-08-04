@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     console.log('🧪 Test Email API called');
 
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Gmail transporter
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: emailUser,
