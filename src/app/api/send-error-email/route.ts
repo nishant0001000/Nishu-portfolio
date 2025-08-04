@@ -187,6 +187,11 @@ export async function POST(request: NextRequest) {
     `;
 
     console.log('📧 Sending email via Gmail SMTP...');
+    console.log('📧 Email configuration:', {
+      from: emailUser,
+      to: emailUser,
+      hasEmailContent: !!emailContent
+    });
 
     // Send email using Gmail SMTP
     const mailOptions = {

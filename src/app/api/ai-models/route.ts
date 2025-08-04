@@ -31,13 +31,13 @@ async function sendErrorEmail(errorDetails: {
     const responseData = await response.json();
     
     if (response.ok && responseData.success) {
-      // Email sent successfully
+      console.log('✅ Error email sent successfully to rajputvashu429@gmail.com');
     } else {
-      // Failed to send email
+      console.error('❌ Failed to send error email:', response.status, responseData);
     }
-      } catch {
-      // Error sending email
-    }
+  } catch (error) {
+    console.error('❌ Error sending email:', error);
+  }
 }
 
 export async function POST(request: NextRequest) {
