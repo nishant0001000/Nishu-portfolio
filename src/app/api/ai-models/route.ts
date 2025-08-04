@@ -12,9 +12,12 @@ async function sendErrorEmail(errorDetails: {
     // Get the base URL dynamically
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}` 
-      : process.env.NEXT_PUBLIC_BASE_URL || 'https://www.nishantportfolio.space/';
+      : process.env.NEXT_PUBLIC_BASE_URL || 'https://nishu-portfolio-seven.vercel.app';
     
-
+    console.log('📧 Attempting to send error email to:', 'rajputvashu429@gmail.com');
+    console.log('📧 Using base URL:', baseUrl);
+    console.log('📧 Error details:', errorDetails);
+    console.log('📧 User message:', userMessage);
     
     // Call our email API route
     const response = await fetch(`${baseUrl}/api/send-error-email`, {
@@ -28,7 +31,10 @@ async function sendErrorEmail(errorDetails: {
       }),
     });
 
+    console.log('📧 Email API response status:', response.status);
+    
     const responseData = await response.json();
+    console.log('📧 Email API response data:', responseData);
     
     if (response.ok && responseData.success) {
       console.log('✅ Error email sent successfully to rajputvashu429@gmail.com');
