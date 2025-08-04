@@ -12,7 +12,7 @@ async function sendErrorEmail(errorDetails: {
     // Get the base URL dynamically
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}` 
-      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      : process.env.NEXT_PUBLIC_BASE_URL || 'https://nishu-portfolio-seven.vercel.app';
     
 
     
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       baseURL: 'https://openrouter.ai/api/v1',
       apiKey: openRouterKey,
       defaultHeaders: {
-        'HTTP-Referer': 'https://nishant-portfolio.vercel.app',
+        'HTTP-Referer': 'https://nishu-portfolio-seven.vercel.app',
         'X-Title': 'Nishant Portfolio AI',
       },
     });
