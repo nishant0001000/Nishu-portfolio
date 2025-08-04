@@ -12,7 +12,7 @@ async function sendErrorEmail(errorDetails: {
     // Get the base URL dynamically
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}` 
-      : process.env.NEXT_PUBLIC_BASE_URL || 'https://nishu-portfolio-seven.vercel.app';
+      : process.env.NEXT_PUBLIC_BASE_URL || 'https://nishantportfolio.space';
     
     console.log('📧 Attempting to send error email to:', 'rajputvashu429@gmail.com');
     console.log('📧 Using base URL:', baseUrl);
