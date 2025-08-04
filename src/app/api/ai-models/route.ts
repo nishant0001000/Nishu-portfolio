@@ -1,9 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-export async function POST(request: NextRequest) {
+// Email sending function
+async function sendErrorEmail(errorDetails: any, userMessage: string) {
   try {
-    const { message, modelType = 'gemini' } = await request.json();
+    // Get the base URL dynamically
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    
+
+    
+    // Call our email API route
+    const response = await fetch(`${baseUrl}/api/send-error-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        errorDetails,
+        userMessage
+      }),
+    });
+
+    const responseData = await response.json();
+    
+    if (response.ok && responseData.success) {
+      // Email sent successfully
+    } else {
+      // Failed to send email
+    }
+  } catch (error) {
+    // Error sending email
+  }
+}
+
+export async function POST(request: NextRequest) {
+  // Declare variables outside try block so they're available in catch block
+  let message: string = '';
+  let modelType: string = '';
+  let model: string = '';
+  let modelName: string = 'Unknown';
+  
+
+  
+  try {
+    const requestData = await request.json();
+    message = requestData.message;
+    modelType = requestData.modelType;
 
     if (!message || message.trim() === '') {
       return NextResponse.json(
@@ -12,25 +56,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🔍 AI Models API Request:', message, 'Model:', modelType);
+    // Use the provided OpenRouter API Key from environment
+    const openRouterKey = process.env.OPENROUTER_API_KEY;
     
-    // Debug environment variables
-    console.log('🔍 All environment variables:', Object.keys(process.env).filter(key => key.includes('OPENROUTER')));
-    console.log('🔍 OPENROUTER_API_KEY value:', process.env.OPENROUTER_API_KEY ? 'EXISTS' : 'NOT FOUND');
-    
-    // OpenRouter API Key from environment variable with fallback
-    const openRouterKey = process.env.OPENROUTER_API_KEY ;
-    
-    console.log('🔑 OpenRouter API Key exists:', !!openRouterKey);
-    console.log('🔑 OpenRouter API Key length:', openRouterKey?.length);
-    console.log('🔑 OpenRouter API Key starts with:', openRouterKey?.substring(0, 10) + '...');
-    console.log('🔑 Using environment variable:', !!process.env.OPENROUTER_API_KEY);
 
+    
     if (!openRouterKey) {
+      const errorDetails = {
+        errorType: 'Missing API Key',
+        message: 'OpenRouter API key not found in environment variables',
+        status: 500,
+        modelName: 'Unknown'
+      };
+      
+      await sendErrorEmail(errorDetails, message);
+      
       return NextResponse.json(
         { 
           success: false,
-          error: 'OpenRouter API key not found'
+          error: 'AI models are currently being updated. Please wait a moment and try again.',
+          userMessage: 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!'
         },
         { status: 500 }
       );
@@ -41,71 +86,124 @@ export async function POST(request: NextRequest) {
       baseURL: 'https://openrouter.ai/api/v1',
       apiKey: openRouterKey,
       defaultHeaders: {
-        'HTTP-Referer': 'http://localhost:3000',
+        'HTTP-Referer': 'https://nishant-portfolio.vercel.app',
         'X-Title': 'Nishant Portfolio AI',
       },
     });
 
-    let modelName, modelDisplayName;
+    // Determine model based on modelType
 
-    // Model selection based on modelType
     switch (modelType) {
       case 'gemini':
-        modelName = 'google/gemma-3n-e2b-it:free';
-        modelDisplayName = 'Nishu AI';
+        model = 'google/gemini-2.0-flash-exp:free';
+        modelName = 'Nishu AI (Gemini 2.0 Flash)';
         break;
       case 'mistral':
-        modelName = 'mistralai/mistral-small-3.2-24b-instruct:free';
-        modelDisplayName = 'Nishu 2.0';
+        model = 'cognitivecomputations/dolphin-mistral-24b-venice-edition:free';
+        modelName = 'Nishu 2.0 (Venice)';
         break;
       case 'qwen':
-      default:
-        modelName = 'qwen/qwen3-coder:free';
-        modelDisplayName = 'Nishu 3.0';
+        model = 'mistralai/mistral-7b-instruct:free';
+        modelName = 'Nishu 3.0 (Mistral 7B)';
         break;
+      default:
+        model = 'google/gemini-2.0-flash-exp:free';
+        modelName = 'Nishu AI (Gemini 2.0 Flash)';
     }
 
-    console.log('🚀 Using model:', modelName);
 
+
+    // Create completion with speed optimizations
     const completion = await openai.chat.completions.create({
-      model: modelName,
+      model: model,
       messages: [
         {
           role: 'user',
           content: message,
         },
       ],
-      max_tokens: 400,
-      temperature: 0.1,
-      top_p: 0.9
+      max_tokens: 500,
+      temperature: 0.3,
+      presence_penalty: 0,
+      frequency_penalty: 0,
     });
 
-    console.log('✅ OpenRouter API Success:', {
-      tokens: completion.usage?.total_tokens,
-      model: completion.model,
-      type: modelType
-    });
+
     
     return NextResponse.json({
       success: true,
-      response: completion.choices[0]?.message?.content || 'No response received',
-      model_used: modelDisplayName,
-      citations: [], // OpenRouter doesn't provide citations in the same format
+      response: completion.choices[0].message.content,
+      model_used: modelName,
       usage: completion.usage || { total_tokens: 0 }
     });
 
-  } catch (error) {
-    console.error('AI Models API Server Error:', error);
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : 'No stack trace',
-      name: error instanceof Error ? error.name : 'Unknown error type'
-    });
+  } catch (error: any) {
+
+    // Prepare error details for email
+    const errorDetails = {
+      errorType: 'API Error',
+      message: error.message || 'Unknown error',
+      status: error.status || 500,
+      modelName: modelName || 'Unknown'
+    };
+
+    // Send error email
+    await sendErrorEmail(errorDetails, message);
+    
+    // Handle insufficient credits error
+    if (error?.status === 402 || error?.message?.includes('402') || error?.message?.includes('Insufficient credits')) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: 'AI models are currently being updated. Please wait a moment and try again.',
+          userMessage: 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!'
+        },
+        { status: 402 }
+      );
+    }
+
+    // Handle specific OpenRouter rate limit errors
+    if (error?.status === 429) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: 'AI models are currently being updated. Please wait a moment and try again.',
+          userMessage: 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!'
+        },
+        { status: 429 }
+      );
+    }
+
+    // Handle API key errors
+    if (error?.status === 401) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: 'AI models are currently being updated. Please wait a moment and try again.',
+          userMessage: 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!'
+        },
+        { status: 401 }
+      );
+    }
+
+    // Handle model not found errors
+    if (error?.status === 404) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: 'AI models are currently being updated. Please wait a moment and try again.',
+          userMessage: 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!'
+        },
+        { status: 404 }
+      );
+    }
+
+    // Generic error response
     return NextResponse.json(
       { 
         success: false,
-        error: 'Server error occurred',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: 'AI models are currently being updated. Please wait a moment and try again.',
+        userMessage: 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!'
       },
       { status: 500 }
     );

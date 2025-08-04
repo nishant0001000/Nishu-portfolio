@@ -30,9 +30,9 @@ const HeroContent = () => {
         </WrapButton>
     </div>
       <h3 className="px-4 mt-20 text-2xl font-bold leading-tight text-center text-black dark:text-white sm:text-3xl lg:text-4xl sm:mt-32 lg:mt-40">
-        Welcome to My P<span className="inline-block animate-bounce" style={{animation: 'shy 2s infinite'}}>🫣</span>rtfolio
+        Welcome to My P<span className="inline-block animate-bounce apple-emoji" style={{animation: 'shy 2s infinite'}}>😉</span>rtfolio
       </h3>
-      <h1 className="text-black dark:text-white text-3xl sm:text-4xl md:text-5xl lg:text-[5.4rem] font-bold text-center px-4">Nishant<span className="inline-block text-red-500" style={{animation: 'heartbeat 1s infinite'}}>❤️</span>Mogahaa</h1>
+      <h1 className="text-black dark:text-white text-3xl sm:text-4xl md:text-5xl lg:text-[5.4rem] font-bold text-center px-4">Nishant<span className="inline-block text-red-500 apple-emoji" style={{animation: 'heartbeat 1s infinite'}}>❤️</span>Mogahaa</h1>
              <div className="flex justify-center w-full">
          <WrapButton onClick={handleOpenResume} className="mt-6 sm:mt-8 lg:mt-10">
              View Resume

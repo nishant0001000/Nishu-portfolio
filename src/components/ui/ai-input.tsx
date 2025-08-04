@@ -79,7 +79,7 @@ const AnimatedPlaceholder = ({ showSearch, selectedModel }: { showSearch: boolea
       transition={{ duration: 0.1 }}
       className="pointer-events-none w-[150px] text-sm absolute text-black/70 dark:text-white/70"
     >
-      {selectedModel === 'local' ? "Ask about Nishant..." : selectedModel === 'gemini' ? "Ask anything with Gemma 3N E2B..." : selectedModel === 'mistral' ? "Ask anything with Mistral Small..." : selectedModel === 'qwen' ? "Ask anything with Qwen3 Coder..." : "Please select a model first..."}
+      {selectedModel === 'local' ? "Ask about Nishant..." : selectedModel === 'gemini' ? "Ask anything with Gemini 2.0 Flash..." : selectedModel === 'mistral' ? "Ask anything with Venice..." : selectedModel === 'qwen' ? "Ask anything with Mistral 7B..." : "Please select a model first..."}
     </motion.p>
   </AnimatePresence>
 )
@@ -242,7 +242,7 @@ export default function AiInput() {
         setChatHistory(prev => [...prev, aiMessage]);
       } else if (selectedModel === 'gemini') {
         // ✅ Gemma 3N E2B API call
-        console.log('Sending request to Gemma 3N E2B API...');
+        console.log('Sending request to Nishu AI (Gemini 2.0 Flash) API...');
 
         try {
           const apiResponse = await fetch('/api/ai-models', {
@@ -258,7 +258,7 @@ export default function AiInput() {
           if (!apiResponse.ok) {
             const errorData = await apiResponse.json();
             console.error('API Error Data:', errorData);
-            throw new Error(errorData.error || `API request failed with status ${apiResponse.status}`);
+            throw new Error(errorData.userMessage || 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!');
           }
 
           const data = await apiResponse.json();
@@ -267,7 +267,7 @@ export default function AiInput() {
           if (data.success) {
             response = data.response;
           } else {
-            throw new Error(data.error || 'API request failed');
+            throw new Error(data.error || 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!');
           }
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
@@ -280,7 +280,7 @@ export default function AiInput() {
         } catch (error) {
           console.error('Gemma API failed:', error);
           // Fallback response if Gemma fails
-          response = "I'm sorry, I'm having trouble connecting to the Gemma 3N E2B API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
+          response = "Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!";
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
@@ -292,7 +292,7 @@ export default function AiInput() {
         }
       } else if (selectedModel === 'mistral') {
         // ✅ Mistral Small API call
-        console.log('Sending request to Mistral Small API...');
+        console.log('Sending request to Nishu 2.0 (Venice) API...');
 
         try {
           const apiResponse = await fetch('/api/ai-models', {
@@ -308,7 +308,7 @@ export default function AiInput() {
           if (!apiResponse.ok) {
             const errorData = await apiResponse.json();
             console.error('API Error Data:', errorData);
-            throw new Error(errorData.error || `API request failed with status ${apiResponse.status}`);
+            throw new Error(errorData.userMessage || 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!');
           }
 
           const data = await apiResponse.json();
@@ -317,20 +317,20 @@ export default function AiInput() {
           if (data.success) {
             response = data.response;
           } else {
-            throw new Error(data.error || 'API request failed');
+            throw new Error(data.error || 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!');
           }
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: data.model_used || 'Mistral Small (Mistral AI)'
+            modelUsed: data.model_used || 'Nishu 2.0 (Venice)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         } catch (error) {
           console.error('Mistral API failed:', error);
           // Fallback response if Mistral fails
-          response = "I'm sorry, I'm having trouble connecting to the Mistral Small API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
+          response = "Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!";
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
@@ -341,8 +341,8 @@ export default function AiInput() {
           setChatHistory(prev => [...prev, aiMessage]);
         }
       } else if (selectedModel === 'qwen') {
-        // ✅ Qwen3 Coder API call
-        console.log('Sending request to Qwen3 Coder API...');
+        // ✅ Mistral 7B API call
+        console.log('Sending request to Nishu 3.0 (Mistral 7B) API...');
 
         try {
           const apiResponse = await fetch('/api/ai-models', {
@@ -358,7 +358,7 @@ export default function AiInput() {
           if (!apiResponse.ok) {
             const errorData = await apiResponse.json();
             console.error('API Error Data:', errorData);
-            throw new Error(errorData.error || `API request failed with status ${apiResponse.status}`);
+            throw new Error(errorData.userMessage || 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!');
           }
 
           const data = await apiResponse.json();
@@ -367,33 +367,33 @@ export default function AiInput() {
           if (data.success) {
             response = data.response;
           } else {
-            throw new Error(data.error || 'API request failed');
+            throw new Error(data.error || 'Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!');
           }
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: data.model_used || 'Qwen3 Coder (Qwen)'
+            modelUsed: data.model_used || 'Nishu 3.0 (Mistral 7B)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         } catch (error) {
-          console.error('Qwen API failed:', error);
-          // Fallback response if Qwen fails
-          response = "I'm sorry, I'm having trouble connecting to the Qwen3 Coder API right now. Please try again later or switch to 'Local AI' mode for portfolio information!";
+          console.error('Mistral 7B API failed:', error);
+          // Fallback response if Mistral 7B fails
+          response = "Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!";
           const aiMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             type: 'ai',
             content: response,
             timestamp: new Date(),
-            modelUsed: 'Qwen3 Coder (Fallback)'
+            modelUsed: 'Mistral 7B (Fallback)'
           };
           setChatHistory(prev => [...prev, aiMessage]);
         }
       }
     } catch (error) {
       setIsError(true)
-      setErrorMessage(error instanceof Error ? error.message : "An error occurred")
+      setErrorMessage(error instanceof Error ? error.message : "Sorry! Our AI models are currently being updated for future improvements. Please wait a moment and try again. Our AI is the fastest AI in the world!")
     } finally {
       setIsLoading(false)
     }
@@ -473,15 +473,15 @@ export default function AiInput() {
                       } else if (model === 'gemini') {
                         modelName = 'Nishu AI';
                         modelUsed = 'Nishu AI';
-                        message = "Great! I've selected Nishu AI for you. Now you can do web search!";
+                        message = "Great! I've selected Nishu AI (Gemini 2.0 Flash) for you. Fast and powerful!";
                       } else if (model === 'mistral') {
                         modelName = 'Nishu 2.0';
                         modelUsed = 'Nishu 2.0';
-                        message = "Great! I've selected Nishu 2.0 for you. Now you can use Mistral Small!";
+                        message = "Great! I've selected Nishu 2.0 (Venice) for you. Fast and smart!";
                       } else if (model === 'qwen') {
                         modelName = 'Nishu 3.0';
                         modelUsed = 'Nishu 3.0';
-                        message = "Great! I've selected Nishu 3.0 for you. Now you can use Qwen3 Coder!";
+                        message = "Great! I've selected Nishu 3.0 (Mistral 7B) for you. This is the fastest free Mistral model!";
                       }
 
                       const confirmMessage: ChatMessage = {
@@ -712,7 +712,7 @@ export default function AiInput() {
                           Nishu AI
                         </div>
                         <div className="mt-1 text-xs text-black/60 dark:text-white/60">
-                          Gemma 3N E2B
+                          Gemini 2.0 Flash (Fast)
                         </div>
                       </button>
 
@@ -733,7 +733,7 @@ export default function AiInput() {
                           Nishu 2.0
                         </div>
                         <div className="mt-1 text-xs text-black/60 dark:text-white/60">
-                          Mistral Small
+                          Venice (Fast & Smart)
                         </div>
                       </button>
 
@@ -754,7 +754,7 @@ export default function AiInput() {
                           Nishu 3.0
                         </div>
                         <div className="mt-1 text-xs text-black/60 dark:text-white/60">
-                          Qwen3 Coder
+                          Mistral 7B (Fastest)
                         </div>
                       </button>
 
@@ -765,7 +765,7 @@ export default function AiInput() {
                 )}
               </div>
 
-              {/* Simple Qwen Button */}
+                                  {/* Simple Mistral 7B Button */}
               <button
                 type="button"
                 onClick={() => setSelectedModel('qwen')}
