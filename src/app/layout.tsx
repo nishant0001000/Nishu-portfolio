@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/ui/theme-provider'
 import LenisProvider from '@/components/ui/lenis-provider'
+import Navbar from '@/components/navbar/Navbar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -104,6 +105,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
+  
     <html lang="en" suppressHydrationWarning>
              <head>
          {/* Google Analytics */}
@@ -274,6 +276,7 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
+        
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -281,6 +284,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <LenisProvider>
+            <Navbar />
             {children}
           </LenisProvider>
         </ThemeProvider>
