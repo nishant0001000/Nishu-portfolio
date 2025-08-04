@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
 
     // Prepare error details for email
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStatus = (error as any)?.status || 500;
+    const errorStatus = (error as { status?: number })?.status || 500;
     
     const errorDetails = {
       errorType: 'API Error',
