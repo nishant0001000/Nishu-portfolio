@@ -203,8 +203,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, messageId: info.messageId });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Error sending email:', error);
-    return NextResponse.json({ success: false, error: 'Email service error', details: error?.message || 'Unknown error' });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ success: false, error: 'Email service error', details: errorMessage });
   }
 } 

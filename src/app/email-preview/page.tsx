@@ -707,7 +707,7 @@ const EmailTemplate = () => {
             color: '#cccccc',
             fontSize: '14px'
           }}>
-            This is an automated alert from Nishant's Portfolio AI System
+                         This is an automated alert from Nishant&apos;s Portfolio AI System
           </p>
           <p style={{
             margin: 0,

@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 // Email sending function
-async function sendErrorEmail(errorDetails: any, userMessage: string) {
+async function sendErrorEmail(errorDetails: {
+  errorType: string;
+  message: string;
+  status: number;
+  modelName: string;
+}, userMessage: string) {
   try {
     // Get the base URL dynamically
     const baseUrl = process.env.VERCEL_URL 
@@ -30,9 +35,9 @@ async function sendErrorEmail(errorDetails: any, userMessage: string) {
     } else {
       // Failed to send email
     }
-  } catch (error) {
-    // Error sending email
-  }
+      } catch {
+      // Error sending email
+    }
 }
 
 export async function POST(request: NextRequest) {
@@ -137,13 +142,16 @@ export async function POST(request: NextRequest) {
       usage: completion.usage || { total_tokens: 0 }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
 
     // Prepare error details for email
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStatus = (error as any)?.status || 500;
+    
     const errorDetails = {
       errorType: 'API Error',
-      message: error.message || 'Unknown error',
-      status: error.status || 500,
+      message: errorMessage,
+      status: errorStatus,
       modelName: modelName || 'Unknown'
     };
 
@@ -151,7 +159,7 @@ export async function POST(request: NextRequest) {
     await sendErrorEmail(errorDetails, message);
     
     // Handle insufficient credits error
-    if (error?.status === 402 || error?.message?.includes('402') || error?.message?.includes('Insufficient credits')) {
+    if (errorStatus === 402 || errorMessage.includes('402') || errorMessage.includes('Insufficient credits')) {
       return NextResponse.json(
         { 
           success: false,
@@ -163,7 +171,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle specific OpenRouter rate limit errors
-    if (error?.status === 429) {
+    if (errorStatus === 429) {
       return NextResponse.json(
         { 
           success: false,
@@ -175,7 +183,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle API key errors
-    if (error?.status === 401) {
+    if (errorStatus === 401) {
       return NextResponse.json(
         { 
           success: false,
@@ -187,7 +195,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle model not found errors
-    if (error?.status === 404) {
+    if (errorStatus === 404) {
       return NextResponse.json(
         { 
           success: false,
