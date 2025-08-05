@@ -338,7 +338,7 @@ export async function POST(request: NextRequest) {
           <!-- Footer -->
           <div style="background-color: #1a1a1a; padding: 20px; text-align: center; border-top: 1px solid #333333; border-radius: 0 0 30px 30px;">
             <p style="margin: 0 0 10px 0; color: #cccccc; font-size: 14px;">
-              Thank you for choosing Nishant's Portfolio Services
+              This is an automated notification from Nishant's Portfolio Contact System
             </p>
             <p style="margin: 0; color: #888888; font-size: 12px;">
               © 2025 Nishant Portfolio AI. All rights reserved.
