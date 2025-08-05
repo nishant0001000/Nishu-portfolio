@@ -321,7 +321,7 @@ const TemplateCard = () => {
                             >
                                 <div className="flex justify-center items-center w-full h-full">
                                     <video
-                                        src="/videos/m-logo.mp4"
+                                        src="https://res.cloudinary.com/dbtymafqf/video/upload/v1754257529/m-logodark1_pphxjz.mp4"
                                         width={28}
                                         height={28}
                                         autoPlay
@@ -350,7 +350,7 @@ const TemplateCard = () => {
                         >
                             <div className="flex overflow-hidden relative justify-center items-center w-full h-full bg-black rounded-full">
                                 <video
-                                    src="/videos/m-logo.mp4"
+                                    src="https://res.cloudinary.com/dbtymafqf/video/upload/v1754257529/m-logodark1_pphxjz.mp4"
                                     width={35}
                                     height={35}
                                     autoPlay

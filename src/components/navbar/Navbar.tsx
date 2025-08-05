@@ -82,7 +82,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="w-8 h-8">
             <video 
-              src="/videos/m-logodark1.mp4"
+              src="https://res.cloudinary.com/dbtymafqf/video/upload/v1754257529/m-logodark1_pphxjz.mp4"
               width={32} 
               height={32}
               autoPlay 
@@ -92,7 +92,7 @@ const Navbar = () => {
               className="rounded-full dark:hidden"
             />
             <video 
-              src="/videos/m-logolight1.mp4"
+              src="https://res.cloudinary.com/dbtymafqf/video/upload/v1754257529/m-logolight1_y8u0bu.mp4"
               width={32} 
               height={32}
               autoPlay 

@@ -60,7 +60,7 @@ export function Footer() {
              <div className="hidden relative justify-center items-center ml-2 w-8 h-8 bg-gradient-to-br rounded-full border shadow-lg backdrop-blur-sm transition-all duration-300 cursor-pointer md:flex from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 border-white/20 hover:shadow-xl group">
               <div className="flex overflow-hidden relative justify-center items-center p-1 w-full h-full bg-black rounded-full">
                 <video
-                  src="/videos/m-logo.mp4"
+                  src="https://res.cloudinary.com/dbtymafqf/video/upload/v1754257529/m-logodark1_pphxjz.mp4"
                   width={24}
                   height={24}
                   autoPlay
