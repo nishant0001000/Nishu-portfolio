@@ -786,10 +786,10 @@ export default function AiInput() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isLoading || !value.trim() || !selectedModel}
+                disabled={isLoading || !value.trim()}
                 className={cn(
                   "rounded-full p-2 transition-colors",
-                  value && !isLoading && selectedModel
+                  value && !isLoading
                     ? "bg-[#ff3f17]/15 text-[#ff3f17] hover:bg-[#ff3f17]/20"
                     : "bg-white/5 dark:bg-black/5 text-black/40 dark:text-white/40"
                 )}
