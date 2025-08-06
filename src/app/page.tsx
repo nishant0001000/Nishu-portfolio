@@ -33,10 +33,10 @@ const page = () => {
          <section className="py-0 mt-16 text-center bg-gray-50 sr-only dark:bg-gray-900">
           <div className="mx-auto max-w-4xl">
             <h1 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">
-              Nishant Mogahaa - Expert Full Stack Developer & AI Engineer
+              Nishant Mogahaa (NMM) - Expert Full Stack Developer & AI Engineer
             </h1>
             <p className="mb-6 text-xl text-gray-600 dark:text-gray-300">
-              Leading Full Stack Developer specializing in React, Next.js, Node.js, and AI/ML technologies. 
+              Also known as Nishant Mogha or NMM. Leading Full Stack Developer specializing in React, Next.js, Node.js, and AI/ML technologies. 
               Best developer for hire in India with expertise in modern web development and artificial intelligence.
             </p>
             <div className="grid grid-cols-1 gap-6 mt-12 md:grid-cols-3">

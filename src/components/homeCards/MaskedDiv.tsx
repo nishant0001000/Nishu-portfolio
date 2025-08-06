@@ -158,7 +158,7 @@ function MaskedDivDemo() {
 
         .time-display {
           font-size: 0.4rem;
-          font-weight: 400;
+          font-weight: 800;
           color: white;
           margin-top: -0.1rem;
         }
@@ -173,7 +173,8 @@ function MaskedDivDemo() {
         .date-display {
           font-size: 0.25rem;
           color: white;
-          margin-top: -0.1rem;
+          font-weight: 800;
+          margin-top: -0.2rem;
         }
 
         .button-container {
@@ -238,7 +239,7 @@ function MaskedDivDemo() {
 
           .time-display {
             font-size: 1.5rem !important;
-            margin-top: -0.5rem !important;
+            margin-top: -0.3rem !important;
           }
 
           .day-display {
@@ -247,7 +248,7 @@ function MaskedDivDemo() {
 
           .date-display {
             font-size: 0.875rem !important;
-            margin-top: -0.4rem !important;
+            margin-top: -0.2rem !important;
           }
 
           .button-container {

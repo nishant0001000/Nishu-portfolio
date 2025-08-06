@@ -30,9 +30,48 @@ const HeroContent = () => {
         </WrapButton>
     </div>
       <h3 className="px-4 mt-20 text-2xl font-bold leading-tight text-center text-black dark:text-white sm:text-3xl lg:text-4xl sm:mt-32 lg:mt-40">
-        Welcome to My P<span className="inline-block animate-bounce apple-emoji" style={{animation: 'shy 2s infinite'}}>😉</span>rtfolio
+        Welcome to My P
+        <span className="inline-block mx-1 animate-bounce" style={{animation: 'shy 2s infinite'}}>
+          <Image 
+            src="/images/Lion-img.png" 
+            alt="Portfolio Icon" 
+            width={32} 
+            height={32}
+            className="w-6 h-6 transform translate-y-2 sm:w-8 sm:h-8 lg:w-10 lg:h-10"
+            quality={100}
+            priority
+          />
+        </span>
+        rtfolio
       </h3>
-      <h1 className="text-black dark:text-white text-3xl sm:text-4xl md:text-5xl lg:text-[5.4rem] font-bold text-center px-4">Nishant<span className="inline-block text-red-500 apple-emoji" style={{animation: 'heartbeat 1s infinite'}}>❤️</span>Mogahaa</h1>
+      <h1 className="text-black dark:text-white text-3xl sm:text-4xl md:text-5xl lg:text-[5.4rem] font-bold text-center px-4">
+        Nishant
+                 <span className="inline-block mx-2">
+           {/* Dark theme image */}
+           <Image 
+             className="hidden w-8 h-10 animate-pulse dark:inline-block sm:w-10 sm:h-12 md:w-12 md:h-12 lg:w-46 lg:h-60" 
+             style={{animation: 'shake 0.3s ease-in-out infinite'}}
+             src="/images/memogi.png" 
+             alt="Dark theme logo" 
+             width={74} 
+             height={90}
+             quality={100}
+             priority
+           />
+           {/* Light theme image */}
+           <Image 
+             className="inline-block w-8 h-8 dark:hidden sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16" 
+             style={{animation: 'shake 1.5s ease-in-out infinite'}}
+             src="/images/memogi.png" 
+             alt="Light theme logo" 
+             width={64} 
+             height={64}
+             quality={100}
+             priority
+           />
+         </span>
+        Mogahaa
+      </h1>
              <div className="flex justify-center w-full">
          <WrapButton onClick={handleOpenResume} className="mt-6 sm:mt-8 lg:mt-10">
              View Resume

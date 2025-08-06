@@ -9,13 +9,24 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
-    default: 'Nishant Mogahaa - Full Stack Developer | AI Portfolio | Best Developer in India',
-    template: '%s | Nishant Mogahaa - Full Stack Developer'
+    default: 'Nishant Mogahaa (NMM) - Full Stack Developer | AI Portfolio | Best Developer in India',
+    template: '%s | Nishant Mogahaa (NMM) - Full Stack Developer'
   },
-  description: 'Nishant Mogahaa - Expert Full Stack Developer, AI Engineer, and IT Consultant. Specializing in React, Next.js, Node.js, AI/ML, and modern web technologies. Best developer for hire in India. Cybershoora IT Solutions.',
+  icons: {
+    icon: [
+      { url: '/images/favicon.svg', type: 'image/svg+xml' },
+      { url: '/images/favicon.svg', sizes: 'any' },
+      { url: '/images/favicon.png', type: 'image/png' }
+    ],
+    apple: '/images/favicon.png',
+    shortcut: '/images/favicon.ico'
+  },
+  description: 'Nishant Mogahaa (NMM) - Expert Full Stack Developer, AI Engineer, and IT Consultant. Also known as Nishant Moghaa or NMM. Specializing in React, Next.js, Node.js, AI/ML, and modern web technologies. Best developer for hire in India. Cybershoora IT Solutions.',
   keywords: [
     'Nishant Mogahaa',
     'Nishant Mogha',
+    'Nishant Moghaa', // alternate spelling
+    'NMM',
     'Full Stack Developer',
     'React Developer',
     'Next.js Developer',
@@ -46,9 +57,9 @@ export const metadata: Metadata = {
     'Tech Consultant',
     'Digital Solutions'
   ],
-  authors: [{ name: 'Nishant Mogahaa' }],
-  creator: 'Nishant Mogahaa',
-  publisher: 'Nishant Mogahaa',
+  authors: [{ name: 'Nishant Mogahaa (NMM)' }, { name: 'Nishant Moghaa' }],
+  creator: 'Nishant Mogahaa (NMM)',
+  publisher: 'Nishant Mogahaa (NMM)',
   formatDetection: {
     email: false,
     address: false,
@@ -62,23 +73,23 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://nishantportfolio.space',
-    title: 'Nishant Mogahaa - Full Stack Developer | AI Portfolio | Best Developer in India',
-    description: 'Expert Full Stack Developer, AI Engineer, and IT Consultant. Specializing in React, Next.js, Node.js, AI/ML, and modern web technologies. Best developer for hire in India.',
-    siteName: 'Nishant Mogahaa Portfolio',
+    title: 'Nishant Mogahaa (NMM) - Full Stack Developer | AI Portfolio | Best Developer in India',
+    description: 'Expert Full Stack Developer, AI Engineer, and IT Consultant. Also known as Nishant Moghaa or NMM. Specializing in React, Next.js, Node.js, AI/ML, and modern web technologies. Best developer for hire in India.',
+    siteName: 'Nishant Mogahaa (NMM) Portfolio',
     images: [
       {
-        url: '/images/m-logo.svg',
+        url: '/images/favicon.svg',
         width: 1200,
         height: 630,
-        alt: 'Nishant Mogahaa - Full Stack Developer',
+        alt: 'Nishant Mogahaa (NMM) - Full Stack Developer',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Nishant Mogahaa - Full Stack Developer | AI Portfolio',
-    description: 'Expert Full Stack Developer, AI Engineer, and IT Consultant. Best developer for hire in India.',
-    images: ['/images/NISHANT.svg'],
+    title: 'Nishant Mogahaa (NMM) - Full Stack Developer | AI Portfolio',
+    description: 'Expert Full Stack Developer, AI Engineer, and IT Consultant. Also known as Nishant Moghaa or NMM. Best developer for hire in India.',
+    images: ['/images/favicon.svg'],
     creator: '@nishant_mogahaa',
   },
   robots: {
