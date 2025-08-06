@@ -36,8 +36,8 @@ const HeroContent = () => {
             src="/images/Lion-img.png" 
             alt="Portfolio Icon" 
             width={32} 
-            height={32}
-            className="w-6 h-6 transform translate-y-2 sm:w-8 sm:h-8 lg:w-10 lg:h-10"
+            height={42}
+            className="w-6 h-6 transform translate-y-1 sm:w-8 sm:h-8 lg:w-9 lg:h-12"
             quality={100}
             priority
           />
