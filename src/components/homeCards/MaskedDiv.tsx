@@ -105,9 +105,11 @@ function MaskedDivDemo() {
           margin: 0 auto;
           margin-top: 0;
          
-          max-width: 80rem;
+          max-width: 100vw;
+          width: 100%;
           margin-bottom: 8.75rem;
           align-items: center;
+          overflow-x: hidden;
         }
 
         .masked-video-container {

@@ -7,6 +7,9 @@
   font-family: skip;
   src: url(/fonts/103fc5fac08dcb15-s.p.woff2);
 }
+html, body {
+  overflow-x: hidden;
+}
 body {
   background-color: white !important;
 }

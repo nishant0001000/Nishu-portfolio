@@ -45,7 +45,7 @@ type StatusIconProps = {
 const StatusIcon: React.FC<StatusIconProps> = ({ status }) => {
   const iconMap: Record<StatusIconProps["status"], JSX.Element> = useMemo(
     () => ({
-      loading: <Loader2 className="animate-spin text-white" size={20} />,
+      loading: <Loader2 className="text-white animate-spin" size={20} />,
       success: <Check className="text-white" size={20} />,
       error: <X className="text-white" size={20} />,
     }),
@@ -142,7 +142,7 @@ const CustomSlideButton = forwardRef<HTMLButtonElement, CustomSlideButtonProps>(
        <motion.div
          animate={completed ? BUTTON_STATES.completed : BUTTON_STATES.initial}
          transition={ANIMATION_CONFIG.spring}
-         className="flex relative justify-center items-center h-12 bg-gray-100 rounded-full shadow-button-inset dark:shadow-button-inset-dark"
+         className="flex relative justify-center items-center h-12 bg-neutral-100 dark:bg-neutral-800 rounded-full shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(0,0,0,0.1),0_2px_2px_0_rgba(0,0,0,0.1),0_4px_4px_0_rgba(0,0,0,0.1),0_8px_8px_0_rgba(0,0,0,0.1)]"
        >
          {/* Background progress bar */}
          {!completed && (
@@ -150,24 +150,24 @@ const CustomSlideButton = forwardRef<HTMLButtonElement, CustomSlideButtonProps>(
              style={{
                width: adjustedWidth,
              }}
-             className="absolute inset-y-0 left-0 z-0 rounded-full bg-gradient-to-r from-[#EEBDE0] to-[#D4A5C7]"
+             className="absolute inset-y-0 left-0 z-0 rounded-full bg-primary"
            />
          )}
 
-         {/* Text label */}
-         <AnimatePresence mode="wait">
-           {!completed && (
-             <motion.div
-               key="slide-text"
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               exit={{ opacity: 0 }}
-               className="absolute z-5 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
-             >
-               {isDragging ? "Sending..." : "Slide to send"}
-             </motion.div>
-           )}
-         </AnimatePresence>
+                                                                                                                                                               {/* Text label */}
+             <AnimatePresence mode="wait">
+               {!completed && (
+                 <motion.div
+                   key="slide-text"
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   className="absolute text-sm font-medium text-center text-white z-5"
+                 >
+                   {isDragging ? "Checking..." : "Slide to access"}
+                 </motion.div>
+               )}
+             </AnimatePresence>
 
          {/* Drag handle */}
          <AnimatePresence key={crypto.randomUUID()}>
@@ -190,12 +190,12 @@ const CustomSlideButton = forwardRef<HTMLButtonElement, CustomSlideButtonProps>(
                  {...props}
                  size="icon"
                  className={cn(
-                   "shadow-button rounded-full drop-shadow-xl bg-white dark:bg-gray-800",
+                   "shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(0,0,0,0.1),0_2px_2px_0_rgba(0,0,0,0.1),0_4px_4px_0_rgba(0,0,0,0.1),0_8px_8px_0_rgba(0,0,0,0.1)] rounded-full drop-shadow-xl bg-background w-10 h-10",
                    isDragging && "scale-105 transition-transform",
                    className
                  )}
                >
-                 <SendHorizontal className="size-4 text-gray-700 dark:text-gray-300" />
+                 <SendHorizontal className="size-4 text-foreground" />
                </Button>
              </motion.div>
            )}
@@ -216,10 +216,10 @@ const CustomSlideButton = forwardRef<HTMLButtonElement, CustomSlideButtonProps>(
                   onClick={status === "error" ? handleReset : undefined}
                   {...props}
                   className={cn(
-                    "rounded-full transition-all duration-300 size-full",
+                    "rounded-full transition-all duration-300 size-full shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(0,0,0,0.1),0_2px_2px_0_rgba(0,0,0,0.1),0_4px_4px_0_rgba(0,0,0,0.1),0_8px_8px_0_rgba(0,0,0,0.1)]",
                     status === "success" && "bg-green-500 hover:bg-green-600",
-                    status === "error" && "bg-red-500 hover:bg-red-600 cursor-pointer",
-                    status === "loading" && "bg-blue-500 hover:bg-blue-600",
+                    status === "error" && "bg-destructive hover:bg-destructive/90",
+                    status === "loading" && "bg-primary hover:bg-primary/90",
                     className
                   )}
                 >

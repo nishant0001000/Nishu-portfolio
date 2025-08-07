@@ -13,8 +13,8 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div className="overflow-x-hidden min-h-screen bg-white dark:bg-black">
-      <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div className="overflow-x-hidden min-h-screen bg-white dark:bg-black w-full">
+      <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 w-full">
        
         <HeroContent />
         <MaskedDivDemo />

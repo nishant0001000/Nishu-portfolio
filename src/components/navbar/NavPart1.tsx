@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
+import { useAdmin } from '../ui/admin-context'
 
 const NavPart1 = () => {
   const { theme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const { incrementClickCount, clickCount } = useAdmin()
 
   // useEffect to handle hydration
   useEffect(() => {
@@ -17,9 +19,14 @@ const NavPart1 = () => {
   // Default to 'dark' initially to show dark video until theme is properly detected
   const currentTheme = mounted ? (resolvedTheme || theme) : 'dark'
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    incrementClickCount()
+  }
+
   return (
     <div className='flex gap-4 items-center'>
-        <a href="#" className='flex gap-2 items-center'>
+        <a href="#" className='flex gap-2 items-center' onClick={handleLogoClick}>
             {/* Light Theme Video - Hidden in Dark Mode */}
             <video 
                 src="https://res.cloudinary.com/dbtymafqf/video/upload/v1754257529/m-logolight1_y8u0bu.mp4"
@@ -29,7 +36,7 @@ const NavPart1 = () => {
                 loop 
                 muted 
                 playsInline
-                className={`rounded-lg ${currentTheme === 'dark' ? 'hidden' : 'block'}`}
+                className={`rounded-lg cursor-pointer transition-transform hover:scale-105 ${currentTheme === 'dark' ? 'hidden' : 'block'}`}
             />
             
             {/* Dark Theme Video - Hidden in Light Mode */}
@@ -41,7 +48,7 @@ const NavPart1 = () => {
                 loop 
                 muted 
                 playsInline
-                className={`rounded-lg ${currentTheme === 'dark' ? 'block' : 'hidden'}`}
+                className={`rounded-lg cursor-pointer transition-transform hover:scale-105 ${currentTheme === 'dark' ? 'block' : 'hidden'}`}
             />
             
             {/* <h4 className='text-lg font-bold'>Nishant Mogahaa</h4>

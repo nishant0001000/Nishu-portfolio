@@ -127,6 +127,29 @@ export function MouseTrailDemo() {
       })
 
       if (response.data.success) {
+        // Track form submission
+        try {
+          await fetch('/api/track-visitor', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'form',
+              visitorInfo: {
+                name: formData.name,
+                email: formData.email,
+                phone: selectedCountryCode + formData.phone,
+                message: formData.message,
+                preferredTime: selectedTime,
+                timestamp: new Date().toISOString()
+              }
+            })
+          })
+        } catch (trackingError) {
+          console.error('Error tracking form submission:', trackingError)
+        }
+
         setSubmitStatus("success")
         setSubmitMessage("Thank you! Your message has been sent successfully. You'll receive a confirmation email shortly, and Nishant will get back to you soon!")
         

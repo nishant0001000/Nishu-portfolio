@@ -3,7 +3,11 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/ui/theme-provider'
 import LenisProvider from '@/components/ui/lenis-provider'
+import { AdminProvider } from '@/components/ui/admin-context'
 import Navbar from '@/components/navbar/Navbar'
+import PasswordModal from '@/components/ui/password-modal'
+import AdminPanel from '@/components/ui/admin-panel'
+import VisitorTracker from '@/components/ui/visitor-tracker'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -294,10 +298,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <LenisProvider>
-            <Navbar />
-            {children}
-          </LenisProvider>
+          <AdminProvider>
+            <LenisProvider>
+              <VisitorTracker />
+              <Navbar />
+              {children}
+              <PasswordModal />
+              <AdminPanel />
+            </LenisProvider>
+          </AdminProvider>
         </ThemeProvider>
       </body>
     </html>
