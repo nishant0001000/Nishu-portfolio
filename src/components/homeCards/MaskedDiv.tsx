@@ -101,12 +101,13 @@ function MaskedDivDemo() {
           display: flex;
           flex-wrap: wrap;
           gap: 1.25rem;
-          justify-content: space-between;
+          justify-content: center;
           margin: 0 auto;
           margin-top: 0;
+         
           max-width: 80rem;
           margin-bottom: 8.75rem;
-          align-items: space-between;
+          align-items: center;
         }
 
         .masked-video-container {

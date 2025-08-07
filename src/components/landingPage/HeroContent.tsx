@@ -37,7 +37,7 @@ const HeroContent = () => {
             alt="Portfolio Icon" 
             width={32} 
             height={42}
-            className="w-6 h-6 transform translate-y-1 sm:w-8 sm:h-8 lg:w-9 lg:h-12"
+            className="w-6 h-6 transform translate-y-1 sm:w-8 sm:h-8 lg:w-9 lg:h-10"
             quality={100}
             priority
           />
@@ -50,8 +50,8 @@ const HeroContent = () => {
            {/* Dark theme image */}
            <Image 
              className="hidden w-8 h-10 animate-pulse dark:inline-block sm:w-10 sm:h-12 md:w-12 md:h-12 lg:w-46 lg:h-60" 
-             style={{animation: 'shake 0.3s ease-in-out infinite'}}
-             src="/images/memogi.png" 
+             style={{animation: 'shake 0.5s ease-in-out infinite'}}
+             src="/images/memogi2.png" 
              alt="Dark theme logo" 
              width={74} 
              height={90}
@@ -60,9 +60,9 @@ const HeroContent = () => {
            />
            {/* Light theme image */}
            <Image 
-             className="inline-block w-8 h-8 dark:hidden sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16" 
-             style={{animation: 'shake 1.5s ease-in-out infinite'}}
-             src="/images/memogi.png" 
+             className="inline-block w-8 h-10 dark:hidden sm:w-10 sm:h-12 md:w-12 md:h-12 lg:w-46 lg:h-60" 
+             style={{animation: 'shake 0.5s ease-in-out infinite'}}
+             src="/images/memogi2.png" 
              alt="Light theme logo" 
              width={64} 
              height={64}
@@ -98,7 +98,7 @@ const HeroContent = () => {
     </div>
 
     {/* Nishant Image - Theme Responsive */}
-    <Image className="hidden md:hidden lg:block absolute left-0 top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[30rem] lg:h-[50rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
+    <Image className="hidden md:hidden lg:block absolute left-[-9rem] top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[50rem] lg:h-[60rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
            src="/images/NISHANT.svg" 
            alt="Nishant" 
            width={400} 
@@ -106,7 +106,7 @@ const HeroContent = () => {
     />
     
     {/* Nishant Image for Light Theme - Add your image here */}
-    <Image className="hidden md:hidden lg:block absolute left-0 top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[30rem] lg:h-[50rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
+    <Image className="hidden md:hidden lg:block absolute left-[-9rem] top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[50rem] lg:h-[60rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
            src="/images/NISHANT-black.svg" 
            alt="Nishant Light" 
            width={400} 
@@ -114,7 +114,7 @@ const HeroContent = () => {
     />
     
     {/* Mogahaa Image - Theme Responsive */}
-    <Image className="hidden md:hidden lg:block absolute right-0 top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[30rem] lg:h-[50rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
+    <Image className="hidden md:hidden lg:block absolute right-[-9rem] top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[50rem] lg:h-[60rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
            src="/images/MOGAHAA.svg" 
            alt="Mogahaa" 
            width={400} 
@@ -122,7 +122,7 @@ const HeroContent = () => {
     />
     
     {/* Mogahaa Image for Light Theme - Add your image here */}
-    <Image className="hidden md:hidden lg:block absolute right-0 top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[30rem] lg:h-[50rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
+    <Image className="hidden md:hidden lg:block absolute right-[-9rem] top-20 sm:top-32 lg:top-150 h-[20rem] sm:h-[50rem] lg:h-[60rem] opacity-20 sm:opacity-30 lg:opacity-100 pointer-events-none" 
            src="/images/MOGAHAA-black.svg" 
            alt="Mogahaa Light" 
            width={400} 
@@ -133,7 +133,7 @@ const HeroContent = () => {
     <ResumePopup
       isOpen={isResumePopupOpen}
       onClose={handleCloseResume}
-      pdfUrl="/pdfs/NishantResume.pdf"
+      pdfUrl="/pdfs/Nishant_Mogahaa_CV.pdf"
     />
     </>
   );
