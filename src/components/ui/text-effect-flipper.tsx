@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react"
+import React from "react"
 import { motion } from "framer-motion"
 
 const DURATION = 0.25
@@ -16,7 +16,7 @@ const FlipLink: React.FC<FlipLinkProps> = ({ children, href }) => {
       whileHover="hovered"
       target="_blank"
       href={href}
-       className="block overflow-hidden relative text-3xl font-semibold uppercase whitespace-nowrap dark:text-white/90 sm:text-7xl md:text-6xl"
+      className="block overflow-hidden relative text-3xl font-semibold uppercase whitespace-nowrap dark:text-white/90 sm:text-7xl md:text-6xl"
       style={{
         lineHeight: 0.75,
       }}

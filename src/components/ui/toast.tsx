@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, XCircle, X } from 'lucide-react'
 
@@ -59,11 +59,3 @@ const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onClose }) => {
 }
 
 export default Toast
-
-
-
-
-
-
-
-
