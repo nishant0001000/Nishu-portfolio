@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
+import { ObjectId } from 'mongodb'
 
 // Database and collection names
 const DB_NAME = 'portfolio_tracking'
@@ -7,13 +8,13 @@ const FORMS_COLLECTION = 'forms'
 
 // Define interface for form structure
 interface FormDocument {
-  _id: any
+  _id: ObjectId
   id?: string
   email: string
   name: string
   phone: string
   timestamp: string | Date
-  [key: string]: any
+  [key: string]: unknown // Fixed: 'any' को 'unknown' में change किया
 }
 
 // Helper function to get database
@@ -33,7 +34,7 @@ export async function POST() {
     const allForms: FormDocument[] = await db.collection(FORMS_COLLECTION)
       .find({})
       .sort({ timestamp: 1 })
-      .toArray()
+      .toArray() as FormDocument[]
 
     console.log(`📊 Found ${allForms.length} total forms`)
 
@@ -110,7 +111,7 @@ export async function GET() {
     const allForms: FormDocument[] = await db.collection(FORMS_COLLECTION)
       .find({})
       .sort({ timestamp: 1 })
-      .toArray()
+      .toArray() as FormDocument[]
 
     // Group by email + name + phone to find duplicates
     const formGroups = new Map<string, FormDocument[]>()
