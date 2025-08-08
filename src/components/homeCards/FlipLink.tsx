@@ -15,6 +15,17 @@ import { cn } from "@/lib/utils"
 
 import { FlipLink } from "../ui/text-effect-flipper"
 
+// Helper function to detect browser name
+const getBrowserName = (): string => {
+  const userAgent = navigator.userAgent
+  if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) return 'Chrome'
+  if (userAgent.includes('Firefox')) return 'Firefox'
+  if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) return 'Safari'
+  if (userAgent.includes('Edg')) return 'Edge'
+  if (userAgent.includes('Opera') || userAgent.includes('OPR')) return 'Opera'
+  return 'Unknown'
+}
+
 const Icons = {
   linkedin: () => (
     <div className="w-[25px] h-[25px] md:w-[60px] md:h-[60px] rounded-[4px] md:rounded-[10px] bg-[#D9D9D9] transition-all duration-500 ease-in-out group-hover:bg-accent flex items-center justify-center">
@@ -118,40 +129,58 @@ export function MouseTrailDemo() {
     setSubmitMessage("")
 
     try {
+      // Collect detailed visitor information for form submissions
+      const visitorInfo = {
+        url: window.location.href,
+        referrer: document.referrer,
+        language: navigator.language,
+        screenResolution: `${screen.width}x${screen.height}`,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        platform: navigator.platform,
+        cookieEnabled: navigator.cookieEnabled,
+        onlineStatus: navigator.onLine,
+        location: 'Unknown', // Default value
+        device: /Mobile|Android|iPhone|iPad/.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+        browser: getBrowserName(),
+        timestamp: new Date().toISOString()
+      }
+
+      // Submit form immediately without waiting for location (for fast slider response)
       const response = await axios.post('/api/send-contact-email', {
         name: formData.name,
         email: formData.email,
         phone: selectedCountryCode + formData.phone,
         message: formData.message,
-        preferredTime: selectedTime
+        preferredTime: selectedTime,
+        visitorInfo // Include visitor info (location will be 'Unknown' if not available quickly)
       })
 
       if (response.data.success) {
-        // Track form submission
-        try {
-          await fetch('/api/track-visitor', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              type: 'form',
-              visitorInfo: {
-                name: formData.name,
-                email: formData.email,
-                phone: selectedCountryCode + formData.phone,
-                message: formData.message,
-                preferredTime: selectedTime,
-                timestamp: new Date().toISOString()
-              }
-            })
-          })
-        } catch (trackingError) {
-          console.error('Error tracking form submission:', trackingError)
-        }
+        // Form submission is now handled by /api/send-contact-email
+        // No need for separate tracking call as it's already stored in database
+        console.log('✅ Form submitted and stored in database successfully')
 
         setSubmitStatus("success")
         setSubmitMessage("Thank you! Your message has been sent successfully. You'll receive a confirmation email shortly, and Nishant will get back to you soon!")
+        
+        // Try to get location in background after successful submission (non-blocking)
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const location = `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`
+              console.log('📍 Location obtained after submission:', location)
+              // Could optionally update the form record with location if needed
+            },
+            (geoError) => {
+              console.log('📍 Location not available after submission:', geoError.message)
+            },
+            { 
+              timeout: 10000,
+              enableHighAccuracy: false,
+              maximumAge: 300000
+            }
+          )
+        }
         
         // Show success animation after a short delay
         setTimeout(() => {
@@ -173,10 +202,10 @@ export function MouseTrailDemo() {
         throw new Error("Failed to send message")
       }
     } catch (error) {
-      console.error('Error sending contact form:', error)
+      console.error('❌ Error sending contact form:', error)
       setSubmitStatus("error")
       setSubmitMessage("Failed to send message. Please try again later.")
-      throw error
+      throw error // Re-throw to let slider button handle the error state
     } finally {
       setIsSubmitting(false)
     }

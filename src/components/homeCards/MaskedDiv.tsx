@@ -134,9 +134,7 @@ function MaskedDivDemo() {
           cursor: pointer;
         }
 
-        .video-element:hover {
-          transform: scale(1.05);
-        }
+        
 
         .datetime-container {
           position: absolute;

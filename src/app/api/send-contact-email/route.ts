@@ -1,11 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import clientPromise from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
+
+// Database and collection names
+const DB_NAME = 'portfolio_tracking'
+const FORMS_COLLECTION = 'forms'
+const COUNTERS_COLLECTION = 'counters'
+
+// Helper function to get database
+const getDb = async () => {
+  const client = await clientPromise
+  return client.db(DB_NAME)
+}
+
+// Helper function to update form counter
+const updateFormCounter = async () => {
+  const db = await getDb()
+  await db.collection(COUNTERS_COLLECTION).updateOne(
+    { _id: 'main' },
+    { $inc: { totalForms: 1 } },
+    { upsert: true }
+  )
+}
+
+// Helper function to store form data in database with detailed visitor info
+const storeFormData = async (formData: Record<string, unknown>, request: NextRequest, visitorInfo?: Record<string, unknown>) => {
+  try {
+    const db = await getDb()
+    const newForm = {
+      _id: new ObjectId(),
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      // Server-side data
+      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+      userAgent: request.headers.get('user-agent') || 'unknown',
+      referer: request.headers.get('referer') || 'direct',
+      // Form data
+      ...formData,
+      // Detailed visitor info (location, device, etc.) - only stored for form submissions
+      ...visitorInfo,
+      // Status tracking
+      status: 'new',
+      contacted: false
+    }
+
+    await db.collection(FORMS_COLLECTION).insertOne(newForm)
+    await updateFormCounter()
+    
+    console.log('✅ Form data with detailed visitor info stored successfully:', {
+      id: newForm.id,
+      name: formData.name,
+      email: formData.email,
+      hasLocation: !!visitorInfo?.location,
+      hasDevice: !!visitorInfo?.device,
+      hasBrowser: !!visitorInfo?.browser
+    })
+    return true
+  } catch (error) {
+    console.error('❌ Error storing form data:', error)
+    return false
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, phone, message, preferredTime } = await request.json();
+    const { name, email, phone, message, preferredTime, visitorInfo } = await request.json();
 
-    console.log('📧 Contact Email API called with:', { name, email, phone, message, preferredTime });
+    console.log('📧 Contact Email API called with:', { name, email, phone, message, preferredTime, hasVisitorInfo: !!visitorInfo });
+
+    // Store form data in database with detailed visitor info
+    const formData = { name, email, phone, message, preferredTime }
+    await storeFormData(formData, request, visitorInfo)
 
     // Debug all environment variables
     console.log('🔍 Environment variables check:');
