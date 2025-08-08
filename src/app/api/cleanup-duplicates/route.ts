@@ -5,6 +5,17 @@ import clientPromise from '@/lib/mongodb'
 const DB_NAME = 'portfolio_tracking'
 const FORMS_COLLECTION = 'forms'
 
+// Define interface for form structure
+interface FormDocument {
+  _id: any
+  id?: string
+  email: string
+  name: string
+  phone: string
+  timestamp: string | Date
+  [key: string]: any
+}
+
 // Helper function to get database
 const getDb = async () => {
   const client = await clientPromise
@@ -18,23 +29,23 @@ export async function POST() {
     
     const db = await getDb()
     
-    // Get all forms
-    const allForms = await db.collection(FORMS_COLLECTION)
+    // Get all forms with proper typing
+    const allForms: FormDocument[] = await db.collection(FORMS_COLLECTION)
       .find({})
-      .sort({ timestamp: 1 }) // oldest first
+      .sort({ timestamp: 1 })
       .toArray()
 
     console.log(`📊 Found ${allForms.length} total forms`)
 
     // Group by email + name + phone to find duplicates
-    const formGroups = new Map()
+    const formGroups = new Map<string, FormDocument[]>()
     
     for (const form of allForms) {
       const key = `${form.email}-${form.name}-${form.phone}`
       if (!formGroups.has(key)) {
         formGroups.set(key, [])
       }
-      formGroups.get(key).push(form)
+      formGroups.get(key)!.push(form)
     }
 
     let duplicatesRemoved = 0
@@ -44,8 +55,11 @@ export async function POST() {
       if (forms.length > 1) {
         console.log(`🔍 Found ${forms.length} duplicates for: ${key}`)
         
-        // Sort by timestamp (latest first) and keep the first one
-        forms.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        // Fixed sort function with proper typing
+        forms.sort((a: FormDocument, b: FormDocument) => 
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        )
+        
         const toKeep = forms[0]
         const toRemove = forms.slice(1)
         
@@ -81,7 +95,7 @@ export async function POST() {
       success: false, 
       error: 'Failed to cleanup duplicates',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }
 
@@ -92,21 +106,21 @@ export async function GET() {
     
     const db = await getDb()
     
-    // Get all forms
-    const allForms = await db.collection(FORMS_COLLECTION)
+    // Get all forms with proper typing
+    const allForms: FormDocument[] = await db.collection(FORMS_COLLECTION)
       .find({})
       .sort({ timestamp: 1 })
       .toArray()
 
     // Group by email + name + phone to find duplicates
-    const formGroups = new Map()
+    const formGroups = new Map<string, FormDocument[]>()
     
     for (const form of allForms) {
       const key = `${form.email}-${form.name}-${form.phone}`
       if (!formGroups.has(key)) {
         formGroups.set(key, [])
       }
-      formGroups.get(key).push(form)
+      formGroups.get(key)!.push(form)
     }
 
     const duplicateGroups = []
@@ -117,14 +131,14 @@ export async function GET() {
         duplicateGroups.push({
           key,
           count: forms.length,
-          forms: forms.map(f => ({
+          forms: forms.map((f: FormDocument) => ({
             id: f.id,
             timestamp: f.timestamp,
             name: f.name,
             email: f.email
           }))
         })
-        totalDuplicates += forms.length - 1 // -1 because we keep one
+        totalDuplicates += forms.length - 1
       }
     }
 
@@ -142,6 +156,6 @@ export async function GET() {
       success: false, 
       error: 'Failed to check duplicates',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }
