@@ -10,6 +10,19 @@ interface CountersDocument {
   totalClients: number
 }
 
+interface FormDocument {
+  _id: ObjectId
+  id: string
+  name: string
+  email: string
+  phone: string
+  message: string
+  preferredTime?: string
+  timestamp: string
+  ip: string
+  userAgent: string
+}
+
 // Database and collection names
 const DB_NAME = 'portfolio_tracking'
 const FORMS_COLLECTION = 'forms'
@@ -21,23 +34,28 @@ const getDb = async () => {
   return client.db(DB_NAME)
 }
 
-// Helper function to get counters
-const getCounters = async () => {
+// Helper function to get counters - FIXED
+const getCounters = async (): Promise<CountersDocument> => {
   const db = await getDb()
-  const counters = await db.collection(COUNTERS_COLLECTION).findOne({ _id: 'main' }) as CountersDocument | null
+  
+  // FIXED: Using generic typing instead of 'as any'
+  const counters = await db.collection<CountersDocument>(COUNTERS_COLLECTION).findOne(
+    { _id: 'main' }
+  )
+  
   return counters || { _id: 'main', totalVisitors: 0, totalForms: 0, totalClients: 0 }
 }
 
 // Helper function to cleanup old records (older than 15 days)
-const cleanupOldRecords = async () => {
+const cleanupOldRecords = async (): Promise<number> => {
   const db = await getDb()
   const fifteenDaysAgo = new Date()
   fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15)
 
   console.log(`🧹 Cleaning up form records older than: ${fifteenDaysAgo.toISOString()}`)
 
-  // Cleanup old forms
-  const result = await db.collection(FORMS_COLLECTION).deleteMany({
+  // Cleanup old forms - FIXED: Add generic typing
+  const result = await db.collection<FormDocument>(FORMS_COLLECTION).deleteMany({
     timestamp: { $lt: fifteenDaysAgo.toISOString() }
   })
 
@@ -58,8 +76,8 @@ export async function GET() {
     // Get counters
     const counters = await getCounters()
     
-    // Get all contact forms (sorted by latest first)
-    const contactForms = await db.collection(FORMS_COLLECTION)
+    // Get all contact forms (sorted by latest first) - FIXED: Add generic typing
+    const contactForms = await db.collection<FormDocument>(FORMS_COLLECTION)
       .find({})
       .sort({ timestamp: -1 })
       .toArray()
@@ -123,7 +141,7 @@ export async function GET() {
       success: false, 
       error: 'Failed to fetch contact forms',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }
 
@@ -135,23 +153,26 @@ export async function POST(request: NextRequest) {
     console.log('📝 Adding new contact form:', { name, email, phone, message, preferredTime })
     
     const db = await getDb()
-    const newForm = {
+    
+    // FIXED: Proper typing for new form
+    const newForm: FormDocument = {
       _id: new ObjectId(),
       id: Date.now().toString(),
       timestamp: new Date().toISOString(),
       ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
       userAgent: request.headers.get('user-agent') || 'unknown',
-      name,
-      email,
-      phone,
-      message,
-      preferredTime
+      name: name as string,
+      email: email as string,
+      phone: phone as string,
+      message: message as string,
+      preferredTime: preferredTime as string
     }
 
-    await db.collection(FORMS_COLLECTION).insertOne(newForm)
+    // FIXED: Add generic typing
+    await db.collection<FormDocument>(FORMS_COLLECTION).insertOne(newForm)
     
-    // Update counter
-    await db.collection(COUNTERS_COLLECTION).updateOne(
+    // Update counter - FIXED: Add generic typing
+    await db.collection<CountersDocument>(COUNTERS_COLLECTION).updateOne(
       { _id: 'main' },
       { $inc: { totalForms: 1 } },
       { upsert: true }
@@ -171,7 +192,7 @@ export async function POST(request: NextRequest) {
       success: false, 
       error: 'Failed to add contact form',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }
 
@@ -194,6 +215,6 @@ export async function DELETE() {
       success: false, 
       error: 'Failed to cleanup old forms',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }

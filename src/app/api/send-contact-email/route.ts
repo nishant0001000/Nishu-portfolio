@@ -3,6 +3,32 @@ import nodemailer from 'nodemailer';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
+// Type definitions - ADD THESE
+interface CountersDocument {
+  _id: string
+  totalVisitors: number
+  totalForms: number
+  totalClients: number
+}
+
+interface FormDocument {
+  _id: ObjectId
+  id: string
+  name: string
+  email: string
+  phone: string
+  message: string
+  preferredTime?: string
+  timestamp: string
+  createdAt: string
+  ip: string
+  userAgent: string
+  referer: string
+  status: string
+  contacted: boolean
+  [key: string]: unknown // for visitor info and other fields
+}
+
 // Database and collection names
 const DB_NAME = 'portfolio_tracking'
 const FORMS_COLLECTION = 'forms'
@@ -14,21 +40,25 @@ const getDb = async () => {
   return client.db(DB_NAME)
 }
 
-// Helper function to update form counter
+// Helper function to update form counter - FIXED
 const updateFormCounter = async () => {
   const db = await getDb()
-  await db.collection(COUNTERS_COLLECTION).updateOne(
+  
+  // FIXED: Using generic typing instead of raw string
+  await db.collection<CountersDocument>(COUNTERS_COLLECTION).updateOne(
     { _id: 'main' },
     { $inc: { totalForms: 1 } },
     { upsert: true }
   )
 }
 
-// Helper function to store form data in database with detailed visitor info
-const storeFormData = async (formData: Record<string, unknown>, request: NextRequest, visitorInfo?: Record<string, unknown>) => {
+// Helper function to store form data in database with detailed visitor info - FIXED
+const storeFormData = async (formData: Record<string, unknown>, request: NextRequest, visitorInfo?: Record<string, unknown>): Promise<boolean> => {
   try {
     const db = await getDb()
-    const newForm = {
+    
+    // FIXED: Proper typing for new form
+    const newForm: FormDocument = {
       _id: new ObjectId(),
       id: Date.now().toString(),
       timestamp: new Date().toISOString(),
@@ -37,16 +67,21 @@ const storeFormData = async (formData: Record<string, unknown>, request: NextReq
       ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
       userAgent: request.headers.get('user-agent') || 'unknown',
       referer: request.headers.get('referer') || 'direct',
-      // Form data
-      ...formData,
-      // Detailed visitor info (location, device, etc.) - only stored for form submissions
-      ...visitorInfo,
+      // Form data with proper typing
+      name: formData.name as string,
+      email: formData.email as string,
+      phone: formData.phone as string,
+      message: formData.message as string,
+      preferredTime: formData.preferredTime as string,
       // Status tracking
       status: 'new',
-      contacted: false
+      contacted: false,
+      // Spread visitor info if available
+      ...visitorInfo,
     }
 
-    await db.collection(FORMS_COLLECTION).insertOne(newForm)
+    // FIXED: Add generic typing
+    await db.collection<FormDocument>(FORMS_COLLECTION).insertOne(newForm)
     await updateFormCounter()
     
     console.log('✅ Form data with detailed visitor info stored successfully:', {
@@ -91,11 +126,12 @@ export async function POST(request: NextRequest) {
 
     if (!emailPass) {
       console.error('❌ Email API key not configured');
-      return NextResponse.json({ success: false, error: 'Email not configured' });
+      return NextResponse.json({ success: false, error: 'Email not configured' }, { status: 500 });
     }
 
     // Create Gmail transporter
-    const transporter = nodemailer.createTransport({
+   const transporter = nodemailer.createTransport({
+
       service: 'gmail',
       auth: {
         user: emailUser,
@@ -191,8 +227,6 @@ export async function POST(request: NextRequest) {
                 </div>
               </div>
             </div>
-
-           
 
             <!-- Action Required -->
             <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%); padding: 20px; border-radius: 10px; margin-bottom: 25px; border: 1px solid #333333;">
@@ -346,8 +380,6 @@ export async function POST(request: NextRequest) {
               </div>
             </div>
 
-            
-
             <!-- What's Next -->
             <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%); padding: 20px; border-radius: 10px; margin-bottom: 25px; border: 1px solid #333333;">
               <h3 style="margin: 0 0 15px 0; color: #ffffff; font-size: 18px;">⏰ What's Next?</h3>
@@ -457,6 +489,6 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     console.error('❌ Error sending contact email:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ success: false, error: 'Email service error', details: errorMessage });
+    return NextResponse.json({ success: false, error: 'Email service error', details: errorMessage }, { status: 500 });
   }
-} 
+}

@@ -2,7 +2,34 @@ import { NextRequest, NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
 
-// Type definitions
+// Type definitions - FIXED
+interface Project {
+  id: string
+  name: string
+  description: string
+  status: string
+  startDate: string
+  endDate: string
+  budget: number
+  createdAt: string
+}
+
+interface ClientDocument {
+  _id: ObjectId
+  id: string
+  name: string
+  email: string
+  phone: string
+  status: string
+  projects: Project[]
+  createdAt: string
+  lastContact: string
+  notes: string
+  originalFormId?: string
+  originalMessage?: string
+  preferredTime?: string
+}
+
 interface CountersDocument {
   _id: string
   totalVisitors: number
@@ -23,9 +50,13 @@ const getDb = async () => {
 }
 
 // Helper function to get counters
-const getCounters = async () => {
+const getCounters = async (): Promise<CountersDocument> => {
   const db = await getDb()
-  const counters = await db.collection(COUNTERS_COLLECTION).findOne({ _id: 'main' }) as CountersDocument | null
+  
+  const counters = await db.collection<CountersDocument>(COUNTERS_COLLECTION).findOne(
+    { _id: 'main' }
+  )
+  
   return counters || { _id: 'main', totalVisitors: 0, totalForms: 0, totalClients: 0 }
 }
 
@@ -33,7 +64,8 @@ const getCounters = async () => {
 const updateCounters = async (type: 'client') => {
   const db = await getDb()
   const field = type === 'client' ? 'totalClients' : 'totalClients'
-  await db.collection(COUNTERS_COLLECTION).updateOne(
+  
+  await db.collection<CountersDocument>(COUNTERS_COLLECTION).updateOne(
     { _id: 'main' },
     { $inc: { [field]: 1 } },
     { upsert: true }
@@ -48,7 +80,7 @@ export async function GET() {
     const db = await getDb()
     
     // Get all clients (sorted by latest first)
-    const clients = await db.collection(CLIENTS_COLLECTION)
+    const clients = await db.collection<ClientDocument>(CLIENTS_COLLECTION)
       .find({})
       .sort({ createdAt: -1 })
       .toArray()
@@ -117,11 +149,11 @@ export async function GET() {
       success: false, 
       error: 'Failed to fetch clients',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }
 
-// POST endpoint to create a new client or update existing
+// POST endpoint - FIXED
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -130,16 +162,13 @@ export async function POST(request: NextRequest) {
     const db = await getDb()
 
     if (action === 'convert_to_client') {
-      // Convert form request to client
       console.log('🔄 Converting form request to client:', formId)
       
-      // Get the original form data
       const form = await db.collection(FORMS_COLLECTION).findOne({ id: formId })
       if (!form) {
-        return NextResponse.json({ success: false, error: 'Form not found' })
+        return NextResponse.json({ success: false, error: 'Form not found' }, { status: 404 })
       }
 
-      // Check if client already exists
       const existingClient = await db.collection(CLIENTS_COLLECTION).findOne({ 
         originalFormId: formId 
       })
@@ -148,30 +177,28 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ 
           success: false, 
           error: 'Client already exists for this form request' 
-        })
+        }, { status: 400 })
       }
 
-      // Create new client
-      const newClient = {
+      const newClient: ClientDocument = {
         _id: new ObjectId(),
         id: Date.now().toString(),
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
+        name: form.name as string,
+        email: form.email as string,
+        phone: form.phone as string,
         status: 'active',
         projects: [],
         createdAt: new Date().toISOString(),
         lastContact: new Date().toISOString(),
         notes: `Converted from form request. Original message: ${form.message}`,
         originalFormId: formId,
-        originalMessage: form.message,
-        preferredTime: form.preferredTime
+        originalMessage: form.message as string,
+        preferredTime: form.preferredTime as string
       }
 
-      await db.collection(CLIENTS_COLLECTION).insertOne(newClient)
+      await db.collection<ClientDocument>(CLIENTS_COLLECTION).insertOne(newClient)
       await updateCounters('client')
 
-      // Mark form as converted
       await db.collection(FORMS_COLLECTION).updateOne(
         { id: formId },
         { 
@@ -191,7 +218,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'mark_contacted') {
-      // Mark form as contacted
       console.log('📞 Marking form as contacted:', formId)
       
       await db.collection(FORMS_COLLECTION).updateOne(
@@ -212,22 +238,23 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'add_project') {
-      // Add project to existing client
       console.log('📁 Adding project to client:', clientData.clientId)
       
-      const project = {
+      // FIXED: Proper typing for project object
+      const project: Project = {
         id: Date.now().toString(),
-        name: projectData.name,
-        description: projectData.description,
-        status: projectData.status || 'planning',
-        startDate: projectData.startDate,
-        endDate: projectData.endDate,
-        budget: projectData.budget,
+        name: projectData.name as string,
+        description: projectData.description as string,
+        status: (projectData.status as string) || 'planning',
+        startDate: projectData.startDate as string,
+        endDate: projectData.endDate as string,
+        budget: Number(projectData.budget) || 0,
         createdAt: new Date().toISOString()
       }
 
-      await db.collection(CLIENTS_COLLECTION).updateOne(
-        { id: clientData.clientId },
+      // FIXED: Using proper generic typing
+      await db.collection<ClientDocument>(CLIENTS_COLLECTION).updateOne(
+        { id: clientData.clientId as string },
         { 
           $push: { projects: project },
           $set: { lastContact: new Date().toISOString() }
@@ -243,20 +270,19 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'update_client') {
-      // Update client information
       console.log('✏️ Updating client:', clientData.clientId)
       
       const updateData = {
-        ...(clientData.name && { name: clientData.name }),
-        ...(clientData.email && { email: clientData.email }),
-        ...(clientData.phone && { phone: clientData.phone }),
-        ...(clientData.status && { status: clientData.status }),
-        ...(clientData.notes && { notes: clientData.notes }),
+        ...(clientData.name && { name: clientData.name as string }),
+        ...(clientData.email && { email: clientData.email as string }),
+        ...(clientData.phone && { phone: clientData.phone as string }),
+        ...(clientData.status && { status: clientData.status as string }),
+        ...(clientData.notes && { notes: clientData.notes as string }),
         lastContact: new Date().toISOString()
       }
 
-      await db.collection(CLIENTS_COLLECTION).updateOne(
-        { id: clientData.clientId },
+      await db.collection<ClientDocument>(CLIENTS_COLLECTION).updateOne(
+        { id: clientData.clientId as string },
         { $set: updateData }
       )
 
@@ -267,7 +293,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({ success: false, error: 'Invalid action' })
+    return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 })
     
   } catch (error) {
     console.error('❌ Error in client operation:', error)
@@ -275,31 +301,31 @@ export async function POST(request: NextRequest) {
       success: false, 
       error: 'Client operation failed',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }
 
-// DELETE endpoint to delete a client
+// DELETE endpoint
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const clientId = searchParams.get('clientId')
 
     if (!clientId) {
-      return NextResponse.json({ success: false, error: 'Client ID required' })
+      return NextResponse.json({ success: false, error: 'Client ID required' }, { status: 400 })
     }
 
     console.log('🗑️ Deleting client:', clientId)
     
     const db = await getDb()
-    const result = await db.collection(CLIENTS_COLLECTION).deleteOne({ id: clientId })
+    const result = await db.collection<ClientDocument>(CLIENTS_COLLECTION).deleteOne({ id: clientId })
 
     if (result.deletedCount === 0) {
-      return NextResponse.json({ success: false, error: 'Client not found' })
+      return NextResponse.json({ success: false, error: 'Client not found' }, { status: 404 })
     }
 
     // Update counter
-    await db.collection(COUNTERS_COLLECTION).updateOne(
+    await db.collection<CountersDocument>(COUNTERS_COLLECTION).updateOne(
       { _id: 'main' },
       { $inc: { totalClients: -1 } }
     )
@@ -316,6 +342,6 @@ export async function DELETE(request: NextRequest) {
       success: false, 
       error: 'Failed to delete client',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }

@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
 
+// Type definitions - ADD THESE
+interface CountersDocument {
+  _id: string
+  totalVisitors: number
+  totalForms: number
+  totalClients?: number
+}
+
+interface FormDocument {
+  _id: ObjectId
+  id: string
+  timestamp: string
+  ip: string
+  userAgent: string
+  referer: string
+  [key: string]: unknown // for visitor info and other fields
+}
+
 // Database and collection names
 const DB_NAME = 'portfolio_tracking'
 // const VISITORS_COLLECTION = 'visitors' // No longer used since we don't store visitor data
@@ -14,32 +32,38 @@ const getDb = async () => {
   return client.db(DB_NAME)
 }
 
-// Helper function to get counters
-const getCounters = async () => {
+// Helper function to get counters - FIXED
+const getCounters = async (): Promise<CountersDocument> => {
   const db = await getDb()
-  const counters = await db.collection(COUNTERS_COLLECTION).findOne({ _id: 'main' })
-  return counters || { totalVisitors: 0, totalForms: 0 }
+  
+  // FIXED: Using generic typing instead of raw string
+  const counters = await db.collection<CountersDocument>(COUNTERS_COLLECTION).findOne({ _id: 'main' })
+  
+  return counters || { _id: 'main', totalVisitors: 0, totalForms: 0 }
 }
 
-// Helper function to update counters
+// Helper function to update counters - FIXED
 const updateCounters = async (type: 'visitor' | 'form') => {
   const db = await getDb()
   const field = type === 'visitor' ? 'totalVisitors' : 'totalForms'
-  await db.collection(COUNTERS_COLLECTION).updateOne(
+  
+  // FIXED: Add generic typing
+  await db.collection<CountersDocument>(COUNTERS_COLLECTION).updateOne(
     { _id: 'main' },
     { $inc: { [field]: 1 } },
     { upsert: true }
   )
 }
 
-// Helper function to cleanup old records (older than 15 days)
-const cleanupOldRecords = async () => {
+// Helper function to cleanup old records (older than 15 days) - FIXED
+const cleanupOldRecords = async (): Promise<number> => {
   const db = await getDb()
   const fifteenDaysAgo = new Date()
   fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15)
 
   // Only cleanup old forms (no visitor data to cleanup since we don't store it)
-  const result = await db.collection(FORMS_COLLECTION).deleteMany({
+  // FIXED: Add generic typing
+  const result = await db.collection<FormDocument>(FORMS_COLLECTION).deleteMany({
     timestamp: { $lt: fifteenDaysAgo.toISOString() }
   })
   
@@ -68,7 +92,9 @@ export async function POST(request: NextRequest) {
     if (type === 'form') {
       // For form submissions, store detailed data including location, device info
       const db = await getDb()
-      const newForm = {
+      
+      // FIXED: Proper typing for new form
+      const newForm: FormDocument = {
         _id: new ObjectId(),
         id: Date.now().toString(),
         timestamp: new Date().toISOString(),
@@ -79,7 +105,8 @@ export async function POST(request: NextRequest) {
         ...visitorInfo
       }
 
-      await db.collection(FORMS_COLLECTION).insertOne(newForm)
+      // FIXED: Add generic typing
+      await db.collection<FormDocument>(FORMS_COLLECTION).insertOne(newForm)
       await updateCounters('form')
       
       const counters = await getCounters()
@@ -92,11 +119,11 @@ export async function POST(request: NextRequest) {
       })
     }
     
-    return NextResponse.json({ success: false, error: 'Invalid type' })
+    return NextResponse.json({ success: false, error: 'Invalid type' }, { status: 400 })
     
   } catch (error) {
     console.error('Error tracking visitor:', error)
-    return NextResponse.json({ success: false, error: 'Tracking failed' })
+    return NextResponse.json({ success: false, error: 'Tracking failed' }, { status: 500 })
   }
 }
 
@@ -111,7 +138,8 @@ export async function GET() {
     const counters = await getCounters()
     
     // Get recent forms (last 10) - no visitor data since we don't store it
-    const recentForms = await db.collection(FORMS_COLLECTION)
+    // FIXED: Add generic typing
+    const recentForms = await db.collection<FormDocument>(FORMS_COLLECTION)
       .find({})
       .sort({ timestamp: -1 })
       .limit(10)
@@ -157,12 +185,18 @@ export async function GET() {
       totalForms: counters.totalForms,
       visitorChange, // Always 0 since we don't track monthly visitor data
       formChange,
-      recentForms,
+      recentForms: recentForms.map(form => ({
+        id: form.id || form._id.toString(),
+        timestamp: form.timestamp,
+        ip: form.ip,
+        userAgent: form.userAgent,
+        referer: form.referer
+      })),
       message: 'Visitors are only counted, not stored individually'
     })
     
   } catch (error) {
     console.error('Error getting stats:', error)
-    return NextResponse.json({ success: false, error: 'Failed to get stats' })
+    return NextResponse.json({ success: false, error: 'Failed to get stats' }, { status: 500 })
   }
 }

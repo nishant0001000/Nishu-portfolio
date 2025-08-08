@@ -1,5 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
+import { ObjectId } from 'mongodb'
+
+// Type definitions - ADD THESE
+interface Project {
+  id: string
+  name: string
+  description: string
+  status: string
+  startDate: string
+  endDate: string
+  budget: number
+  createdAt: string
+}
+
+interface ClientDocument {
+  _id: ObjectId
+  id: string
+  name: string
+  email: string
+  phone: string
+  status: string
+  projects: Project[]
+  createdAt: string
+  lastContact: string
+  notes: string
+  originalFormId?: string
+}
+
+interface VisitorDocument {
+  _id: ObjectId
+  timestamp: string
+  ip: string
+  userAgent: string
+  referer: string
+  location: string
+  device: string
+  browser: string
+}
+
+interface FormDocument {
+  _id: ObjectId
+  id: string
+  name: string
+  email: string
+  phone: string
+  message: string
+  preferredTime?: string
+  timestamp: string
+  status?: string
+  ip: string
+}
 
 // Database and collection names
 const DB_NAME = 'portfolio_tracking'
@@ -43,7 +94,7 @@ export async function GET(request: NextRequest) {
 
     if (type === 'visitors' || type === 'all') {
       console.log('👥 Exporting visitors...')
-      const visitors = await db.collection(VISITORS_COLLECTION)
+      const visitors = await db.collection<VisitorDocument>(VISITORS_COLLECTION)
         .find({})
         .sort({ timestamp: -1 })
         .toArray()
@@ -67,7 +118,7 @@ export async function GET(request: NextRequest) {
 
     if (type === 'forms' || type === 'all') {
       console.log('📝 Exporting contact forms...')
-      const forms = await db.collection(FORMS_COLLECTION)
+      const forms = await db.collection<FormDocument>(FORMS_COLLECTION)
         .find({})
         .sort({ timestamp: -1 })
         .toArray()
@@ -92,7 +143,7 @@ export async function GET(request: NextRequest) {
 
     if (type === 'clients' || type === 'all') {
       console.log('👤 Exporting clients...')
-      const clients = await db.collection(CLIENTS_COLLECTION)
+      const clients = await db.collection<ClientDocument>(CLIENTS_COLLECTION)
         .find({})
         .sort({ createdAt: -1 })
         .toArray()
@@ -114,15 +165,17 @@ export async function GET(request: NextRequest) {
 
       exportData += '=== CLIENTS ===\n' + clientCSV + '\n\n'
 
-      // Export client projects separately
+      // Export client projects separately - FIXED
       const allProjects: Record<string, unknown>[] = []
       clients.forEach(client => {
         if (client.projects && client.projects.length > 0) {
-          client.projects.forEach((project: Record<string, unknown>) => {
+          // FIXED: Proper typing for project
+          client.projects.forEach((project: Project) => {
             allProjects.push({
               clientName: client.name,
               clientEmail: client.email,
               projectName: project.name,
+              // FIXED: Now TypeScript knows project.description is a string
               projectDescription: (project.description || 'N/A').replace(/\n/g, ' '),
               projectStatus: project.status || 'planning',
               projectBudget: project.budget || 'N/A',
@@ -165,6 +218,6 @@ export async function GET(request: NextRequest) {
       success: false, 
       error: 'Failed to export data',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }

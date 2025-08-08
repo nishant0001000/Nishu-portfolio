@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
 
+// Type definitions - ADD THESE
+interface CountersDocument {
+  _id: string
+  totalVisitors: number
+  totalForms: number
+  totalClients?: number
+}
+
 // Database and collection names
 const DB_NAME = 'portfolio_tracking'
 // const VISITORS_COLLECTION = 'visitors' // No longer used since we don't store visitor data
@@ -12,11 +20,14 @@ const getDb = async () => {
   return client.db(DB_NAME)
 }
 
-// Helper function to get counters
-const getCounters = async () => {
+// Helper function to get counters - FIXED
+const getCounters = async (): Promise<CountersDocument> => {
   const db = await getDb()
-  const counters = await db.collection(COUNTERS_COLLECTION).findOne({ _id: 'main' })
-  return counters || { totalVisitors: 0, totalForms: 0 }
+  
+  // FIXED: Using generic typing instead of raw string
+  const counters = await db.collection<CountersDocument>(COUNTERS_COLLECTION).findOne({ _id: 'main' })
+  
+  return counters || { _id: 'main', totalVisitors: 0, totalForms: 0 }
 }
 
 // Helper function to cleanup old records (no longer needed since we don't store visitor data)
@@ -49,7 +60,7 @@ export async function GET() {
       success: false, 
       error: 'Failed to fetch visitor stats',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }
 
@@ -71,6 +82,6 @@ export async function DELETE() {
       success: false, 
       error: 'Failed to process cleanup request',
       details: error instanceof Error ? error.message : 'Unknown error'
-    })
+    }, { status: 500 })
   }
 }
