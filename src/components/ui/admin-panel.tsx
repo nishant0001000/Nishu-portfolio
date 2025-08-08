@@ -488,8 +488,8 @@ const AdminPanel = () => {
                     </svg>
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
-                    <p className="text-sm text-muted-foreground">Welcome back, Admin</p>
+                    <h1 className="text-2xl font-bold text-foreground">Nishant Mogahaa</h1>
+                    <p className="text-sm text-muted-foreground">Welcome back ❤️</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
