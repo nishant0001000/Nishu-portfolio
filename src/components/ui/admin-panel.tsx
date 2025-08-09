@@ -1128,7 +1128,7 @@ const AdminPanel = () => {
                   />
                   <select
                     value={formStatus}
-                    onChange={(e) => setFormStatus(e.target.value as any)}
+                    onChange={(e) => setFormStatus(e.target.value as 'all' | 'new' | 'contacted' | 'converted')}
                     className="w-full px-3 py-2 text-sm border border-input bg-background text-foreground rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
                   >
                     <option value="all">All statuses</option>
@@ -1138,7 +1138,7 @@ const AdminPanel = () => {
                   </select>
                   <select
                     value={formSort}
-                    onChange={(e) => setFormSort(e.target.value as any)}
+                    onChange={(e) => setFormSort(e.target.value as 'newest' | 'oldest')}
                     className="w-full px-3 py-2 text-sm border border-input bg-background text-foreground rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
                   >
                     <option value="newest">Newest first</option>
@@ -1485,7 +1485,7 @@ const AdminPanel = () => {
                                       <button
                                         className="px-2 py-1 text-[11px] rounded bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
                                         onClick={() => {
-                                          openAddProject({ ...(client as any) })
+                                          openAddProject(client as Client)
                                           setProjectData(v => ({ ...v, name: project.name, description: project.description || '', status: project.status || 'planning', startDate: project.startDate || '', endDate: '', budget: String(project.budget || '') }))
                                         }}
                                         title="Extend date"

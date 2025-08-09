@@ -301,10 +301,17 @@ export async function POST(request: NextRequest) {
         ...(projectData.budget && { budget: Number(projectData.budget) })
       }
 
-      const setObject: any = {}
-      Object.keys(updates).forEach((key) => {
-        setObject[`projects.$.${key}`] = (updates as any)[key]
-      })
+      const setObject: { [path: string]: string | number } = {}
+      const keys = Object.keys(updates) as Array<keyof Project>
+      for (const key of keys) {
+        const value = updates[key]
+        if (typeof value !== 'undefined') {
+          // All Project fields are string or number; coerce accordingly
+          setObject[`projects.$.${String(key)}`] = (typeof value === 'number' || typeof value === 'string')
+            ? (value as number | string)
+            : String(value)
+        }
+      }
 
       if (Object.keys(setObject).length === 0) {
         return NextResponse.json({ success: false, error: 'No updates provided' }, { status: 400 })
