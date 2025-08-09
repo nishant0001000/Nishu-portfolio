@@ -81,7 +81,7 @@ export async function GET() {
     
     // Get all clients (sorted by latest first)
     const clients = await db.collection<ClientDocument>(CLIENTS_COLLECTION)
-      .find({})
+      .find({ status: 'active' })
       .sort({ createdAt: -1 })
       .toArray()
 
@@ -199,20 +199,19 @@ export async function POST(request: NextRequest) {
       await db.collection<ClientDocument>(CLIENTS_COLLECTION).insertOne(newClient)
       await updateCounters('client')
 
-      await db.collection(FORMS_COLLECTION).updateOne(
-        { id: formId },
-        { 
-          $set: { 
-            status: 'converted_to_client',
-            convertedAt: new Date().toISOString()
-          }
-        }
+      // Remove the form from forms collection now that it's converted
+      await db.collection(FORMS_COLLECTION).deleteOne({ id: formId })
+      // Decrement totalForms counter
+      await db.collection<CountersDocument>(COUNTERS_COLLECTION).updateOne(
+        { _id: 'main' },
+        { $inc: { totalForms: -1 } },
+        { upsert: true }
       )
 
       console.log('✅ Successfully converted form to client')
       return NextResponse.json({ 
         success: true, 
-        message: 'Form request converted to client successfully',
+        message: 'Form request converted to client and removed from forms',
         clientId: newClient.id
       })
     }
@@ -234,6 +233,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         success: true, 
         message: 'Form marked as contacted successfully'
+      })
+    }
+
+    if (action === 'unmark_contacted') {
+      console.log('↩️ Unmarking form as contacted:', formId)
+      
+      await db.collection(FORMS_COLLECTION).updateOne(
+        { id: formId },
+        { 
+          $unset: { 
+            status: "",
+            contactedAt: ""
+          }
+        }
+      )
+
+      console.log('✅ Successfully unmarked form as contacted')
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Form set back to uncontacted'
       })
     }
 
@@ -267,6 +286,42 @@ export async function POST(request: NextRequest) {
         message: 'Project added to client successfully',
         projectId: project.id
       })
+    }
+
+    if (action === 'update_project') {
+      console.log('🗓️ Updating project for client:', clientData.clientId)
+      const clientId: string = clientData.clientId as string
+      const projectId: string = projectData.projectId as string
+      const updates: Partial<Project> = {
+        ...(projectData.name && { name: projectData.name as string }),
+        ...(projectData.description && { description: projectData.description as string }),
+        ...(projectData.status && { status: projectData.status as string }),
+        ...(projectData.startDate && { startDate: projectData.startDate as string }),
+        ...(projectData.endDate && { endDate: projectData.endDate as string }),
+        ...(projectData.budget && { budget: Number(projectData.budget) })
+      }
+
+      const setObject: any = {}
+      Object.keys(updates).forEach((key) => {
+        setObject[`projects.$.${key}`] = (updates as any)[key]
+      })
+
+      if (Object.keys(setObject).length === 0) {
+        return NextResponse.json({ success: false, error: 'No updates provided' }, { status: 400 })
+      }
+
+      const db = await getDb()
+      const result = await db.collection<ClientDocument>(CLIENTS_COLLECTION).updateOne(
+        { id: clientId, 'projects.id': projectId },
+        { $set: { ...setObject, lastContact: new Date().toISOString() } }
+      )
+
+      if (result.matchedCount === 0) {
+        return NextResponse.json({ success: false, error: 'Client or project not found' }, { status: 404 })
+      }
+
+      console.log('✅ Successfully updated project')
+      return NextResponse.json({ success: true, message: 'Project updated successfully' })
     }
 
     if (action === 'update_client') {

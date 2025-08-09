@@ -21,6 +21,9 @@ interface FormDocument {
   timestamp: string
   ip: string
   userAgent: string
+  status?: 'contacted' | 'converted_to_client' | string
+  contactedAt?: string
+  convertedAt?: string
 }
 
 // Database and collection names
@@ -131,7 +134,10 @@ export async function GET() {
         preferredTime: form.preferredTime,
         timestamp: form.timestamp,
         ip: form.ip,
-        userAgent: form.userAgent
+        userAgent: form.userAgent,
+        status: form.status || undefined,
+        contactedAt: form.contactedAt || undefined,
+        convertedAt: form.convertedAt || undefined
       }))
     })
     
