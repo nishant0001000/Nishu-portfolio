@@ -1199,7 +1199,7 @@ const AdminPanel = () => {
       if (data.success && data.data) {
         const counts: Record<string, number> = {}
         // @ts-expect-error: legacy any usage for project type
-        data.data.forEach((project: any) => {
+        (data.data as Project[]).forEach((project) => {
           if (project.category) {
             counts[project.category] = (counts[project.category] || 0) + 1
           }

@@ -13,9 +13,9 @@ export async function POST(request: NextRequest) {
 
     // Update or insert the homepage content
     const result = await collection.updateOne(
-      { _id: 'homepage' as unknown as string },
-      { 
-        $set: { 
+      { _id: 'homepage' } as any,
+      {
+        $set: {
           content,
           images,
           updatedAt: new Date()
@@ -24,10 +24,10 @@ export async function POST(request: NextRequest) {
       { upsert: true }
     )
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Homepage content saved successfully',
-      result 
+      result
     })
 
   } catch (error) {
@@ -49,8 +49,8 @@ export async function GET() {
     // Get the homepage content
     const homepage = await collection.findOne({ _id: 'homepage' as unknown as string })
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       data: homepage || { content: {}, images: {} }
     })
 
