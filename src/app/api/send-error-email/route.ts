@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     const emailUser = process.env.EMAIL_USER;
     const emailPass = process.env.EMAIL_PASS;
 
+    console.log({
       emailUser,
       hasEmailPass: !!emailPass,
       emailPassLength: emailPass ? emailPass.length : 0,
@@ -179,11 +180,6 @@ export async function POST(request: NextRequest) {
       </body>
       </html>
     `;
-
-      from: emailUser,
-      to: emailUser,
-      hasEmailContent: !!emailContent
-    });
 
     // Send email using Gmail SMTP
     const mailOptions = {
