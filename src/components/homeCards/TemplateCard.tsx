@@ -26,7 +26,7 @@ const TemplateCard = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [detailsOpen, setDetailsOpen] = useState(false)
     const [selectedProject, setSelectedProject] = useState<DbProject | null>(null)
-    const [categories, setCategories] = useState<any[]>([])
+    const [categories, setCategories] = useState<Record<string, unknown>[]>([])
     const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -258,7 +258,7 @@ const TemplateCard = () => {
                                             key={cat._id}
                                             type="button"
                                             onClick={() => {
-                                                setSelectedCategory(cat.name)
+                                                setSelectedCategory(cat.name as string)
                                                 setShowCategoryDropdown(false)
                                             }}
                                             className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground first:rounded-t-lg last:rounded-b-lg"

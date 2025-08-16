@@ -64,7 +64,7 @@ const CardCarouselParent = () => {
         autoplayDelay={1000}
         title={title}
         subtitle={subtitle}
-        categories={categories.map((c: any) => c.name)}
+        categories={categories.map((c: Record<string, unknown>) => String(c.name))}
         selectedCategory={selectedCategory}
         onChangeCategory={setSelectedCategory}
       />

@@ -80,6 +80,21 @@ interface Client {
   lastContact?: string
 }
 
+// Add at the top:
+type HeroVideo = { _id: string; url: string; public_id: string };
+type Category = { name: string; [key: string]: any };
+type ChartData = {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+    borderRadius: number;
+  }[];
+};
+
 const AdminPanel = () => {
   const { isAdminPanelOpen, closeAdminPanel } = useAdmin()
   const { toast, showSuccess, showError, hideToast } = useToast()
@@ -125,17 +140,17 @@ const AdminPanel = () => {
   const [techInput, setTechInput] = useState('')
   const [projectLink, setProjectLink] = useState('')
   // Edit Projects (DB)
-  const [projectsDB, setProjectsDB] = useState<any[]>([])
+  const [projectsDB, setProjectsDB] = useState<Record<string, unknown>[]>([])
   const [isProjectsLoading, setIsProjectsLoading] = useState(false)
   const [editProjectModalOpen, setEditProjectModalOpen] = useState(false)
   const [editProject, setEditProject] = useState<{ _id?: string; title: string; description: string; technologies: string; link: string; imageUrl: string; category: string }>({ title: '', description: '', technologies: '', link: '', imageUrl: '', category: 'Website' })
   // Manage Categories
-  const [categories, setCategories] = useState<any[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(false)
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
   const [showEditCategoryModal, setShowEditCategoryModal] = useState(false)
   const [newCategory, setNewCategory] = useState({ name: '', color: 'bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-300/30' })
-  const [editingCategory, setEditingCategory] = useState<any>(null)
+  const [editingCategory, setEditingCategory] = useState<Category>(null)
 
   // State for dropdowns
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
@@ -163,7 +178,7 @@ const AdminPanel = () => {
   const projectStatusDropdownRef = useRef<HTMLDivElement>(null)
 
   const [totalVisitors, setTotalVisitors] = useState(0);
-  const [formsChartData, setFormsChartData] = useState({ labels: [], datasets: [] });
+  const [formsChartData, setFormsChartData] = useState<ChartData>({ labels: [], datasets: [] });
   const [formsViewType, setFormsViewType] = useState('date');
   const [formsCustomFrom, setFormsCustomFrom] = useState('');
   const [formsCustomTo, setFormsCustomTo] = useState('');
@@ -178,7 +193,7 @@ const AdminPanel = () => {
   const [uploadedHeroVideoUrls, setUploadedHeroVideoUrls] = useState([]);
   const [heroVideoError, setHeroVideoError] = useState('');
 
-  const [heroVideos, setHeroVideos] = useState([]);
+  const [heroVideos, setHeroVideos] = useState<HeroVideo[]>([]);
   const [loadingHeroVideos, setLoadingHeroVideos] = useState(false);
   const [deleteVideoId, setDeleteVideoId] = useState('');
 

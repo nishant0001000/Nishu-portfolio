@@ -14,7 +14,7 @@ import { Footer } from '@/components/footer/footer'
 import React from 'react'
 import { useHomepage } from '@/components/ui/homepage-context'
 
-const page = () => {
+const Page = () => {
   const { content } = useHomepage();
   
   return (
@@ -124,4 +124,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

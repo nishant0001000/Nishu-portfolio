@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     }
     const client = await clientPromise
     const db = client.db(DB_NAME)
-    const result = await db.collection(COLLECTION).insertOne(project as any)
+    const result = await db.collection(COLLECTION).insertOne(project as Record<string, unknown>)
     return NextResponse.json({ success: true, data: { _id: result.insertedId, ...project } })
   } catch (e) {
     console.error('POST /api/projects error:', e)
@@ -56,7 +56,7 @@ export async function PUT(req: NextRequest) {
     const client = await clientPromise
     const db = client.db(DB_NAME)
     const { ObjectId } = await import('mongodb')
-    const update: any = {}
+    const update: Record<string, unknown> = {}
     if (title !== undefined) update.title = title
     if (description !== undefined) update.description = description
     if (technologies !== undefined) update.technologies = technologies
