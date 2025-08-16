@@ -11,7 +11,7 @@ interface DbProject {
 
 const CardCarouselParent = () => {
   const [projects, setProjects] = useState<DbProject[]>([])
-  const [categories, setCategories] = useState<any[]>([])
+  const [categories, setCategories] = useState<Record<string, unknown>[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
 
   useEffect(() => {

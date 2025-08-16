@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     // Update or insert the homepage content
     const result = await collection.updateOne(
-      { _id: 'homepage' as any },
+      { _id: 'homepage' as unknown as string },
       { 
         $set: { 
           content,
@@ -47,7 +47,7 @@ export async function GET() {
     const collection = db.collection('homepage')
 
     // Get the homepage content
-    const homepage = await collection.findOne({ _id: 'homepage' as any })
+    const homepage = await collection.findOne({ _id: 'homepage' as unknown as string })
 
     return NextResponse.json({ 
       success: true, 

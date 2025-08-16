@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     if (!res.ok) {
       return NextResponse.json({ success: false, error: text }, { status: 400 })
     }
-    let json: any
+    let json: Record<string, unknown>
     try { json = JSON.parse(text) } catch { json = {} }
 
     return NextResponse.json({ success: true, url: json.secure_url, publicId: json.public_id })
