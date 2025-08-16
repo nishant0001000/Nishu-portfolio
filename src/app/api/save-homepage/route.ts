@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
     const collection = db.collection('homepage')
 
     // Update or insert the homepage content
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await collection.updateOne(
       { _id: 'homepage' } as any,
       {
