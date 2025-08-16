@@ -1198,7 +1198,8 @@ const AdminPanel = () => {
       const data = await response.json()
       if (data.success && data.data) {
         const counts: Record<string, number> = {}
-        (data.data as any[]).forEach((project) => {
+        // @ts-expect-error: legacy any usage for project type
+        data.data.forEach((project: any) => {
           if (project.category) {
             counts[project.category] = (counts[project.category] || 0) + 1
           }
