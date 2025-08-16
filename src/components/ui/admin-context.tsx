@@ -56,21 +56,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }
 
   const openAdminPanel = async () => {
-    console.log('🔐 Opening admin panel...')
     // Only open admin panel after successful password verification
     setIsAdminPanelOpen(true)
     setIsPasswordModalOpen(false)
     
     // Send login notification
     try {
-      console.log('📧 Preparing to send admin login notification...')
       const deviceInfo = getDeviceInfo()
       const locationInfo = await getLocationInfo()
       const timestamp = new Date().toLocaleString()
       
-      console.log('📱 Device info:', deviceInfo)
-      console.log('📍 Location info:', locationInfo)
-      console.log('⏰ Timestamp:', timestamp)
       
       const response = await fetch('/api/admin-login', {
         method: 'POST',
@@ -85,10 +80,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       })
       
       const result = await response.json()
-      console.log('📧 Admin login API response:', result)
       
       if (result.success) {
-        console.log('✅ Admin login notification sent successfully!')
       } else {
         console.error('❌ Failed to send admin login notification:', result.error)
       }

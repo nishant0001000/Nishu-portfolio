@@ -17,7 +17,6 @@ const getDb = async () => {
 // GET endpoint to create a complete backup
 export async function GET() {
   try {
-    console.log('💾 Starting database backup...')
     
     const db = await getDb()
     const timestamp = new Date().toISOString()
@@ -64,11 +63,6 @@ export async function GET() {
       }
     }
 
-    console.log(`✅ Backup completed:`)
-    console.log(`📊 Visitors: ${visitors.length}`)
-    console.log(`📝 Forms: ${forms.length}`)
-    console.log(`👤 Clients: ${clients.length}`)
-    console.log(`⚙️ Counters: ${counters.length}`)
 
     const filename = `portfolio_backup_${new Date().toISOString().split('T')[0]}_${Date.now()}.json`
 
@@ -95,7 +89,6 @@ export async function GET() {
 // POST endpoint to restore from backup
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔄 Starting database restore...')
     
     const backupData = await request.json()
     
@@ -120,31 +113,26 @@ export async function POST(request: NextRequest) {
     if (backupData.collections.visitors?.data?.length > 0) {
       await db.collection(VISITORS_COLLECTION).insertMany(backupData.collections.visitors.data)
       restoredCount += backupData.collections.visitors.data.length
-      console.log(`✅ Restored ${backupData.collections.visitors.data.length} visitors`)
     }
 
     // Restore forms
     if (backupData.collections.forms?.data?.length > 0) {
       await db.collection(FORMS_COLLECTION).insertMany(backupData.collections.forms.data)
       restoredCount += backupData.collections.forms.data.length
-      console.log(`✅ Restored ${backupData.collections.forms.data.length} forms`)
     }
 
     // Restore clients
     if (backupData.collections.clients?.data?.length > 0) {
       await db.collection(CLIENTS_COLLECTION).insertMany(backupData.collections.clients.data)
       restoredCount += backupData.collections.clients.data.length
-      console.log(`✅ Restored ${backupData.collections.clients.data.length} clients`)
     }
 
     // Restore counters
     if (backupData.collections.counters?.data?.length > 0) {
       await db.collection(COUNTERS_COLLECTION).insertMany(backupData.collections.counters.data)
       restoredCount += backupData.collections.counters.data.length
-      console.log(`✅ Restored ${backupData.collections.counters.data.length} counters`)
     }
 
-    console.log(`🎉 Restore completed! Total records restored: ${restoredCount}`)
 
     return NextResponse.json({
       success: true,

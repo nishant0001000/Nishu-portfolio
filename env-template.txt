@@ -1,0 +1,16 @@
+# Copy this file to .env.local and fill in your actual values
+
+OPENROUTER_API_KEY=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
+EMAIL_USER=rajputvashu429@gmail.com
+EMAIL_PASS=pegw vbcl tint bixh
+# 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
+
+NEXT_PUBLIC_ADMIN_PASSWORD=9870691784@maa
+MONGODB_URI=mongodb+srv://nishuportfolio:9870691784%40maa@cluster0.igpbrhf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+# Cloudinary Configuration
+CLOUDINARY_CLOUD_NAME=nishantcloud
+CLOUDINARY_API_KEY=696666769465761
+CLOUDINARY_API_SECRET=L5K8QakfABsW-Jk8500DIoBpGHc
+CLOUDINARY_UPLOAD_PRESET=nishu-portfolio/images
+

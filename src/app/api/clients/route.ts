@@ -75,7 +75,6 @@ const updateCounters = async (type: 'client') => {
 // GET endpoint to fetch all clients
 export async function GET() {
   try {
-    console.log('👥 Fetching clients...')
     
     const db = await getDb()
     
@@ -85,11 +84,9 @@ export async function GET() {
       .sort({ createdAt: -1 })
       .toArray()
 
-    console.log(`📈 Found ${clients.length} clients`)
 
     // Get counters
     const counters = await getCounters()
-    console.log(`📈 Total clients counter: ${counters.totalClients}`)
 
     // Calculate percentage changes for current vs previous month
     const now = new Date()
@@ -162,7 +159,6 @@ export async function POST(request: NextRequest) {
     const db = await getDb()
 
     if (action === 'convert_to_client') {
-      console.log('🔄 Converting form request to client:', formId)
       
       const form = await db.collection(FORMS_COLLECTION).findOne({ id: formId })
       if (!form) {
@@ -208,7 +204,6 @@ export async function POST(request: NextRequest) {
         { upsert: true }
       )
 
-      console.log('✅ Successfully converted form to client')
       return NextResponse.json({ 
         success: true, 
         message: 'Form request converted to client and removed from forms',
@@ -217,7 +212,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'mark_contacted') {
-      console.log('📞 Marking form as contacted:', formId)
       
       await db.collection(FORMS_COLLECTION).updateOne(
         { id: formId },
@@ -229,7 +223,6 @@ export async function POST(request: NextRequest) {
         }
       )
 
-      console.log('✅ Successfully marked form as contacted')
       return NextResponse.json({ 
         success: true, 
         message: 'Form marked as contacted successfully'
@@ -237,7 +230,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'unmark_contacted') {
-      console.log('↩️ Unmarking form as contacted:', formId)
       
       await db.collection(FORMS_COLLECTION).updateOne(
         { id: formId },
@@ -249,7 +241,6 @@ export async function POST(request: NextRequest) {
         }
       )
 
-      console.log('✅ Successfully unmarked form as contacted')
       return NextResponse.json({ 
         success: true, 
         message: 'Form set back to uncontacted'
@@ -257,7 +248,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'add_project') {
-      console.log('📁 Adding project to client:', clientData.clientId)
       
       // FIXED: Proper typing for project object
       const project: Project = {
@@ -280,7 +270,6 @@ export async function POST(request: NextRequest) {
         }
       )
 
-      console.log('✅ Successfully added project to client')
       return NextResponse.json({ 
         success: true, 
         message: 'Project added to client successfully',
@@ -289,7 +278,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'update_project') {
-      console.log('🗓️ Updating project for client:', clientData.clientId)
       const clientId: string = clientData.clientId as string
       const projectId: string = projectData.projectId as string
       const updates: Partial<Project> = {
@@ -327,12 +315,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'Client or project not found' }, { status: 404 })
       }
 
-      console.log('✅ Successfully updated project')
       return NextResponse.json({ success: true, message: 'Project updated successfully' })
     }
 
     if (action === 'update_client') {
-      console.log('✏️ Updating client:', clientData.clientId)
       
       const updateData = {
         ...(clientData.name && { name: clientData.name as string }),
@@ -348,7 +334,6 @@ export async function POST(request: NextRequest) {
         { $set: updateData }
       )
 
-      console.log('✅ Successfully updated client')
       return NextResponse.json({ 
         success: true, 
         message: 'Client updated successfully'
@@ -377,7 +362,6 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Client ID required' }, { status: 400 })
     }
 
-    console.log('🗑️ Deleting client:', clientId)
     
     const db = await getDb()
     const result = await db.collection<ClientDocument>(CLIENTS_COLLECTION).deleteOne({ id: clientId })
@@ -392,7 +376,6 @@ export async function DELETE(request: NextRequest) {
       { $inc: { totalClients: -1 } }
     )
 
-    console.log('✅ Successfully deleted client')
     return NextResponse.json({ 
       success: true, 
       message: 'Client deleted successfully'

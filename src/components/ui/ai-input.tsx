@@ -242,7 +242,6 @@ export default function AiInput() {
         setChatHistory(prev => [...prev, aiMessage]);
       } else if (selectedModel === 'gemini') {
         // ✅ Gemma 3N E2B API call
-        console.log('Sending request to Nishu AI (Gemini 2.0 Flash) API...');
 
         try {
           const apiResponse = await fetch('/api/ai-models', {
@@ -253,7 +252,6 @@ export default function AiInput() {
             body: JSON.stringify({ message: value, modelType: 'gemini' }),
           });
 
-          console.log('API Response status:', apiResponse.status);
 
           if (!apiResponse.ok) {
             const errorData = await apiResponse.json();
@@ -262,7 +260,6 @@ export default function AiInput() {
           }
 
           const data = await apiResponse.json();
-          console.log('API Response data:', data);
 
           if (data.success) {
             response = data.response;
@@ -292,7 +289,6 @@ export default function AiInput() {
         }
       } else if (selectedModel === 'mistral') {
         // ✅ Mistral Small API call
-        console.log('Sending request to Nishu 2.0 (Venice) API...');
 
         try {
           const apiResponse = await fetch('/api/ai-models', {
@@ -303,7 +299,6 @@ export default function AiInput() {
             body: JSON.stringify({ message: value, modelType: 'mistral' }),
           });
 
-          console.log('API Response status:', apiResponse.status);
 
           if (!apiResponse.ok) {
             const errorData = await apiResponse.json();
@@ -312,7 +307,6 @@ export default function AiInput() {
           }
 
           const data = await apiResponse.json();
-          console.log('API Response data:', data);
 
           if (data.success) {
             response = data.response;
@@ -342,7 +336,6 @@ export default function AiInput() {
         }
       } else if (selectedModel === 'qwen') {
         // ✅ Mistral 7B API call
-        console.log('Sending request to Nishu 3.0 (Mistral 7B) API...');
 
         try {
           const apiResponse = await fetch('/api/ai-models', {
@@ -353,7 +346,6 @@ export default function AiInput() {
             body: JSON.stringify({ message: value, modelType: 'qwen' }),
           });
 
-          console.log('API Response status:', apiResponse.status);
 
           if (!apiResponse.ok) {
             const errorData = await apiResponse.json();
@@ -362,7 +354,6 @@ export default function AiInput() {
           }
 
           const data = await apiResponse.json();
-          console.log('API Response data:', data);
 
           if (data.success) {
             response = data.response;

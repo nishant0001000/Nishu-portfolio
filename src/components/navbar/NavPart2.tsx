@@ -22,7 +22,6 @@ const NavPart2 = ({ onSearchToggle }: NavPart2Props) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle search functionality here
-    console.log("Searching for:", searchQuery);
     setIsSearchExpanded(false);
     setSearchQuery("");
     onSearchToggle?.(false);

@@ -36,7 +36,6 @@ const VisitorTracker = () => {
         if (response.ok) {
           // Mark as tracked for this session
           sessionStorage.setItem('visitorTracked', 'true')
-          console.log('✅ Visitor tracked successfully')
         }
       } catch (error) {
         console.error('❌ Error tracking visitor:', error)

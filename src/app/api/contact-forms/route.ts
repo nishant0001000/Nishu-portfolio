@@ -55,21 +55,18 @@ const cleanupOldRecords = async (): Promise<number> => {
   const fifteenDaysAgo = new Date()
   fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15)
 
-  console.log(`🧹 Cleaning up form records older than: ${fifteenDaysAgo.toISOString()}`)
 
   // Cleanup old forms - FIXED: Add generic typing
   const result = await db.collection<FormDocument>(FORMS_COLLECTION).deleteMany({
     timestamp: { $lt: fifteenDaysAgo.toISOString() }
   })
 
-  console.log(`🗑️ Deleted ${result.deletedCount} old form records`)
   return result.deletedCount
 }
 
 // GET endpoint to fetch all contact forms for admin dashboard
 export async function GET() {
   try {
-    console.log('📋 Fetching contact forms for admin dashboard...')
     
     const db = await getDb()
     
@@ -85,8 +82,6 @@ export async function GET() {
       .sort({ timestamp: -1 })
       .toArray()
 
-    console.log(`📊 Found ${contactForms.length} contact forms`)
-    console.log(`📈 Total forms counter: ${counters.totalForms}`)
 
     // Calculate percentage changes for current vs previous month
     const now = new Date()
@@ -156,7 +151,6 @@ export async function POST(request: NextRequest) {
   try {
     const { name, email, phone, message, preferredTime } = await request.json()
     
-    console.log('📝 Adding new contact form:', { name, email, phone, message, preferredTime })
     
     const db = await getDb()
     
@@ -184,7 +178,6 @@ export async function POST(request: NextRequest) {
       { upsert: true }
     )
     
-    console.log('✅ Contact form added successfully')
     
     return NextResponse.json({ 
       success: true, 
@@ -205,7 +198,6 @@ export async function POST(request: NextRequest) {
 // DELETE endpoint to remove old forms (manual cleanup)
 export async function DELETE() {
   try {
-    console.log('🗑️ Manual cleanup of old contact forms...')
     
     const deletedCount = await cleanupOldRecords()
     

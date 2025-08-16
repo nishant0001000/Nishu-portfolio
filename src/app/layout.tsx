@@ -8,6 +8,7 @@ import Navbar from '@/components/navbar/Navbar'
 import PasswordModal from '@/components/ui/password-modal'
 import AdminPanel from '@/components/ui/admin-panel'
 import VisitorTracker from '@/components/ui/visitor-tracker'
+import { HomepageProvider } from '@/components/ui/homepage-context'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -302,9 +303,11 @@ export default function RootLayout({
             <LenisProvider>
               <VisitorTracker />
               <Navbar />
-              {children}
+              <HomepageProvider>
+                {children}
+                <AdminPanel />
+              </HomepageProvider>
               <PasswordModal />
-              <AdminPanel />
             </LenisProvider>
           </AdminProvider>
         </ThemeProvider>

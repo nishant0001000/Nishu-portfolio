@@ -12,6 +12,64 @@ const TemplateCard = () => {
     const [scrollbarPosition, setScrollbarPosition] = useState(0);
     const [horizontalScrollProgress, setHorizontalScrollProgress] = useState(0);
 
+    type DbProject = {
+        _id: string
+        title: string
+        description: string
+        technologies: string[]
+        link?: string
+        imageUrl: string
+        category?: string
+    }
+
+    const [projects, setProjects] = useState<DbProject[]>([])
+    const [isLoading, setIsLoading] = useState(false)
+    const [detailsOpen, setDetailsOpen] = useState(false)
+    const [selectedProject, setSelectedProject] = useState<DbProject | null>(null)
+    const [categories, setCategories] = useState<any[]>([])
+    const [selectedCategory, setSelectedCategory] = useState<string>('all')
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                setIsLoading(true)
+                const res = await fetch('/api/projects')
+                const data = await res.json()
+                if (data?.success && Array.isArray(data.data)) {
+                    setProjects(data.data)
+                } else {
+                    setProjects([])
+                }
+            } catch (e) {
+                setProjects([])
+            } finally {
+                setIsLoading(false)
+            }
+        }
+        fetchProjects()
+    }, [])
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch('/api/categories')
+                const data = await res.json()
+                if (data?.success && Array.isArray(data.data)) {
+                    setCategories(data.data)
+                } else {
+                    setCategories([])
+                }
+            } catch (e) {
+                setCategories([])
+            }
+        }
+        fetchCategories()
+    }, [])
+
+    // Filter projects based on selected category
+    const filteredProjects = selectedCategory === 'all' 
+        ? projects 
+        : projects.filter(project => project.category === selectedCategory)
 
 
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -64,7 +122,7 @@ const TemplateCard = () => {
         const handleScroll = () => {
             if (scrollContainerRef.current) {
                 const { scrollTop, scrollHeight, clientHeight, scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-                
+
                 // Handle vertical scrolling for desktop
                 if (scrollbarRef.current) {
                     const maxScroll = scrollHeight - clientHeight;
@@ -99,63 +157,6 @@ const TemplateCard = () => {
         }
     }, []);
 
-    const cards = [
-        {
-            title: "Sick title",
-            description:
-                "How to design with gestures and motion that feel intuitive and natural.",
-            src: "https://pbs.twimg.com/media/GgMiuRpa4AAoW2y?format=jpg&name=medium",
-        },
-        {
-            title: "Sick title",
-            description:
-                "How to design with gestures and motion that feel intuitive and natural.",
-            src: "https://pbs.twimg.com/media/GgHZJN0aoAA__92?format=jpg&name=medium",
-        },
-        {
-            title: "Sick title",
-            description:
-                "How to design with gestures and motion that feel intuitive and natural.",
-            src: "https://pbs.twimg.com/media/GgCPjsQacAAWvm3?format=jpg&name=medium",
-        },
-        {
-            title: "Sick title",
-            description:
-                "How to design with gestures and motion that feel intuitive and natural.",
-            src: "https://pbs.twimg.com/media/GgMiuRpa4AAoW2y?format=jpg&name=medium",
-        },
-        {
-            title: "Sick title",
-            description:
-                "How to design with gestures and motion that feel intuitive and natural.",
-            src: "https://pbs.twimg.com/media/GgHZJN0aoAA__92?format=jpg&name=medium",
-        },
-        {
-            title: "Sick title",
-            description:
-                "How to design with gestures and motion that feel intuitive and natural.",
-            src: "https://pbs.twimg.com/media/GgCPjsQacAAWvm3?format=jpg&name=medium",
-        },
-        {
-            title: "Sick title",
-            description:
-                "How to design with gestures and motion that feel intuitive and natural.",
-            src: "https://pbs.twimg.com/media/GgMiuRpa4AAoW2y?format=jpg&name=medium",
-        },
-        {
-            title: "Sick title",
-            description:
-                "How to design with gestures and motion that feel intuitive and natural.",
-            src: "https://pbs.twimg.com/media/GgHZJN0aoAA__92?format=jpg&name=medium",
-        },
-        {
-            title: "Sick title",
-            description:
-                "How to design with gestures and motion that feel intuitive and natural.",
-            src: "https://pbs.twimg.com/media/GgCPjsQacAAWvm3?format=jpg&name=medium",
-        },
-    ]
-
     return (
 
         <div className="w-full flex flex-col items-center mt-[3rem] sm:mt-[4rem] lg:mt-[5rem]">
@@ -182,9 +183,9 @@ const TemplateCard = () => {
                 <path d="M30.5625 27.3357C29.9525 30.7343 29.3425 34.133 28.704 37.5284C29.1225 37.4018 29.5411 37.2751 29.9882 37.1516C28.6034 35.0617 27.2504 32.9465 25.8655 30.8565C25.6406 30.5425 25.1523 30.517 24.8669 30.7451C24.5497 30.9987 24.5305 31.4299 24.7555 31.7439C26.1403 33.8338 27.4933 35.9491 28.8781 38.039C29.2489 38.6003 30.0417 38.2265 30.1624 37.6621C30.7724 34.2635 31.3824 30.8648 32.0209 27.4694C32.0908 27.1016 31.758 26.7178 31.3871 26.6765C30.9559 26.6573 30.6324 26.9679 30.5625 27.3357Z"></path>
             </svg>
 
-            <div className="mx-auto w-full max-w-7xl rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] border border-white/20 p-1 sm:p-2 shadow-sm md:rounded-t-[32px] lg:md:rounded-t-[44px]">
+            <div className="mx-auto w-full max-w-5xl rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] border border-white/20 p-1 sm:p-2 shadow-sm md:rounded-t-[32px] lg:md:rounded-t-[44px]">
 
-                <div className="relative mx-auto flex w-full flex-col rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] border border-black/5 bg-white dark:bg-[#21212156] p-1 sm:p-2 shadow-sm md:items-start md:gap-6 lg:md:gap-8 md:rounded-b-[16px] lg:md:rounded-b-[20px] md:rounded-t-[32px] lg:md:rounded-t-[40px]">
+                <div className="relative mx-auto flex w-full flex-col rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] border border-black/5 bg-white dark:bg-[#21212156] p-1 sm:p-2 shadow-sm md:items-center md:gap-6 lg:md:gap-8 md:rounded-b-[16px] lg:md:rounded-b-[20px] md:rounded-t-[32px] lg:md:rounded-t-[40px]">
 
                     <Badge
                         variant="outline"
@@ -200,10 +201,40 @@ const TemplateCard = () => {
                                 <h3 className="text-2xl font-bold tracking-tight text-black sm:text-3xl lg:text-4xl opacity-85 dark:text-white">
                                     All Projects
                                 </h3>
-                                <p className="text-sm sm:text-base text-black/70 dark:text-white/70">Our All Projects</p>
+                                <p className="text-sm sm:text-base text-black/70 dark:text-white/70">
+                                    {selectedCategory === 'all' 
+                                        ? `Our All Projects (${projects.length})`
+                                        : `${selectedCategory} Projects (${filteredProjects.length} of ${projects.length})`
+                                    }
+                                </p>
                             </div>
                         </div>
                     </div>
+                    
+                    {/* Category Filter */}
+                    <div className="flex justify-center mb-6">
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="px-4 py-2 text-sm border border-border rounded-lg bg-white dark:bg-neutral-800 text-foreground focus:ring-2 focus:ring-ring focus:border-transparent"
+                            style={{ 
+                              direction: 'rtl',
+                              transform: 'scaleY(-1)'
+                            }}
+                        >
+                            <option value="all" style={{ 
+                              direction: 'ltr',
+                              transform: 'scaleY(-1)'
+                            }}>All Categories</option>
+                            {categories.map((cat) => (
+                                <option key={cat._id} value={cat.name} style={{ 
+                                  direction: 'ltr',
+                                  transform: 'scaleY(-1)'
+                                }}>{cat.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
                     <div
                         ref={scrollContainerRef}
                         className="flex flex-nowrap sm:flex-wrap items-center justify-start sm:justify-center gap-2 sm:gap-3 lg:gap-4 max-h-[800px] sm:max-h-[1000px] lg:max-h-[1200px] overflow-x-auto sm:overflow-y-auto scroll-smooth px-4 sm:px-6 lg:px-8 [&::-webkit-scrollbar]:hidden"
@@ -213,10 +244,21 @@ const TemplateCard = () => {
                             scrollBehavior: 'smooth'
                         }}
                     >
-                        {cards.map((card, index) => (
+                        {isLoading && (
+                            <div className="py-8 text-sm text-neutral-500 col-span-full text-center">Loading projects…</div>
+                        )}
+                        {!isLoading && filteredProjects.length === 0 && (
+                            <div className="py-8 text-sm text-neutral-500 col-span-full text-center">
+                                {selectedCategory === 'all' 
+                                    ? 'No projects found.'
+                                    : `No projects found in ${selectedCategory} category.`
+                                }
+                            </div>
+                        )}
+                        {!isLoading && filteredProjects.map((project, index) => (
                             <MinimalCard
                                 className="ml-0 mr-2 sm:m-2 w-[300px] sm:w-[320px] lg:w-[350px] flex-shrink-0 transform transition-all duration-700 ease-out hover:scale-105 hover:rotate-1"
-                                key={index}
+                                key={String(project._id)}
                                 style={{
                                     animationDelay: `${index * 100}ms`,
                                     filter: 'sepia(0.1) contrast(1.1) brightness(0.95)'
@@ -224,27 +266,84 @@ const TemplateCard = () => {
                             >
                                 <MinimalCardImage
                                     className="h-[200px] sm:h-[280px] lg:h-[320px]"
-                                    src={card.src}
-                                    alt={card.title}
+                                    src={project.imageUrl}
+                                    alt={project.title}
                                 />
-                                <MinimalCardTitle>{card.title}</MinimalCardTitle>
-                                <MinimalCardDescription>
-                                    {card.description}
-                                </MinimalCardDescription>
+                                <MinimalCardTitle>{project.title}</MinimalCardTitle>
+                                <div className="relative">
+                                    <MinimalCardDescription
+                                        className="line-clamp-2 min-h-[2.8em]"
+                                        style={{
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            lineHeight: '1.4em',
+                                            maxHeight: '2.8em',
+                                            height: '2.8em'
+                                        }}
+                                    >
+                                        {project.description}
+                                    </MinimalCardDescription>
+                                    <div className="absolute bottom-0 right-0 w-8 h-4 bg-gradient-to-l from-neutral-50 dark:from-neutral-800 to-transparent pointer-events-none"></div>
+                                    <div className="absolute bottom-1 right-1 text-xs text-neutral-400 dark:text-neutral-500 pointer-events-none">...</div>
+                                </div>
+                                
+                                {/* Category Badge */}
+                                {project.category && (
+                                    <div className="px-1 mt-2">
+                                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-700">
+                                            📁 {project.category}
+                                        </span>
+                                    </div>
+                                )}
+                                
                                 <div className="flex flex-wrap gap-2 px-1 mt-3">
-                                    <span className="px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10">React</span>
-                                    <span className="px-2 py-1 text-xs text-green-500 rounded-md bg-green-500/10">TypeScript</span>
-                                    <span className="px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-500/10">Tailwind</span>
-                                    <span className="px-2 py-1 text-xs text-orange-500 rounded-md bg-orange-500/10">Node.js</span>
+                                    {(Array.isArray(project.technologies) ? project.technologies : []).map((tech, i) => {
+                                        const colors = [
+                                            'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-300/30',
+                                            'bg-green-500/20 text-green-700 dark:text-green-300 border-green-300/30',
+                                            'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300/30',
+                                            'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-300/30',
+                                            'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-300/30',
+                                            'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-300/30',
+                                            'bg-red-500/20 text-red-700 dark:text-red-300 border-red-300/30',
+                                            'bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-300/30',
+                                            'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-300/30',
+                                            'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-300/30'
+                                        ];
+                                        const colorClass = colors[i % colors.length];
+                                        return (
+                                            <span
+                                                key={i}
+                                                className={`px-3 py-1.5 text-xs font-medium rounded-full border ${colorClass} transition-all duration-200 hover:scale-105 hover:shadow-sm`}
+                                            >
+                                                {tech}
+                                            </span>
+                                        );
+                                    })}
                                 </div>
 
-                                {/* Details Button with Liquid Glass Effect */}
-                                <div className="px-1 mt-4">
-                                    <button className="relative w-full h-10 bg-gradient-to-r from-black/10 dark:from-white/10 to-black/5 dark:to-white/5 backdrop-blur-sm border border-black/20 dark:border-white/20 rounded-[15px] mb-1 cursor-pointer transition-all duration-300 hover:from-black/20 dark:hover:from-white/20 hover:to-black/10 dark:hover:to-white/10 group overflow-hidden">
-                                        <span className="relative z-10 text-sm font-medium text-black dark:text-white">Details</span>
-                                        {/* Shimmer Effect */}
+                                {/* Details/Visit Buttons */}
+                                <div className="px-1 mt-4 flex gap-2">
+                                    <button
+                                        className="relative w-full h-10 bg-gradient-to-r from-black/10 dark:from-white/10 to-black/5 dark:to-white/5 backdrop-blur-sm border border-black/20 dark:border-white/20 rounded-[15px] mb-1 cursor-pointer transition-all duration-300 hover:from-black/20 dark:hover:from-white/20 hover:to-black/10 dark:hover:to-white/10 group overflow-hidden"
+                                        onClick={() => { setSelectedProject(project); setDetailsOpen(true); }}
+                                    >
+                                        <span className="relative z-10 text-sm font-medium text-black dark:text-white">View Details</span>
                                         <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent transition-transform duration-1000 ease-out -translate-x-full via-black/20 dark:via-white/20 group-hover:translate-x-full"></div>
                                     </button>
+                                    {project.link && (
+                                        <a
+                                            href={project.link}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="relative w-full h-10 bg-blue-500/10 backdrop-blur-sm border border-blue-500/30 rounded-[15px] mb-1 cursor-pointer transition-all duration-300 hover:bg-blue-500/20 flex items-center justify-center"
+                                        >
+                                            <span className="relative z-10 text-sm font-medium text-blue-700 dark:text-blue-300">Visit</span>
+                                        </a>
+                                    )}
                                 </div>
                             </MinimalCard>
                         ))}
@@ -262,59 +361,59 @@ const TemplateCard = () => {
                                 onMouseDown={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    
+
                                     const scrollbarTrack = e.currentTarget.parentElement;
                                     if (!scrollbarTrack || !scrollContainerRef.current) return;
-                                    
+
                                     const trackRect = scrollbarTrack.getBoundingClientRect();
                                     const logoWidth = 32; // 8 * 4 (w-8 = 32px)
-                                    
+
                                     const handleMouseMove = (e: MouseEvent) => {
                                         const mouseX = e.clientX - trackRect.left;
                                         const maxScrollbarLeft = trackRect.width - logoWidth;
                                         const newScrollbarLeft = Math.max(0, Math.min(mouseX - logoWidth / 2, maxScrollbarLeft));
-                                        
+
                                         // Invert the scroll direction to match logo movement
                                         const scrollPercentage = 1 - (newScrollbarLeft / maxScrollbarLeft);
                                         const maxScroll = scrollContainerRef.current!.scrollWidth - scrollContainerRef.current!.clientWidth;
                                         scrollContainerRef.current!.scrollLeft = scrollPercentage * maxScroll;
                                     };
-                                    
+
                                     const handleMouseUp = () => {
                                         document.removeEventListener('mousemove', handleMouseMove);
                                         document.removeEventListener('mouseup', handleMouseUp);
                                     };
-                                    
+
                                     document.addEventListener('mousemove', handleMouseMove);
                                     document.addEventListener('mouseup', handleMouseUp);
                                 }}
                                 onTouchStart={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    
+
                                     const scrollbarTrack = e.currentTarget.parentElement;
                                     if (!scrollbarTrack || !scrollContainerRef.current) return;
-                                    
+
                                     const trackRect = scrollbarTrack.getBoundingClientRect();
                                     const logoWidth = 32; // 8 * 4 (w-8 = 32px)
-                                    
+
                                     const handleTouchMove = (e: TouchEvent) => {
                                         e.preventDefault();
                                         const touchX = e.touches[0].clientX - trackRect.left;
                                         const maxScrollbarLeft = trackRect.width - logoWidth;
                                         const newScrollbarLeft = Math.max(0, Math.min(touchX - logoWidth / 2, maxScrollbarLeft));
-                                        
+
                                         // Invert the scroll direction to match logo movement
                                         const scrollPercentage = 1 - (newScrollbarLeft / maxScrollbarLeft);
                                         const maxScroll = scrollContainerRef.current!.scrollWidth - scrollContainerRef.current!.clientWidth;
                                         scrollContainerRef.current!.scrollLeft = scrollPercentage * maxScroll;
                                     };
-                                    
+
                                     const handleTouchEnd = () => {
                                         document.removeEventListener('touchmove', handleTouchMove);
                                         document.removeEventListener('touchend', handleTouchEnd);
                                     };
-                                    
+
                                     document.addEventListener('touchmove', handleTouchMove, { passive: false });
                                     document.addEventListener('touchend', handleTouchEnd);
                                 }}
@@ -350,7 +449,7 @@ const TemplateCard = () => {
                         >
                             <div className="flex overflow-hidden relative justify-center items-center w-full h-full bg-black rounded-full">
                                 <video
-                                    src="https://res.cloudinary.com/dbtymafqf/video/upload/v1754257529/m-logodark1_pphxjz.mp4"
+                                    src="https://res.cloudinary.com/nishantcloud/video/upload/v1754257529/m-logodark1_pphxjz.mp4"
                                     width={35}
                                     height={35}
                                     autoPlay
@@ -377,9 +476,9 @@ const TemplateCard = () => {
                             }}
                             onMouseDown={handleMouseDown}
                         >
-                             <div className="flex overflow-hidden relative justify-center items-center w-full h-full bg-black rounded-full">
+                            <div className="flex overflow-hidden relative justify-center items-center w-full h-full bg-black rounded-full">
                                 <video
-                                    src="/videos/m-logo.mp4"
+                                    src="https://res.cloudinary.com/nishantcloud/video/upload/v1754257529/m-logodark1_pphxjz.mp4"
                                     width={35}
                                     height={35}
                                     autoPlay
@@ -395,6 +494,58 @@ const TemplateCard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Details Modal */}
+            {detailsOpen && selectedProject && (
+                <div className="fixed inset-0 z-[220] flex items-center justify-center bg-black/40 p-4" onClick={() => setDetailsOpen(false)}>
+                    <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 relative transform transition-all duration-300 ease-out scale-100" onClick={(e) => e.stopPropagation()}>
+                        <button aria-label="Close" className="absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-black/10 dark:hover:bg-white/10" onClick={() => setDetailsOpen(false)}>✕</button>
+                        <div className="relative w-full h-56 sm:h-72 rounded-lg overflow-hidden mb-4">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={selectedProject.imageUrl} alt={selectedProject.title} className="w-full h-full object-cover" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-foreground mb-2">{selectedProject.title}</h3>
+                        <div className="mb-4">
+                            <p className="text-sm text-neutral-600 dark:text-neutral-300 modal-text-wrap leading-relaxed">{selectedProject.description}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {(Array.isArray(selectedProject.technologies) ? selectedProject.technologies : []).map((tech, i) => {
+                                const colors = [
+                                    'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-300/30',
+                                    'bg-green-500/20 text-green-700 dark:text-green-300 border-green-300/30',
+                                    'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300/30',
+                                    'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-300/30',
+                                    'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-300/30',
+                                    'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-300/30',
+                                    'bg-red-500/20 text-red-700 dark:text-red-300 border-red-300/30',
+                                    'bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-300/30',
+                                    'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-300/30',
+                                    'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-300/30'
+                                ];
+                                const colorClass = colors[i % colors.length];
+                                return (
+                                    <span
+                                        key={i}
+                                        className={`px-3 py-1.5 text-xs font-medium rounded-full border ${colorClass} transition-all duration-200 hover:scale-105 hover:shadow-sm`}
+                                    >
+                                        {tech}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                        <div className="flex gap-2">
+                            <button className="px-4 h-10 bg-gradient-to-r from-black/10 dark:from-white/10 to-black/5 dark:to-white/5 backdrop-blur-sm border border-black/20 dark:border-white/20 rounded-[12px] cursor-pointer transition-all duration-300 hover:from-black/20 dark:hover:from-white/20 hover:to-black/10 dark:hover:to-white/10" onClick={() => setDetailsOpen(false)}>
+                                Close
+                            </button>
+                            {selectedProject.link && (
+                                <a href={selectedProject.link} target="_blank" rel="noreferrer" className="px-4 h-10 bg-blue-500/10 backdrop-blur-sm border border-blue-500/30 rounded-[12px] cursor-pointer transition-all duration-300 hover:bg-blue-500/20 flex items-center justify-center text-blue-700 dark:text-blue-300">
+                                    Visit
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

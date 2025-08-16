@@ -3,20 +3,14 @@ import nodemailer from 'nodemailer'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔐 Forgot Admin Password API route called')
     
     const { email } = await request.json()
     const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123"
     
-    console.log('📧 Sending password to:', email)
-    console.log('🔑 Admin password:', adminPassword)
 
     const emailUser = process.env.EMAIL_USER
     const emailPass = process.env.EMAIL_PASS
 
-    console.log('📧 Email configuration check:')
-    console.log('- Email User:', emailUser ? '✅ Configured' : '❌ Not configured')
-    console.log('- Email Pass:', emailPass ? '✅ Configured' : '❌ Not configured')
 
     if (!emailPass) {
       console.error('❌ Email API key not configured')
@@ -32,7 +26,6 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    console.log('📧 Sending password via Gmail SMTP...')
 
     // Create beautiful email template matching contact form and admin login
     const forgotPasswordEmailContent = `
@@ -199,7 +192,6 @@ export async function POST(request: NextRequest) {
 
     try {
       const info = await transporter.sendMail(mailOptions)
-      console.log('📧 Password sent successfully:', info.messageId)
 
       return NextResponse.json({
         success: true,

@@ -1,13 +1,35 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { CardCarousel } from '../ui/card-carousel'
 
-const CardCarouselParent = () => {
+interface DbProject {
+  _id: string
+  title: string
+  imageUrl: string
+  link?: string
+}
 
-    const images = [
-        {src:'/images/card12.png',alt:"Image 1"},
-        {src:'/images/card2.webp',alt:"Image 2"},
-        {src:'/images/card3.webp',alt:"Image 3"},
-    ]
+const CardCarouselParent = () => {
+  const [images, setImages] = useState<{ src: string; alt: string; href?: string }[]>([])
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/api/projects', { cache: 'no-store' })
+        const json = await res.json()
+        if (json?.success && Array.isArray(json.data)) {
+          const latest = (json.data as DbProject[]).slice(0, 4)
+          setImages(
+            latest.map(p => ({ src: p.imageUrl, alt: p.title || 'Project', href: p.link }))
+          )
+        } else {
+          setImages([])
+        }
+      } catch (e) {
+        setImages([])
+      }
+    }
+    load()
+  }, [])
 
   return (
     <div>

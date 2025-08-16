@@ -5,18 +5,12 @@ export async function POST(request: NextRequest) {
   try {
     const { errorDetails, userMessage } = await request.json();
 
-    console.log('📧 Email API called with:', { errorDetails, userMessage });
 
     // Debug all environment variables
-    console.log('🔍 Environment variables check:');
-    console.log('EMAIL_USER:', process.env.EMAIL_USER);
-    console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '***SET***' : 'NOT SET');
-    console.log('OPENROUTER_API_KEY:', process.env.OPENROUTER_API_KEY ? '***SET***' : 'NOT SET');
 
     const emailUser = process.env.EMAIL_USER;
     const emailPass = process.env.EMAIL_PASS;
 
-    console.log('📧 Email configuration:', {
       emailUser,
       hasEmailPass: !!emailPass,
       emailPassLength: emailPass ? emailPass.length : 0,
@@ -55,7 +49,7 @@ export async function POST(request: NextRequest) {
              <!-- Centered Logo -->
              <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 25px; width: 100%;">
                <!-- Logo Image -->
-               <img src="https://res.cloudinary.com/dbtymafqf/image/upload/v1754273854/mail_grlmg4.gif" alt="Nishant Mogahaa Logo" style="width: 60px; height: 60px; border-radius: 45px; display: block; margin: 0 auto;" />
+               <img src="https://res.cloudinary.com/nishantcloud/image/upload/v1754273854/mail_grlmg4.gif" alt="Nishant Mogahaa Logo" style="width: 60px; height: 60px; border-radius: 45px; display: block; margin: 0 auto;" />
              </div>
              <!-- Centered Name and AI Portfolio -->
              <div style="text-align: center; margin-bottom: 15px; width: 100%;">
@@ -68,7 +62,7 @@ export async function POST(request: NextRequest) {
                <!-- Image below AI Portfolio -->
                <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center; width: 100%;">
                  <img 
-                   src="https://res.cloudinary.com/dbtymafqf/image/upload/v1754276405/Notification-_remix_3_hhrrcq.gif" 
+                   src="https://res.cloudinary.com/nishantcloud/image/upload/v1754276405/Notification-_remix_3_hhrrcq.gif" 
                    alt="Portfolio Image" 
                    style="width: 100%; max-width: 400px; height: auto; display: block; margin: 0 auto;"
                  />
@@ -137,7 +131,7 @@ export async function POST(request: NextRequest) {
              <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 25px; width: 100%;">
                <a href="https://instagram.com/nishant_mogahaa/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; cursor: pointer; display: flex; justify-content: center; width: 100%;">
                  <img 
-                   src="https://res.cloudinary.com/dbtymafqf/image/upload/v1754277092/Social-handle_kmu9bw.gif" 
+                   src="https://res.cloudinary.com/nishantcloud/image/upload/v1754277092/Social-handle_kmu9bw.gif" 
                    alt="Context Image" 
                    style="width: 100%; max-width: 400px; height: auto; border-radius: 12px; transition: transform 0.2s ease; cursor: pointer; display: block; margin: 0 auto;"
                  />
@@ -186,8 +180,6 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    console.log('📧 Sending email via Gmail SMTP...');
-    console.log('📧 Email configuration:', {
       from: emailUser,
       to: emailUser,
       hasEmailContent: !!emailContent
@@ -203,8 +195,6 @@ export async function POST(request: NextRequest) {
 
     const info = await transporter.sendMail(mailOptions);
 
-    console.log('📧 Gmail SMTP response:', info);
-    console.log('✅ Error email sent successfully to:', emailUser);
 
     return NextResponse.json({ success: true, messageId: info.messageId });
 

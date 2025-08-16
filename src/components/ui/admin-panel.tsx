@@ -3,8 +3,14 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAdmin } from './admin-context'
+import { useHomepage } from './homepage-context'
 import Toast from './toast'
 import { useToast } from '@/hooks/useToast'
+import { Button } from './button'
+import { Badge } from './badge'
+import { Input } from './input'
+import { Textarea } from './textarea'
+import MinimalCard, { MinimalCardDescription, MinimalCardImage, MinimalCardTitle } from './minimal-card'
 
 // TypeScript interfaces
 interface FormRequest {
@@ -65,6 +71,10 @@ interface Client {
 const AdminPanel = () => {
   const { isAdminPanelOpen, closeAdminPanel } = useAdmin()
   const { toast, showSuccess, showError, hideToast } = useToast()
+  const { content, updateHero, updateImages, updateSEO, saveChanges, hasUnsavedChanges, resetToDefault } = useHomepage()
+  
+  // Check if content is loaded
+  const isContentLoaded = content && content.hero && content.images && content.seo
   const [activeTab, setActiveTab] = useState('dashboard')
   const [isLoading, setIsLoading] = useState(false)
   const [stats, setStats] = useState({
@@ -88,16 +98,32 @@ const AdminPanel = () => {
   const [isSavingClient, setIsSavingClient] = useState(false)
   const [isAddingProject, setIsAddingProject] = useState(false)
   const [projectClientId, setProjectClientId] = useState<string>('')
-  const [projectData, setProjectData] = useState<{ name: string; description: string; status: string; startDate: string; endDate: string; budget: string }>({ name: '', description: '', status: 'planning', startDate: '', endDate: '', budget: '' })
+  const [projectData, setProjectData] = useState<{ name: string; description: string; status: string; startDate: string; endDate: string; budget: string; category: string }>({ name: '', description: '', status: 'planning', startDate: '', endDate: '', budget: '', category: 'Website' })
   const [isSavingProject, setIsSavingProject] = useState(false)
   const [deletingClientId, setDeletingClientId] = useState<string | null>(null)
   const [processingFormId, setProcessingFormId] = useState<string | null>(null)
+  const [uploadingImage, setUploadingImage] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
   const [formSearch, setFormSearch] = useState("")
   const [formStatus, setFormStatus] = useState<'all' | 'new' | 'contacted' | 'converted'>("new")
   const [formSort, setFormSort] = useState<'newest' | 'oldest'>("newest")
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [projectImage, setProjectImage] = useState('')
+  const [techInput, setTechInput] = useState('')
+  const [projectLink, setProjectLink] = useState('')
+  // Edit Projects (DB)
+  const [projectsDB, setProjectsDB] = useState<any[]>([])
+  const [isProjectsLoading, setIsProjectsLoading] = useState(false)
+  const [editProjectModalOpen, setEditProjectModalOpen] = useState(false)
+  const [editProject, setEditProject] = useState<{ _id?: string; title: string; description: string; technologies: string; link: string; imageUrl: string; category: string }>({ title: '', description: '', technologies: '', link: '', imageUrl: '', category: 'Website' })
+  // Manage Categories
+  const [categories, setCategories] = useState<any[]>([])
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false)
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
+  const [showEditCategoryModal, setShowEditCategoryModal] = useState(false)
+  const [newCategory, setNewCategory] = useState({ name: '', color: 'bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-300/30' })
+  const [editingCategory, setEditingCategory] = useState<any>(null)
 
   // Helper function for safe file download
   const downloadFile = (blob: Blob, filename: string) => {
@@ -135,10 +161,8 @@ const AdminPanel = () => {
   const handleAction = async (action: string) => {
     setIsLoading(true)
     try {
-      console.log(`🔧 Admin action: ${action}`)
       
       if (action === 'export_excel') {
-        console.log('📊 Starting Excel export...')
         const response = await fetch('/api/export-excel?type=all')
         
         if (response.ok) {
@@ -147,7 +171,6 @@ const AdminPanel = () => {
           
           const success = downloadFile(blob, filename)
           if (success) {
-            console.log('✅ Excel export completed')
             showSuccess('📊 Data exported successfully! Check your downloads folder.')
           } else {
             throw new Error('Download failed')
@@ -156,7 +179,6 @@ const AdminPanel = () => {
           throw new Error('Export failed')
         }
       } else if (action === 'backup') {
-        console.log('💾 Starting database backup...')
         const response = await fetch('/api/backup-data')
         
         if (response.ok) {
@@ -165,7 +187,6 @@ const AdminPanel = () => {
           
           const success = downloadFile(blob, filename)
           if (success) {
-            console.log('✅ Database backup completed')
             showSuccess('💾 Database backup created successfully! Check your downloads folder.')
           } else {
             throw new Error('Download failed')
@@ -174,7 +195,6 @@ const AdminPanel = () => {
           throw new Error('Backup failed')
         }
       } else if (action === 'refresh') {
-        console.log('🔄 Refreshing dashboard data...')
         
         // Refresh all data without page reload
         await Promise.all([
@@ -185,7 +205,6 @@ const AdminPanel = () => {
         // Refresh stats
         const fetchStats = async () => {
           try {
-            console.log('📊 Refreshing admin dashboard stats...')
             
             // Fetch visitor stats
             const visitorResponse = await fetch('/api/track-visitor')
@@ -235,29 +254,20 @@ const AdminPanel = () => {
               clientChange: clientData.clientChange
             })
 
-            console.log('📈 Stats refreshed successfully:', {
-              totalVisitors: visitorData.totalVisitors,
-              totalForms: formData.totalForms,
-              totalClients: clientData.totalClients,
-              visitorChange: visitorData.visitorChange,
-              formChange: formData.formChange,
-              clientChange: clientData.clientChange
-            })
+            setLastRefresh(new Date())
             
           } catch (error) {
-            console.error('❌ Error refreshing stats:', error)
+            console.error('❌ Error fetching stats:', error)
           }
-        }
-        
-        await fetchStats()
-        
-        console.log('✅ Dashboard data refreshed successfully (no page reload)')
-        showSuccess('🔄 Dashboard data refreshed successfully!')
-        
-      } else {
+         }
+         
+         await fetchStats()
+         
+         showSuccess('🔄 Dashboard data refreshed successfully!')
+         
+       } else {
         // Fallback for other actions
         await new Promise(resolve => setTimeout(resolve, 1000))
-        console.log(`✅ Action ${action} completed`)
         showSuccess(`Action "${action}" completed successfully!`)
       }
     } catch (error) {
@@ -344,14 +354,11 @@ const AdminPanel = () => {
   const fetchFormRequests = async () => {
     setIsFormLoading(true)
     try {
-      console.log('📋 Fetching contact forms from new API...')
       const response = await fetch('/api/contact-forms')
       if (response.ok) {
         const data = await response.json()
-        console.log('📊 Contact forms data:', data)
         if (data.success) {
           setFormRequests(data.contactForms) // already sorted by latest first
-          console.log(`✅ Loaded ${data.contactForms.length} contact forms`)
         } else {
           console.error('❌ Failed to fetch contact forms:', data.error)
         }
@@ -367,14 +374,12 @@ const AdminPanel = () => {
   const fetchClients = async () => {
     setIsClientsLoading(true)
     try {
-      console.log('👥 Fetching clients...')
       const response = await fetch('/api/clients')
       
       if (response.ok) {
         const data = await response.json()
         if (data.success) {
           setClients(data.clients || [])
-          console.log(`✅ Loaded ${data.clients.length} clients`)
         } else {
           console.error('❌ Failed to fetch clients:', data.error)
         }
@@ -393,7 +398,6 @@ const AdminPanel = () => {
   ) => {
     setProcessingFormId(formId)
     try {
-      console.log(`🔄 Processing form ${formId} with action: ${action}`)
       
       const response = await fetch('/api/clients', {
         method: 'POST',
@@ -414,7 +418,6 @@ const AdminPanel = () => {
       const data = await response.json()
       
       if (data.success) {
-        console.log(`✅ ${action} successful:`, data.message)
         showSuccess(data.message)
         
         // Refresh form requests to show updated status
@@ -494,7 +497,15 @@ const AdminPanel = () => {
 
   const openAddProject = (client: Client) => {
     setProjectClientId(client.id || client._id)
-    setProjectData({ name: '', description: '', status: 'planning', startDate: '', endDate: '', budget: '' })
+    setProjectData({ 
+      name: '', 
+      description: '', 
+      status: 'planning', 
+      startDate: '', 
+      endDate: '', 
+      budget: '', 
+      category: 'Website' 
+    })
     setIsAddingProject(true)
   }
 
@@ -531,6 +542,48 @@ const AdminPanel = () => {
     setIsSavingProject(false)
   }
 
+  const uploadImage = async (file: File, imageKey: keyof typeof content.images) => {
+    try {
+      setUploadingImage(imageKey)
+      const formData = new FormData()
+      formData.append('file', file)
+      const response = await fetch('/api/upload-image', { method: 'POST', body: formData })
+      if (!response.ok) throw new Error('Failed to upload image')
+      const result = await response.json()
+      updateImages({ [imageKey]: result.url })
+      showSuccess('Image uploaded successfully!')
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      showError('Failed to upload image')
+    } finally {
+      setUploadingImage(null)
+    }
+  }
+
+  const uploadResumePdf = async (file: File) => {
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/upload-file', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to upload resume')
+      }
+
+      const result = await response.json()
+
+      updateHero({ resumePdfUrl: result.url })
+      showSuccess('Resume uploaded successfully!')
+    } catch (error) {
+      console.error('Error uploading resume:', error)
+      showError('Failed to upload resume')
+    }
+  }
+
   const deleteClient = async (clientId: string) => {
     const proceed = confirm('Are you sure you want to delete this client permanently?')
     if (!proceed) return
@@ -555,7 +608,6 @@ const AdminPanel = () => {
     if (showLoading) setIsRefreshing(true)
     
     try {
-      console.log('📊 Fetching admin dashboard stats...')
       
       // Fetch visitor stats
       const visitorResponse = await fetch('/api/track-visitor')
@@ -607,15 +659,6 @@ const AdminPanel = () => {
 
       setLastRefresh(new Date())
       
-      console.log('📈 Stats updated:', {
-        totalVisitors: visitorData.totalVisitors,
-        totalForms: formData.totalForms,
-        totalClients: clientData.totalClients,
-        visitorChange: visitorData.visitorChange,
-        formChange: formData.formChange,
-        clientChange: clientData.clientChange
-      })
-      
     } catch (error) {
       console.error('❌ Error fetching stats:', error)
     } finally {
@@ -633,7 +676,6 @@ const AdminPanel = () => {
         fetchFormRequests(),
         fetchClients()
       ])
-      console.log('🔄 All dashboard data refreshed successfully')
       showSuccess('🔄 Dashboard data refreshed successfully!')
     } catch (error) {
       console.error('❌ Error refreshing dashboard:', error)
@@ -647,6 +689,23 @@ const AdminPanel = () => {
   useEffect(() => {
     if (isAdminPanelOpen) {
       fetchStats()
+      // Prevent background page scrolling when admin panel is open
+      // Use position: fixed on body to prevent background scroll
+      const originalStyle = window.getComputedStyle(document.body).position
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+      document.body.style.top = `-${window.scrollY}px`
+      
+      // Store original scroll position
+      const scrollY = window.scrollY
+      
+      return () => {
+        // Restore original state when admin panel closes
+        document.body.style.position = originalStyle
+        document.body.style.width = ''
+        document.body.style.top = ''
+        window.scrollTo(0, scrollY)
+      }
     }
   }, [isAdminPanelOpen])
 
@@ -661,13 +720,270 @@ const AdminPanel = () => {
     return () => clearInterval(interval)
   }, [isAdminPanelOpen])
 
+  useEffect(() => {
+    if (activeTab === 'edit-projects') {
+      fetchProjects()
+      fetchCategories()
+    }
+  }, [activeTab])
+
+  useEffect(() => {
+    if (activeTab === 'manage-categories') {
+      fetchCategories()
+    }
+  }, [activeTab])
+
+  useEffect(() => {
+    if (activeTab === 'add-projects') {
+      fetchCategories()
+    }
+  }, [activeTab])
+
+  useEffect(() => {
+    if (categories.length > 0 && activeTab === 'add-projects') {
+      setProjectData(v => ({ ...v, category: categories[0].name }))
+    }
+  }, [categories, activeTab])
+
   const tabs = [
     { id: 'dashboard', name: 'Dashboard', icon: '📊' },
     { id: 'analytics', name: 'Analytics', icon: '📈' },
     { id: 'users', name: 'Users', icon: '👥' },
+    { id: 'edit-homepage', name: 'Edit Homepage', icon: '🏠' },
+    { id: 'add-projects', name: 'Add Project', icon: '➕' },
+    { id: 'edit-projects', name: 'Edit Project', icon: '✏️' },
+    { id: 'manage-categories', name: 'Manage Categories', icon: '🏷️' },
     { id: 'settings', name: 'Settings', icon: '⚙️' },
     { id: 'logs', name: 'Logs', icon: '📝' },
   ]
+
+  const uploadPersonalProjectImage = async (file: File) => {
+   try {
+     const formData = new FormData()
+     formData.append('file', file)
+     const response = await fetch('/api/projects/upload-image', { method: 'POST', body: formData })
+     const text = await response.text()
+     if (!response.ok) {
+       showError(`Upload failed: ${text}`)
+       return
+     }
+     let result: any
+     try { result = JSON.parse(text) } catch { result = {} }
+     if (!result.success) {
+       showError(`Upload failed: ${result.error || 'Unknown error'}`)
+       return
+     }
+     setProjectImage(result.url)
+     showSuccess('Project image uploaded!')
+   } catch (e) {
+     console.error(e)
+     showError('Failed to upload project image')
+   }
+ }
+
+  const handleAddPersonalProject = async () => {
+    try {
+      const technologies = techInput.split(',').map(t => t.trim()).filter(Boolean)
+      const payload = {
+        title: projectData.name,
+        description: projectData.description,
+        technologies,
+        link: projectLink,
+        imageUrl: projectImage,
+        category: projectData.category,
+      }
+      const resp = await fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      const data = await resp.json()
+      if (!data.success) throw new Error(data.error || 'Create failed')
+      showSuccess('Personal project added')
+      // refresh edit list if user navigates there next
+      await fetchProjects()
+      setProjectData({ 
+        name: '', 
+        description: '', 
+        status: 'planning', 
+        startDate: '', 
+        endDate: '', 
+        budget: '', 
+        category: categories.length > 0 ? categories[0].name : 'Website' 
+      })
+      setTechInput('')
+      setProjectLink('')
+      setProjectImage('')
+    } catch (e) {
+      console.error(e)
+      showError('Failed to add project')
+    }
+  }
+
+  const fetchProjects = async () => {
+    setIsProjectsLoading(true)
+    try {
+      const res = await fetch('/api/projects')
+      const json = await res.json()
+      if (json.success) {
+        setProjectsDB(json.data || [])
+      } else {
+        console.error('❌ Failed to load projects:', json.error)
+      }
+    } catch (e) {
+      console.error('❌ Error fetching projects:', e)
+    } finally {
+      setIsProjectsLoading(false)
+    }
+  }
+
+  const openEditProject = (p: any) => {
+    setEditProject({
+      _id: p._id,
+      title: p.title || '',
+      description: p.description || '',
+      technologies: Array.isArray(p.technologies) ? p.technologies.join(', ') : (p.technologies || ''),
+      link: p.link || '',
+      imageUrl: p.imageUrl || '',
+      category: p.category || (categories.length > 0 ? categories[0].name : 'Website')
+    })
+    setEditProjectModalOpen(true)
+  }
+
+  const saveEditProject = async () => {
+    try {
+      const payload = {
+        _id: editProject._id,
+        title: editProject.title,
+        description: editProject.description,
+        technologies: editProject.technologies.split(',').map(t => t.trim()).filter(Boolean),
+        link: editProject.link,
+        imageUrl: editProject.imageUrl,
+        category: editProject.category,
+      }
+      const res = await fetch('/api/projects', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error || 'Update failed')
+      showSuccess('Project updated')
+      setEditProjectModalOpen(false)
+      await fetchProjects()
+    } catch (e) {
+      console.error('❌ Error updating project:', e)
+      showError('Failed to update project')
+    }
+  }
+
+  const deleteProject = async (id: string) => {
+    const ok = confirm('Delete this project?')
+    if (!ok) return
+    try {
+      const res = await fetch(`/api/projects?id=${id}`, { method: 'DELETE' })
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error || 'Delete failed')
+      showSuccess('Project deleted')
+      await fetchProjects()
+    } catch (e) {
+      console.error('❌ Error deleting project:', e)
+      showError('Failed to delete project')
+    }
+  }
+
+  const uploadEditProjectImage = async (file: File) => {
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/projects/upload-image', { method: 'POST', body: fd })
+      const text = await res.text()
+      if (!res.ok) { showError(`Upload failed: ${text}`); return }
+      const data = JSON.parse(text)
+      setEditProject(v => ({ ...v, imageUrl: data.url }))
+      showSuccess('Image uploaded!')
+    } catch (e) {
+      console.error(e)
+      showError('Failed to upload image')
+    }
+  }
+
+  // Category Management Functions
+  const fetchCategories = async () => {
+    setIsCategoriesLoading(true)
+    try {
+      const res = await fetch('/api/categories')
+      const json = await res.json()
+      if (json.success) {
+        setCategories(json.data || [])
+      } else {
+        console.error('❌ Failed to load categories:', json.error)
+      }
+    } catch (e) {
+      console.error('❌ Error fetching categories:', e)
+    } finally {
+      setIsCategoriesLoading(false)
+    }
+  }
+
+  const handleAddCategory = async () => {
+    try {
+      const response = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCategory)
+      })
+      const data = await response.json()
+      if (data.success) {
+        showSuccess('Category added successfully!')
+        setShowAddCategoryModal(false)
+        setNewCategory({ name: '', color: 'bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-300/30' })
+        await fetchCategories()
+      } else {
+        showError(`Error: ${data.error}`)
+      }
+    } catch (e) {
+      showError('Failed to add category')
+    }
+  }
+
+  const handleEditCategory = async () => {
+    try {
+      const response = await fetch('/api/categories', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingCategory)
+      })
+      const data = await response.json()
+      if (data.success) {
+        showSuccess('Category updated successfully!')
+        setShowEditCategoryModal(false)
+        setEditingCategory(null)
+        await fetchCategories()
+      } else {
+        showError(`Error: ${data.error}`)
+      }
+    } catch (e) {
+      showError('Failed to update category')
+    }
+  }
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    const proceed = confirm('Are you sure you want to delete this category?')
+    if (!proceed) return
+    
+    try {
+      const response = await fetch(`/api/categories?id=${categoryId}`, {
+        method: 'DELETE'
+      })
+      const data = await response.json()
+      if (data.success) {
+        showSuccess('Category deleted successfully!')
+        await fetchCategories()
+      } else {
+        showError(`Error: ${data.error}`)
+      }
+    } catch (e) {
+      showError('Failed to delete category')
+    }
+  }
+
+  const openEditCategory = (category: any) => {
+    setEditingCategory(category)
+    setShowEditCategoryModal(true)
+  }
 
   return (
     <>
@@ -796,7 +1112,7 @@ const AdminPanel = () => {
                 )}
 
                 {/* Main Content */}
-                <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+                <div className="flex-1 p-4 md:p-6 admin-panel-content">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activeTab}
@@ -804,7 +1120,7 @@ const AdminPanel = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.2 }}
-                      className="space-y-6"
+                      className="space-y-6 h-full overflow-y-auto [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-gray-500 dark:[&::-webkit-scrollbar-track]:bg-gray-800 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 dark:[&::-webkit-scrollbar-thumb]:hover:bg-gray-700"
                     >
                       {activeTab === 'dashboard' && (
                         <div className="space-y-6">
@@ -944,6 +1260,760 @@ const AdminPanel = () => {
                         </div>
                       )}
 
+                      {activeTab === 'edit-homepage' && (
+                        <div>
+                          <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-bold text-foreground">Edit Homepage</h2>
+                            {hasUnsavedChanges && (
+                              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                ⚠️ Unsaved Changes
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {/* Edit Hero Section */}
+                          <div className="space-y-6">
+                            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-border p-6">
+                              <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-foreground">Edit Hero Section</h3>
+                                <p className="text-sm text-muted-foreground">Update the main hero content of your homepage</p>
+                              </div>
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Main Title</label>
+                                  <Input 
+                                    value={content?.hero?.title || ''}
+                                    onChange={(e) => updateHero({ title: e.target.value })}
+                                    placeholder="Enter main title" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Subtitle</label>
+                                  <Input 
+                                    value={content?.hero?.subtitle || ''}
+                                    onChange={(e) => updateHero({ subtitle: e.target.value })}
+                                    placeholder="Enter subtitle" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Description</label>
+                                  <Textarea 
+                                    value={content?.hero?.description || ''}
+                                    onChange={(e) => updateHero({ description: e.target.value })}
+                                    placeholder="Enter description" 
+                                    className="mt-1"
+                                    rows={3}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Top Button Text</label>
+                                  <Input 
+                                    value={content?.hero?.founderText || ''}
+                                    onChange={(e) => updateHero({ founderText: e.target.value })}
+                                    placeholder="Enter founder text" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">2nd Button Text</label>
+                                  <Input 
+                                    value={content?.hero?.resumeButtonText || ''}
+                                    onChange={(e) => updateHero({ resumeButtonText: e.target.value })}
+                                    placeholder="Enter resume button text" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Upload Resume (PDF)</label>
+                                  <div className="flex gap-2 mt-1">
+                                    <Input 
+                                      value={content?.hero?.resumePdfUrl || ''}
+                                      onChange={(e) => updateHero({ resumePdfUrl: e.target.value })}
+                                      placeholder="Enter resume PDF URL" 
+                                      className="flex-1"
+                                    />
+                                    <input
+                                      type="file"
+                                      id="resumePdfInput"
+                                      className="hidden"
+                                      accept="application/pdf"
+                                      onChange={async (e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) {
+                                          await uploadResumePdf(file)
+                                        }
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => document.getElementById('resumePdfInput')?.click()}
+                                      className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:opacity-90"
+                                    >
+                                      Upload
+                                    </button>
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Role Text</label>
+                                  <Input 
+                                    value={content?.hero?.roleText || ''}
+                                    onChange={(e) => updateHero({ roleText: e.target.value })}
+                                    placeholder="Enter role text" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Role Highlight</label>
+                                  <Input 
+                                    value={content?.hero?.roleHighlight || ''}
+                                    onChange={(e) => updateHero({ roleHighlight: e.target.value })}
+                                    placeholder="Enter role highlight" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Manage Images */}
+                            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-border p-6">
+                              <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-foreground">Manage Images</h3>
+                                <p className="text-sm text-muted-foreground">Update or replace homepage images</p>
+                              </div>
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Main Title Image</label>
+                                  <div className="flex gap-2 mt-1">
+                                  <Input 
+                                      value={content?.images?.lionImage || ''}
+                                    onChange={(e) => updateImages({ lionImage: e.target.value })}
+                                    placeholder="Enter image URL" 
+                                      className="flex-1"
+                                    />
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) uploadImage(file, 'lionImage')
+                                      }}
+                                      className="hidden"
+                                      id="lionImage-upload"
+                                    />
+                                    <Button
+                                      type="button"
+                                      onClick={() => document.getElementById('lionImage-upload')?.click()}
+                                      disabled={uploadingImage === 'lionImage'}
+                                      className="px-3"
+                                    >
+                                      {uploadingImage === 'lionImage' ? 'Uploading...' : 'Upload'}
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Subtitle Image</label>
+                                  <div className="flex gap-2 mt-1">
+                                  <Input 
+                                      value={content?.images?.memogiImage || ''}
+                                    onChange={(e) => updateImages({ memogiImage: e.target.value })}
+                                    placeholder="Enter image URL" 
+                                      className="flex-1"
+                                    />
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) uploadImage(file, 'memogiImage')
+                                      }}
+                                      className="hidden"
+                                      id="memogiImage-upload"
+                                    />
+                                    <Button
+                                      type="button"
+                                      onClick={() => document.getElementById('memogiImage-upload')?.click()}
+                                      disabled={uploadingImage === 'memogiImage'}
+                                      className="px-3"
+                                    >
+                                      {uploadingImage === 'memogiImage' ? 'Uploading...' : 'Upload'}
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Left BG Image (Dark)</label>
+                                  <div className="flex gap-2 mt-1">
+                                  <Input 
+                                      value={content?.images?.nishantImage || ''}
+                                    onChange={(e) => updateImages({ nishantImage: e.target.value })}
+                                    placeholder="Enter image URL" 
+                                      className="flex-1"
+                                    />
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) uploadImage(file, 'nishantImage')
+                                      }}
+                                      className="hidden"
+                                      id="nishantImage-upload"
+                                    />
+                                    <Button
+                                      type="button"
+                                      onClick={() => document.getElementById('nishantImage-upload')?.click()}
+                                      disabled={uploadingImage === 'nishantImage'}
+                                      className="px-3"
+                                    >
+                                      {uploadingImage === 'nishantImage' ? 'Uploading...' : 'Upload'}
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Right BG Image (Dark)</label>
+                                  <div className="flex gap-2 mt-1">
+                                  <Input 
+                                      value={content?.images?.mogahaaImage || ''}
+                                    onChange={(e) => updateImages({ mogahaaImage: e.target.value })}
+                                    placeholder="Enter image URL" 
+                                      className="flex-1"
+                                    />
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) uploadImage(file, 'mogahaaImage')
+                                      }}
+                                      className="hidden"
+                                      id="mogahaaImage-upload"
+                                    />
+                                    <Button
+                                      type="button"
+                                      onClick={() => document.getElementById('mogahaaImage-upload')?.click()}
+                                      disabled={uploadingImage === 'mogahaaImage'}
+                                      className="px-3"
+                                    >
+                                      {uploadingImage === 'mogahaaImage' ? 'Uploading...' : 'Upload'}
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Left BG Image (Light)</label>
+                                  <div className="flex gap-2 mt-1">
+                                  <Input 
+                                      value={content?.images?.nishantLightImage || ''}
+                                    onChange={(e) => updateImages({ nishantLightImage: e.target.value })}
+                                    placeholder="Enter image URL" 
+                                      className="flex-1"
+                                    />
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) uploadImage(file, 'nishantLightImage')
+                                      }}
+                                      className="hidden"
+                                      id="nishantLightImage-upload"
+                                    />
+                                    <Button
+                                      type="button"
+                                      onClick={() => document.getElementById('nishantLightImage-upload')?.click()}
+                                      disabled={uploadingImage === 'nishantLightImage'}
+                                      className="px-3"
+                                    >
+                                      {uploadingImage === 'nishantLightImage' ? 'Uploading...' : 'Upload'}
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Right BG Image (Light)</label>
+                                  <div className="flex gap-2 mt-1">
+                                  <Input 
+                                      value={content?.images?.mogahaaLightImage || ''}
+                                    onChange={(e) => updateImages({ mogahaaLightImage: e.target.value })}
+                                    placeholder="Enter image URL" 
+                                      className="flex-1"
+                                    />
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) uploadImage(file, 'mogahaaLightImage')
+                                      }}
+                                      className="hidden"
+                                      id="mogahaaLightImage-upload"
+                                    />
+                                    <Button
+                                      type="button"
+                                      onClick={() => document.getElementById('mogahaaLightImage-upload')?.click()}
+                                      disabled={uploadingImage === 'mogahaaLightImage'}
+                                      className="px-3"
+                                    >
+                                      {uploadingImage === 'mogahaaLightImage' ? 'Uploading...' : 'Upload'}
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* SEO Settings */}
+                            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-border p-6">
+                              <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-foreground">SEO Settings</h3>
+                                <p className="text-sm text-muted-foreground">Manage meta tags and SEO optimization</p>
+                              </div>
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Page Title</label>
+                                  <Input 
+                                    value={content?.seo?.title || ''}
+                                    onChange={(e) => updateSEO({ title: e.target.value })}
+                                    placeholder="Enter page title" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Meta Description</label>
+                                  <Textarea 
+                                    value={content?.seo?.description || ''}
+                                    onChange={(e) => updateSEO({ description: e.target.value })}
+                                    placeholder="Enter meta description" 
+                                    className="mt-1"
+                                    rows={3}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Keywords</label>
+                                  <Textarea 
+                                    value={content?.seo?.keywords?.join(', ') || ''}
+                                    onChange={(e) => updateSEO({ keywords: e.target.value.split(',').map(k => k.trim()) })}
+                                    placeholder="Enter keywords (comma separated)" 
+                                    className="mt-1"
+                                    rows={3}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Author</label>
+                                  <Input 
+                                    value={content?.seo?.author || ''}
+                                    onChange={(e) => updateSEO({ author: e.target.value })}
+                                    placeholder="Enter author name" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Open Graph Title</label>
+                                  <Input 
+                                    value={content?.seo?.ogTitle || ''}
+                                    onChange={(e) => updateSEO({ ogTitle: e.target.value })}
+                                    placeholder="Enter Open Graph title" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Open Graph Description</label>
+                                  <Textarea 
+                                    value={content?.seo?.ogDescription || ''}
+                                    onChange={(e) => updateSEO({ ogDescription: e.target.value })}
+                                    placeholder="Enter Open Graph description" 
+                                    className="mt-1"
+                                    rows={3}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Twitter Title</label>
+                                  <Input 
+                                    value={content?.seo?.twitterTitle || ''}
+                                    onChange={(e) => updateSEO({ twitterTitle: e.target.value })}
+                                    placeholder="Enter Twitter title" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Twitter Description</label>
+                                  <Textarea 
+                                    value={content?.seo?.twitterDescription || ''}
+                                    onChange={(e) => updateSEO({ twitterDescription: e.target.value })}
+                                    placeholder="Enter Twitter description" 
+                                    className="mt-1"
+                                    rows={3}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Canonical URL</label>
+                                  <Input 
+                                    value={content?.seo?.canonicalUrl || ''}
+                                    onChange={(e) => updateSEO({ canonicalUrl: e.target.value })}
+                                    placeholder="Enter canonical URL" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Action Buttons */}
+                            <div className="flex flex-wrap gap-4 pt-4">
+                              <Button 
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                                onClick={async () => {
+                                  try {
+                                    await saveChanges()
+                                    showSuccess('Homepage changes saved successfully!')
+                                  } catch (error) {
+                                    showError('Failed to save changes')
+                                  }
+                                }}
+                                disabled={!hasUnsavedChanges}
+                              >
+                                💾 Save Changes
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                onClick={() => {
+                                  // Preview functionality can be added here
+                                  showSuccess('Preview mode - changes are visible in real-time!')
+                                }}
+                              >
+                                👁️ Preview Changes
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                onClick={() => {
+                                  resetToDefault()
+                                  showSuccess('Reset to default values')
+                                }}
+                              >
+                                🔄 Reset to Default
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {activeTab === 'add-projects' && (
+                        <div>
+                          <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-bold text-foreground">Add Project</h2>
+                            {hasUnsavedChanges && (
+                              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                ⚠️ Unsaved Changes
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {/* Add Project Form */}
+                          <div className="space-y-6">
+                            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-border p-6">
+                              <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-foreground">Project Details</h3>
+                                <p className="text-sm text-muted-foreground">Enter the project details</p>
+                              </div>
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Project Image</label>
+                                  <div className="flex gap-2 mt-1">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-16 h-16 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+                                        {projectImage ? (
+                                          // eslint-disable-next-line @next/next/no-img-element
+                                          <img src={projectImage} alt="preview" className="w-full h-full object-cover" />
+                                        ) : (
+                                          <span className="text-xs text-muted-foreground">No image</span>
+                                        )}
+                                      </div>
+                                      <Input value={projectImage} onChange={e => setProjectImage(e.target.value)} placeholder="Image URL" className="flex-1" />
+                                      <input type="file" id="personalProjectImage" className="hidden" accept="image/*" onChange={async (e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) {
+                                          await uploadPersonalProjectImage(file)
+                                        }
+                                      }} />
+                                      <Button type="button" onClick={() => document.getElementById('personalProjectImage')?.click()} className="px-4">Upload</Button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Project Title</label>
+                                  <Input 
+                                    value={projectData.name}
+                                    onChange={(e) => setProjectData(v => ({ ...v, name: e.target.value }))}
+                                    placeholder="Enter project title" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Project Description</label>
+                                  <Textarea 
+                                    value={projectData.description}
+                                    onChange={(e) => setProjectData(v => ({ ...v, description: e.target.value }))}
+                                    placeholder="Enter project description" 
+                                    className="mt-1"
+                                    rows={3}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Technologies (comma separated)</label>
+                                  <Input 
+                                    value={techInput}
+                                    onChange={(e) => setTechInput(e.target.value)}
+                                    placeholder="React, Next.js, Tailwind" 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Project Link</label>
+                                  <Input 
+                                    value={projectLink}
+                                    onChange={(e) => setProjectLink(e.target.value)}
+                                    placeholder="https://..." 
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium text-foreground">Project Category</label>
+                                  <select
+                                    value={projectData.category}
+                                    onChange={(e) => setProjectData(v => ({ ...v, category: e.target.value }))}
+                                    className="w-full px-3 py-2 mt-1 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring focus:border-transparent"
+                                    style={{ 
+                                      direction: 'rtl',
+                                      transform: 'scaleY(-1)'
+                                    }}
+                                  >
+                                    {categories.map((cat) => (
+                                      <option key={cat._id} value={cat.name} style={{ 
+                                        direction: 'ltr',
+                                        transform: 'scaleY(-1)'
+                                      }}>{cat.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Action Buttons */}
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                                onClick={handleAddPersonalProject}
+                                disabled={!projectData.name || !projectImage}
+                              >
+                                Add Project
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                onClick={() => { 
+                                  setProjectData({ 
+                                    name: '', 
+                                    description: '', 
+                                    status: 'planning', 
+                                    startDate: '', 
+                                    endDate: '', 
+                                    budget: '', 
+                                    category: categories.length > 0 ? categories[0].name : 'Website' 
+                                  }); 
+                                  setTechInput(''); 
+                                  setProjectLink(''); 
+                                  setProjectImage(''); 
+                                }}
+                              >
+                                Reset
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {activeTab === 'edit-projects' && (
+                        <div>
+                          <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-bold text-foreground">Edit Project</h2>
+                            {hasUnsavedChanges && (
+                              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                ⚠️ Unsaved Changes
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {/* Projects List */}
+                          <div className="bg-white dark:bg-neutral-800 rounded-lg border border-border p-6">
+                            {isProjectsLoading ? (
+                              <p className="text-sm text-muted-foreground">Loading projects…</p>
+                            ) : (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                                {projectsDB.map((p) => (
+                                  <MinimalCard
+                                    key={String(p._id)}
+                                    className="w-full transform transition-all duration-300 hover:scale-[1.02]"
+                                  >
+                                                                         <MinimalCardImage className="h-[200px] sm:h-[280px] lg:h-[320px]" src={p.imageUrl} alt={p.title} />
+                                    <MinimalCardTitle>{p.title}</MinimalCardTitle>
+                                                                         <MinimalCardDescription className="line-clamp-3">
+                                       {p.description}
+                                     </MinimalCardDescription>
++                                    <div className="px-1 mt-2">
++                                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-700">
++                                        📁 {p.category || 'Website'}
++                                      </span>
++                                    </div>
+                                    <div className="flex flex-wrap gap-2 px-1 mt-3">
+                                      {(Array.isArray(p.technologies) ? p.technologies : []).map((tech: string, i: number) => {
+                                        const colors = [
+                                          'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-300/30',
+                                          'bg-green-500/20 text-green-700 dark:text-green-300 border-green-300/30',
+                                          'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300/30',
+                                          'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-300/30',
+                                          'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-300/30',
+                                          'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-300/30',
+                                          'bg-red-500/20 text-red-700 dark:text-red-300 border-red-300/30',
+                                          'bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-300/30',
+                                          'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-300/30',
+                                          'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-300/30'
+                                        ];
+                                        const colorClass = colors[i % colors.length];
+                                        return (
+                                          <span 
+                                            key={i} 
+                                            className={`px-3 py-1.5 text-xs font-medium rounded-full border ${colorClass} transition-all duration-200 hover:scale-105 hover:shadow-sm`}
+                                          >
+                                            {tech}
+                                          </span>
+                                        );
+                                      })}
+                                    </div>
+                                    <div className="px-1 mt-4 flex gap-2">
+                                      <button className="relative w-full h-9 bg-gradient-to-r from-black/10 dark:from-white/10 to-black/5 dark:to-white/5 backdrop-blur-sm border border-black/20 dark:border-white/20 rounded-[12px] cursor-pointer transition-all duration-300 hover:from-black/20 dark:hover:from-white/20 hover:to-black/10 dark:hover:to-white/10"
+                                        onClick={() => openEditProject(p)}
+                                      >
+                                        <span className="text-sm font-medium text-black dark:text-white">Edit</span>
+                                      </button>
+                                      <button className="relative w-full h-9 bg-red-500/10 backdrop-blur-sm border border-red-500/30 rounded-[12px] cursor-pointer transition-all duration-300 hover:bg-red-500/20 text-red-700 dark:text-red-300"
+                                        onClick={() => deleteProject(String(p._id))}
+                                      >
+                                        <span className="text-sm font-medium">Delete</span>
+                                      </button>
+                                      {p.link && (
+                                        <a href={p.link} target="_blank" rel="noreferrer" className="relative w-full h-9 bg-blue-500/10 backdrop-blur-sm border border-blue-500/30 rounded-[12px] cursor-pointer transition-all duration-300 hover:bg-blue-500/20 flex items-center justify-center">
+                                          <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Visit</span>
+                                        </a>
+                                      )}
+                                    </div>
+                                  </MinimalCard>
+                                ))}
+                                {projectsDB.length === 0 && (
+                                  <div className="col-span-full text-sm text-muted-foreground">No projects found.</div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Edit Project Modal */}
+                          <AnimatePresence>
+                            {editProjectModalOpen && (
+                              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[220] flex items-center justify-center bg-black/40 p-4">
+                                <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} transition={{ type: 'spring', stiffness: 300, damping: 30 }} className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg w-full max-w-md p-5 relative">
+                                  <button aria-label="Close" className="absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent hover:text-accent-foreground" onClick={() => setEditProjectModalOpen(false)}>✕</button>
+                                  <h3 className="text-lg font-semibold text-foreground mb-4">Edit Project</h3>
+                                  <div className="space-y-3">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-16 h-16 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        {editProject.imageUrl ? <img src={editProject.imageUrl} alt="preview" className="w-full h-full object-cover" /> : <span className="text-xs text-muted-foreground">No image</span>}
+                                      </div>
+                                      <input className="flex-1 px-3 py-2 text-sm border rounded" placeholder="Image URL" value={editProject.imageUrl} onChange={e => setEditProject(v => ({ ...v, imageUrl: e.target.value }))} />
+                                      <input type="file" id="editProjectImage" className="hidden" accept="image/*" onChange={async (e) => {
+                                        const file = e.target.files?.[0]
+                                        if (file) await uploadEditProjectImage(file)
+                                      }} />
+                                      <button className="px-3 py-2 text-sm rounded border" onClick={() => document.getElementById('editProjectImage')?.click()}>Upload</button>
+                                    </div>
+                                    <input className="w-full px-3 py-2 text-sm border rounded" placeholder="Title" value={editProject.title} onChange={e => setEditProject(v => ({ ...v, title: e.target.value }))} />
+                                    <textarea className="w-full px-3 py-2 text-sm border rounded" placeholder="Description" rows={3} value={editProject.description} onChange={e => setEditProject(v => ({ ...v, description: e.target.value }))} />
+                                    <input className="w-full px-3 py-2 text-sm border rounded" placeholder="Technologies (comma separated)" value={editProject.technologies} onChange={e => setEditProject(v => ({ ...v, technologies: e.target.value }))} />
+                                    <input className="w-full px-3 py-2 text-sm border rounded" placeholder="Link" value={editProject.link} onChange={e => setEditProject(v => ({ ...v, link: e.target.value }))} />
+                                    <select className="w-full px-3 py-2 text-sm border rounded" value={editProject.category} onChange={e => setEditProject(v => ({ ...v, category: e.target.value }))} style={{ 
+                                      direction: 'rtl',
+                                      transform: 'scaleY(-1)'
+                                    }}>
+                                      {categories.map((cat) => (
+                                        <option key={cat._id} value={cat.name} style={{ 
+                                          direction: 'ltr',
+                                          transform: 'scaleY(-1)'
+                                        }}>{cat.name}</option>
+                                      ))}
+                                    </select>
+                                    <div className="flex justify-end gap-2">
+                                      <button className="px-3 py-2 text-sm rounded border" onClick={() => setEditProjectModalOpen(false)}>Cancel</button>
+                                      <button className="px-3 py-2 text-sm rounded bg-green-600 text-white" onClick={saveEditProject}>Save</button>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
+
+                      {activeTab === 'manage-categories' && (
+                        <div>
+                          <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-bold text-foreground">Manage Categories</h2>
+                            <button
+                              onClick={() => setShowAddCategoryModal(true)}
+                              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                            >
+                              ➕ Add Category
+                            </button>
+                          </div>
+                          
+                          {/* Categories List */}
+                          <div className="bg-white dark:bg-neutral-800 rounded-lg border border-border p-6">
+                            {isCategoriesLoading ? (
+                              <p className="text-sm text-muted-foreground">Loading categories…</p>
+                            ) : (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+                                {categories.map((category) => (
+                                  <div
+                                    key={String(category._id)}
+                                    className="border border-border rounded-lg p-4 bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                                  >
+                                    <div className="flex items-center justify-between mb-3">
+                                      <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full border ${category.color}`}>
+                                        {category.name}
+                                      </span>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => openEditCategory(category)}
+                                          className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors"
+                                        >
+                                          ✏️ Edit
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteCategory(String(category._id))}
+                                          className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200 transition-colors"
+                                        >
+                                          🗑️ Delete
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      Created: {new Date(category.createdAt).toLocaleDateString()}
+                                    </div>
+                                  </div>
+                                ))}
+                                {categories.length === 0 && (
+                                  <div className="col-span-full text-sm text-muted-foreground">No categories found.</div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {activeTab === 'settings' && (
                         <div>
                           <h2 className="text-2xl font-bold text-foreground mb-6">Settings</h2>
@@ -1000,9 +2070,18 @@ const AdminPanel = () => {
                 <input className="w-full px-3 py-2 text-sm border rounded" placeholder="Name" value={editClientData.name} onChange={e => setEditClientData(v => ({ ...v, name: e.target.value }))} />
                 <input className="w-full px-3 py-2 text-sm border rounded" placeholder="Email" value={editClientData.email} onChange={e => setEditClientData(v => ({ ...v, email: e.target.value }))} />
                 <input className="w-full px-3 py-2 text-sm border rounded" placeholder="Phone" value={editClientData.phone} onChange={e => setEditClientData(v => ({ ...v, phone: e.target.value }))} />
-                <select className="w-full px-3 py-2 text-sm border rounded" value={editClientData.status} onChange={e => setEditClientData(v => ({ ...v, status: e.target.value }))}>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                <select className="w-full px-3 py-2 text-sm border rounded" value={editClientData.status} onChange={e => setEditClientData(v => ({ ...v, status: e.target.value }))} style={{ 
+                  direction: 'rtl',
+                  transform: 'scaleY(-1)'
+                }}>
+                  <option value="active" style={{ 
+                    direction: 'ltr',
+                    transform: 'scaleY(-1)'
+                  }}>Active</option>
+                  <option value="inactive" style={{ 
+                    direction: 'ltr',
+                    transform: 'scaleY(-1)'
+                  }}>Inactive</option>
                 </select>
                 <textarea className="w-full px-3 py-2 text-sm border rounded" placeholder="Notes" rows={3} value={editClientData.notes} onChange={e => setEditClientData(v => ({ ...v, notes: e.target.value }))} />
               </div>
@@ -1051,10 +2130,22 @@ const AdminPanel = () => {
                   <input className="w-full px-3 py-2 text-sm border rounded" type="date" placeholder="End date" value={projectData.endDate} onChange={e => setProjectData(v => ({ ...v, endDate: e.target.value }))} />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <select className="w-full px-3 py-2 text-sm border rounded" value={projectData.status} onChange={e => setProjectData(v => ({ ...v, status: e.target.value }))}>
-                    <option value="planning">Planning</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="completed">Completed</option>
+                  <select className="w-full px-3 py-2 text-sm border rounded" value={projectData.status} onChange={e => setProjectData(v => ({ ...v, status: e.target.value }))} style={{ 
+                    direction: 'rtl',
+                    transform: 'scaleY(-1)'
+                  }}>
+                    <option value="planning" style={{ 
+                      direction: 'ltr',
+                      transform: 'scaleY(-1)'
+                    }}>Planning</option>
+                    <option value="in_progress" style={{ 
+                      direction: 'ltr',
+                      transform: 'scaleY(-1)'
+                    }}>In Progress</option>
+                    <option value="completed" style={{ 
+                      direction: 'ltr',
+                      transform: 'scaleY(-1)'
+                    }}>Completed</option>
                   </select>
                   <input className="w-full px-3 py-2 text-sm border rounded" placeholder="Budget (price)" value={projectData.budget} onChange={e => setProjectData(v => ({ ...v, budget: e.target.value }))} />
                 </div>
@@ -1130,19 +2221,45 @@ const AdminPanel = () => {
                     value={formStatus}
                     onChange={(e) => setFormStatus(e.target.value as 'all' | 'new' | 'contacted' | 'converted')}
                     className="w-full px-3 py-2 text-sm border border-input bg-background text-foreground rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
+                    style={{ 
+                      direction: 'rtl',
+                      transform: 'scaleY(-1)'
+                    }}
                   >
-                    <option value="all">All statuses</option>
-                    <option value="new">New</option>
-                    <option value="contacted">Contacted</option>
-                    <option value="converted">Converted to Client</option>
+                    <option value="all" style={{ 
+                      direction: 'ltr',
+                      transform: 'scaleY(-1)'
+                    }}>All statuses</option>
+                    <option value="new" style={{ 
+                      direction: 'ltr',
+                      transform: 'scaleY(-1)'
+                    }}>New</option>
+                    <option value="contacted" style={{ 
+                      direction: 'ltr',
+                      transform: 'scaleY(-1)'
+                    }}>Contacted</option>
+                    <option value="converted" style={{ 
+                      direction: 'ltr',
+                      transform: 'scaleY(-1)'
+                    }}>Converted to Client</option>
                   </select>
                   <select
                     value={formSort}
                     onChange={(e) => setFormSort(e.target.value as 'newest' | 'oldest')}
                     className="w-full px-3 py-2 text-sm border border-input bg-background text-foreground rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
+                    style={{ 
+                      direction: 'rtl',
+                      transform: 'scaleY(-1)'
+                    }}
                   >
-                    <option value="newest">Newest first</option>
-                    <option value="oldest">Oldest first</option>
+                    <option value="newest" style={{ 
+                      direction: 'ltr',
+                      transform: 'scaleY(-1)'
+                    }}>Newest first</option>
+                    <option value="oldest" style={{ 
+                      direction: 'ltr',
+                      transform: 'scaleY(-1)'
+                    }}>Oldest first</option>
                   </select>
                 </div>
               </div>
@@ -1587,6 +2704,246 @@ const AdminPanel = () => {
         isVisible={toast.isVisible}
         onClose={hideToast}
       />
+
+      {/* Add Category Modal */}
+      <AnimatePresence>
+        {showAddCategoryModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[220] flex items-center justify-center bg-black/40 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg w-full max-w-md p-5 relative"
+            >
+              <button
+                aria-label="Close"
+                className="absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent hover:text-accent-foreground"
+                onClick={() => setShowAddCategoryModal(false)}
+              >
+                ✕
+              </button>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Add New Category</h3>
+              <div className="space-y-3">
+                <input
+                  className="w-full px-3 py-2 text-sm border rounded"
+                  placeholder="Category name"
+                  value={newCategory.name}
+                  onChange={e => setNewCategory(v => ({ ...v, name: e.target.value }))}
+                />
+                
+                {/* Color Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Category Color</label>
+                  
+                  {/* Preset Colors */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { name: 'Blue', value: 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-300/30' },
+                      { name: 'Green', value: 'bg-green-500/20 text-green-700 dark:text-green-300 border-green-300/30' },
+                      { name: 'Purple', value: 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300/30' },
+                      { name: 'Orange', value: 'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-300/30' },
+                      { name: 'Pink', value: 'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-300/30' },
+                      { name: 'Indigo', value: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-300/30' },
+                      { name: 'Red', value: 'bg-red-500/20 text-red-700 dark:text-red-300 border-red-300/30' },
+                      { name: 'Teal', value: 'bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-300/30' },
+                      { name: 'Yellow', value: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-300/30' },
+                      { name: 'Cyan', value: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-300/30' },
+                      { name: 'Gray', value: 'bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-300/30' }
+                    ].map((color) => (
+                      <button
+                        key={color.name}
+                        type="button"
+                        onClick={() => setNewCategory(v => ({ ...v, color: color.value }))}
+                        className={`p-2 rounded border transition-all ${
+                          newCategory.color === color.value 
+                            ? 'ring-2 ring-blue-500 border-blue-500' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full border ${color.value}`}>
+                          {color.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Custom Color Input */}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Custom color (hex: #FF0000 or rgb: rgb(255,0,0))"
+                      className="flex-1 px-3 py-2 text-sm border rounded"
+                      onChange={(e) => {
+                        const colorValue = e.target.value
+                        if (colorValue.startsWith('#') || colorValue.startsWith('rgb')) {
+                          // Convert to Tailwind-like classes
+                          const customColor = `bg-[${colorValue}] text-white border-[${colorValue}]`
+                          setNewCategory(v => ({ ...v, color: customColor }))
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="px-3 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                      onClick={() => {
+                        // Generate a random color
+                        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9']
+                        const randomColor = colors[Math.floor(Math.random() * colors.length)]
+                        const customColor = `bg-[${randomColor}] text-white border-[${randomColor}]`
+                        setNewCategory(v => ({ ...v, color: customColor }))
+                      }}
+                    >
+                      🎨 Random
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end gap-2">
+                  <button
+                    className="px-3 py-2 text-sm rounded border"
+                    onClick={() => setShowAddCategoryModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-3 py-2 text-sm rounded bg-green-600 text-white disabled:opacity-50"
+                    disabled={!newCategory.name.trim()}
+                    onClick={handleAddCategory}
+                  >
+                    Add Category
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Category Modal */}
+      <AnimatePresence>
+        {showEditCategoryModal && editingCategory && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[220] flex items-center justify-center bg-black/40 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg w-full max-w-md p-5 relative"
+            >
+              <button
+                aria-label="Close"
+                className="absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent hover:text-accent-foreground"
+                onClick={() => setShowEditCategoryModal(false)}
+              >
+                ✕
+              </button>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Edit Category</h3>
+              <div className="space-y-3">
+                <input
+                  className="w-full px-3 py-2 text-sm border rounded"
+                  placeholder="Category name"
+                  value={editingCategory.name}
+                  onChange={e => setEditingCategory(v => ({ ...v, name: e.target.value }))}
+                />
+                
+                {/* Color Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Category Color</label>
+                  
+                  {/* Preset Colors */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { name: 'Blue', value: 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-300/30' },
+                      { name: 'Green', value: 'bg-green-500/20 text-green-700 dark:text-green-300 border-green-300/30' },
+                      { name: 'Purple', value: 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300/30' },
+                      { name: 'Orange', value: 'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-300/30' },
+                      { name: 'Pink', value: 'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-300/30' },
+                      { name: 'Indigo', value: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-300/30' },
+                      { name: 'Red', value: 'bg-red-500/20 text-red-700 dark:text-red-300 border-red-300/30' },
+                      { name: 'Teal', value: 'bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-300/30' },
+                      { name: 'Yellow', value: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-300/30' },
+                      { name: 'Cyan', value: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-300/30' },
+                      { name: 'Gray', value: 'bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-300/30' }
+                    ].map((color) => (
+                      <button
+                        key={color.name}
+                        type="button"
+                        onClick={() => setEditingCategory(v => ({ ...v, color: color.value }))}
+                        className={`p-2 rounded border transition-all ${
+                          editingCategory.color === color.value 
+                            ? 'ring-2 ring-blue-500 border-blue-500' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full border ${color.value}`}>
+                          {color.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Custom Color Input */}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Custom color (hex: #FF0000 or rgb: rgb(255,0,0))"
+                      className="flex-1 px-3 py-2 text-sm border rounded"
+                      onChange={(e) => {
+                        const colorValue = e.target.value
+                        if (colorValue.startsWith('#') || colorValue.startsWith('rgb')) {
+                          // Convert to Tailwind-like classes
+                          const customColor = `bg-[${colorValue}] text-white border-[${colorValue}]`
+                          setEditingCategory(v => ({ ...v, color: customColor }))
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="px-3 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                      onClick={() => {
+                        // Generate a random color
+                        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9']
+                        const randomColor = colors[Math.floor(Math.random() * colors.length)]
+                        const customColor = `bg-[${randomColor}] text-white border-[${randomColor}]`
+                        setEditingCategory(v => ({ ...v, color: customColor }))
+                      }}
+                    >
+                      🎨 Random
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end gap-2">
+                  <button
+                    className="px-3 py-2 text-sm rounded border"
+                    onClick={() => setShowEditCategoryModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-3 py-2 text-sm rounded bg-blue-600 text-white disabled:opacity-50"
+                    disabled={!editingCategory.name.trim()}
+                    onClick={handleEditCategory}
+                  >
+                    Update Category
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

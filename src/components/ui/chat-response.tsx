@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { Bot, User, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
 
 interface ChatResponseProps {
   message: string
@@ -31,13 +30,13 @@ export default function ChatResponse({
         animate={{ opacity: 1, y: 0 }}
         className="flex gap-3 items-start p-4 rounded-2xl border bg-white/5 dark:bg-black/5 border-black/10 dark:border-white/10"
       >
-        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
-          <Image 
-            src="https://res.cloudinary.com/dbtymafqf/image/upload/v1754273854/mail_grlmg4.gif"
+         <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden bg-black p-1">
+          <img
+            src="https://res.cloudinary.com/nishantcloud/image/upload/v1754273854/mail_grlmg4.gif"
             alt="Nishu AI"
+            className="w-full h-full rounded-full object-cover"
             width={32}
             height={32}
-            className="w-full h-full object-cover"
           />
         </div>
         <div className="flex-1 min-w-0">
@@ -58,13 +57,13 @@ export default function ChatResponse({
         animate={{ opacity: 1, y: 0 }}
         className="flex gap-3 items-start p-4 rounded-2xl border bg-red-500/10 border-red-500/20"
       >
-        <div className="flex flex-shrink-0 justify-center items-center w-8 h-8 rounded-full overflow-hidden">
-          <Image 
-            src="https://res.cloudinary.com/dbtymafqf/image/upload/v1754273854/mail_grlmg4.gif"
+         <div className="flex flex-shrink-0 justify-center items-center w-8 h-8 rounded-full overflow-hidden bg-black p-1">
+          <img
+            src="https://res.cloudinary.com/nishantcloud/image/upload/v1754273854/mail_grlmg4.gif"
             alt="Nishu AI"
+            className="w-full h-full rounded-full object-cover"
             width={32}
             height={32}
-            className="w-full h-full object-cover"
           />
         </div>
         <div className="flex-1 min-w-0">
@@ -88,13 +87,13 @@ export default function ChatResponse({
           exit={{ opacity: 0, y: -10 }}
           className="flex gap-3 items-start p-4 rounded-2xl border bg-white/5 dark:bg-black/5 border-black/10 dark:border-white/10"
         >
-          <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
-            <Image 
-              src="https://res.cloudinary.com/dbtymafqf/image/upload/v1754273854/mail_grlmg4.gif"
+           <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden bg-black p-1">
+            <img
+              src="https://res.cloudinary.com/nishantcloud/image/upload/v1754273854/mail_grlmg4.gif"
               alt="Nishu AI"
+              className="w-full h-full rounded-full object-cover"
               width={32}
               height={32}
-              className="w-full h-full object-cover"
             />
           </div>
           <div className="flex-1 min-w-0">

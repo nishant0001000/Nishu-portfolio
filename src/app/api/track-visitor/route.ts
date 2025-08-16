@@ -67,7 +67,6 @@ const cleanupOldRecords = async (): Promise<number> => {
     timestamp: { $lt: fifteenDaysAgo.toISOString() }
   })
   
-  console.log(`🧹 Cleaned up ${result.deletedCount} old form records`)
   return result.deletedCount
 }
 
@@ -80,7 +79,6 @@ export async function POST(request: NextRequest) {
       await updateCounters('visitor')
       
       const counters = await getCounters()
-      console.log('👥 Visitor counted (no data stored):', counters.totalVisitors)
       
       return NextResponse.json({ 
         success: true, 
@@ -110,7 +108,6 @@ export async function POST(request: NextRequest) {
       await updateCounters('form')
       
       const counters = await getCounters()
-      console.log('📝 Form submission with detailed data stored:', newForm.id)
       
       return NextResponse.json({ 
         success: true, 

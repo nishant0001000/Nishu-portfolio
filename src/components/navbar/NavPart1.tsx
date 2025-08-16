@@ -29,7 +29,7 @@ const NavPart1 = () => {
         <a href="#" className='flex gap-2 items-center' onClick={handleLogoClick}>
             {/* Light Theme Video - Hidden in Dark Mode */}
             <video 
-                src="https://res.cloudinary.com/dbtymafqf/video/upload/v1754257529/m-logolight1_y8u0bu.mp4"
+                src="https://res.cloudinary.com/nishantcloud/video/upload/v1754257529/m-logolight1_y8u0bu.mp4"
                 width={42} 
                 height={42}
                 autoPlay 
@@ -41,7 +41,7 @@ const NavPart1 = () => {
             
             {/* Dark Theme Video - Hidden in Light Mode */}
             <video 
-                src="https://res.cloudinary.com/dbtymafqf/video/upload/v1754257529/m-logodark1_pphxjz.mp4"
+                src="https://res.cloudinary.com/nishantcloud/video/upload/v1754257529/m-logodark1_pphxjz.mp4"
                 width={42} 
                 height={42}
                 autoPlay 

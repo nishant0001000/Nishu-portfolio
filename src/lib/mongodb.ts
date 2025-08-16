@@ -1,11 +1,14 @@
-import { MongoClient } from 'mongodb'
+import { MongoClient, MongoClientOptions } from 'mongodb'
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Please add your Mongo URI to .env.local')
 }
 
 const uri = process.env.MONGODB_URI
-const options = {}
+const options: MongoClientOptions = {
+  // Fail faster in dev so UI doesn't hang 30s when Atlas is unreachable
+  serverSelectionTimeoutMS: 8000,
+}
 
 let client
 let clientPromise: Promise<MongoClient>

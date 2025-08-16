@@ -8,7 +8,7 @@ import "swiper/css"
 import "swiper/css/effect-coverflow"
 import "swiper/css/pagination"
 import "swiper/css/navigation"
-import { SparklesIcon } from "lucide-react"
+import { SparklesIcon, ArrowUpRight } from "lucide-react"
 import {
   Autoplay,
   EffectCoverflow,
@@ -19,7 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 
 interface CarouselProps {
-  images: { src: string; alt: string }[]
+  images: { src: string; alt: string; href?: string }[]
   autoplayDelay?: number
   showPagination?: boolean
   showNavigation?: boolean
@@ -106,15 +106,22 @@ export const CardCarousel: React.FC<CarouselProps> = ({
           <div className="flex gap-4 justify-center items-center w-full">
             <div className="w-full">
               <Swiper
+                key={`carousel-${images.length}`}
                 spaceBetween={50}
                 autoplay={{
                   delay: autoplayDelay,
                   disableOnInteraction: false,
+                  pauseOnMouseEnter: false,
+                  stopOnLastSlide: false,
                 }}
                 effect={"coverflow"}
                 grabCursor={true}
                 centeredSlides={true}
                 loop={true}
+                observer={true}
+                observeParents={true}
+                watchOverflow={true}
+                speed={700}
                 slidesPerView={"auto"}
                 coverflowEffect={{
                   rotate: 0,
@@ -158,6 +165,8 @@ export const CardCarousel: React.FC<CarouselProps> = ({
                 {images.map((image, index) => (
                   <SwiperSlide key={index}>
                     <div className="rounded-3xl size-full">
+                      {image.href ? (
+                        <a href={image.href} target="_blank" rel="noreferrer">
                       <Image
                         src={image.src}
                         width={600}
@@ -165,19 +174,16 @@ export const CardCarousel: React.FC<CarouselProps> = ({
                         className="object-cover rounded-3xl size-full"
                         alt={image.alt}
                       />
-                    </div>
-                  </SwiperSlide>
-                ))}
-                {images.map((image, index) => (
-                  <SwiperSlide key={index}>
-                    <div className="rounded-3xl size-full">
+                        </a>
+                      ) : (
                       <Image
                         src={image.src}
-                        width={300}
-                        height={200}
+                          width={600}
+                          height={400}
                         className="object-cover rounded-3xl size-full"
                         alt={image.alt}
                       />
+                      )}
                     </div>
                   </SwiperSlide>
                 ))}

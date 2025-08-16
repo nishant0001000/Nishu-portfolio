@@ -39,11 +39,9 @@ const getCounters = async (): Promise<CountersDocument> => {
 // GET endpoint to fetch visitor stats (no individual visitor data stored)
 export async function GET() {
   try {
-    console.log('📊 Fetching visitor statistics...')
     
     // Get counters
     const counters = await getCounters()
-    console.log(`📈 Total visitors counter: ${counters.totalVisitors}`)
 
     return NextResponse.json({
       success: true,
@@ -67,7 +65,6 @@ export async function GET() {
 // DELETE endpoint for manual cleanup (no visitor data to cleanup)
 export async function DELETE() {
   try {
-    console.log('🧹 Manual cleanup requested...')
     
     return NextResponse.json({
       success: true,

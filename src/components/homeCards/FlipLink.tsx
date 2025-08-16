@@ -158,7 +158,6 @@ export function MouseTrailDemo() {
       if (response.data.success) {
         // Form submission is now handled by /api/send-contact-email
         // No need for separate tracking call as it's already stored in database
-        console.log('✅ Form submitted and stored in database successfully')
 
         setSubmitStatus("success")
         setSubmitMessage("Thank you! Your message has been sent successfully. You'll receive a confirmation email shortly, and Nishant will get back to you soon!")
@@ -168,11 +167,9 @@ export function MouseTrailDemo() {
           navigator.geolocation.getCurrentPosition(
             (position) => {
               const location = `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`
-              console.log('📍 Location obtained after submission:', location)
               // Could optionally update the form record with location if needed
             },
             (geoError) => {
-              console.log('📍 Location not available after submission:', geoError.message)
             },
             { 
               timeout: 10000,

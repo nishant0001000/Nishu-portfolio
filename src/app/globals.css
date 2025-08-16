@@ -187,6 +187,66 @@ body {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;  /* Safari and Chrome */
   }
+
+  /* New: 3-line clamp utility for clean card descriptions */
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* New: 2-line clamp utility for card descriptions */
+  .line-clamp-2 {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-break: break-word !important;
+    line-height: 1.4 !important;
+    max-height: 2.8em !important;
+  }
+
+  /* Modal text wrapping utility */
+  .modal-text-wrap {
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.6;
+  }
+
+  /* Fallback for line-clamp-2 (for older browsers) */
+  .line-clamp-2-fallback {
+    max-height: 2.8em; /* 2 lines * 1.4 line-height */
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Specific rule for MinimalCardDescription with line-clamp-2 */
+  .MinimalCardDescription.line-clamp-2,
+  p.line-clamp-2 {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-break: break-word !important;
+    line-height: 1.4 !important;
+    max-height: 2.8em !important;
+    height: 2.8em !important;
+  }
+
+  .line-clamp-2-fallback::after {
+    content: "...";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: inherit;
+    padding-left: 4px;
+    color: inherit;
+  }
 }
 
 @keyframes heartbeat {
@@ -222,6 +282,110 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Admin Panel Scrolling Styles */
+.admin-panel-content {
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+/* Custom scrollbar for admin panel */
+.admin-panel-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-panel-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.admin-panel-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.admin-panel-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Dark theme scrollbar */
+.dark .admin-panel-content::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark .admin-panel-content::-webkit-scrollbar-thumb {
+  background: #6b7280;
+}
+
+.dark .admin-panel-content::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Mobile-friendly dropdown styles */
+select[style*="transform: scaleY(-1)"] {
+  /* Ensure proper rendering on mobile */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 32px;
+}
+
+/* Mobile-specific dropdown positioning */
+@media (max-width: 768px) {
+  select[style*="transform: scaleY(-1)"] {
+    /* Force dropdown to open upwards on mobile */
+    transform-origin: bottom center;
+    /* Ensure proper touch behavior */
+    touch-action: manipulation;
+    /* Prevent zoom on focus */
+    font-size: 16px;
+  }
+  
+  select[style*="transform: scaleY(-1)"] option {
+    /* Ensure options are readable on mobile */
+    background: white;
+    color: black;
+    /* Better touch targets */
+    padding: 8px 12px;
+    font-size: 16px;
+  }
+  
+  /* Force dropdown to open upwards on mobile Safari */
+  select[style*="transform: scaleY(-1)"]:focus {
+    transform: scaleY(-1) translateY(-100%);
+  }
+}
+
+/* Additional mobile optimizations */
+@media (max-width: 480px) {
+  select[style*="transform: scaleY(-1)"] {
+    /* Larger touch targets on small screens */
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+}
+
+/* Cross-browser mobile dropdown support */
+select[style*="transform: scaleY(-1)"] {
+  /* Ensure consistent behavior across browsers */
+  -webkit-transform: scaleY(-1);
+  -moz-transform: scaleY(-1);
+  -ms-transform: scaleY(-1);
+  transform: scaleY(-1);
+}
+
+select[style*="transform: scaleY(-1)"] option {
+  /* Ensure consistent option rendering */
+  -webkit-transform: scaleY(-1);
+  -moz-transform: scaleY(-1);
+  -ms-transform: scaleY(-1);
+  transform: scaleY(-1);
 }
 
 

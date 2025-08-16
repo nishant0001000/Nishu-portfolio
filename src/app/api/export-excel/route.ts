@@ -83,7 +83,6 @@ const convertToCSV = (data: Record<string, unknown>[], headers: string[]) => {
 // GET endpoint to export all data as Excel-compatible CSV
 export async function GET(request: NextRequest) {
   try {
-    console.log('📊 Starting Excel export...')
     
     const db = await getDb()
     const { searchParams } = new URL(request.url)
@@ -93,7 +92,6 @@ export async function GET(request: NextRequest) {
     let filename = 'portfolio_data.csv'
 
     if (type === 'visitors' || type === 'all') {
-      console.log('👥 Exporting visitors...')
       const visitors = await db.collection<VisitorDocument>(VISITORS_COLLECTION)
         .find({})
         .sort({ timestamp: -1 })
@@ -117,7 +115,6 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'forms' || type === 'all') {
-      console.log('📝 Exporting contact forms...')
       const forms = await db.collection<FormDocument>(FORMS_COLLECTION)
         .find({})
         .sort({ timestamp: -1 })
@@ -142,7 +139,6 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'clients' || type === 'all') {
-      console.log('👤 Exporting clients...')
       const clients = await db.collection<ClientDocument>(CLIENTS_COLLECTION)
         .find({})
         .sort({ createdAt: -1 })
@@ -200,7 +196,6 @@ export async function GET(request: NextRequest) {
     else if (type === 'clients') filename = 'clients_data.csv'
     else filename = `portfolio_complete_data_${new Date().toISOString().split('T')[0]}.csv`
 
-    console.log(`✅ Excel export completed: ${filename}`)
 
     // Return CSV data with proper headers for Excel
     return new NextResponse(exportData, {

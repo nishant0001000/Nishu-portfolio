@@ -26,7 +26,6 @@ const getDb = async () => {
 // POST endpoint to remove duplicate forms
 export async function POST() {
   try {
-    console.log('🧹 Starting duplicate cleanup...')
     
     const db = await getDb()
     
@@ -36,7 +35,6 @@ export async function POST() {
       .sort({ timestamp: 1 })
       .toArray() as FormDocument[]
 
-    console.log(`📊 Found ${allForms.length} total forms`)
 
     // Group by email + name + phone to find duplicates
     const formGroups = new Map<string, FormDocument[]>()
@@ -54,7 +52,6 @@ export async function POST() {
     // Remove duplicates (keep the latest one)
     for (const [key, forms] of formGroups) {
       if (forms.length > 1) {
-        console.log(`🔍 Found ${forms.length} duplicates for: ${key}`)
         
         // Fixed sort function with proper typing
         forms.sort((a: FormDocument, b: FormDocument) => 
@@ -64,13 +61,11 @@ export async function POST() {
         const toKeep = forms[0]
         const toRemove = forms.slice(1)
         
-        console.log(`✅ Keeping form from: ${toKeep.timestamp}`)
         
         // Remove duplicates
         for (const duplicate of toRemove) {
           await db.collection(FORMS_COLLECTION).deleteOne({ _id: duplicate._id })
           duplicatesRemoved++
-          console.log(`🗑️ Removed duplicate from: ${duplicate.timestamp}`)
         }
       }
     }
@@ -78,9 +73,6 @@ export async function POST() {
     // Get updated count
     const remainingForms = await db.collection(FORMS_COLLECTION).countDocuments()
     
-    console.log(`✅ Cleanup completed!`)
-    console.log(`🗑️ Removed ${duplicatesRemoved} duplicate forms`)
-    console.log(`📊 Remaining forms: ${remainingForms}`)
 
     return NextResponse.json({
       success: true,
@@ -103,7 +95,6 @@ export async function POST() {
 // GET endpoint to check for duplicates without removing
 export async function GET() {
   try {
-    console.log('🔍 Checking for duplicates...')
     
     const db = await getDb()
     

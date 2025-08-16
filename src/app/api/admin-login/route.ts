@@ -3,18 +3,13 @@ import nodemailer from 'nodemailer'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔐 Admin Login API route called')
     
     const { deviceInfo, location, timestamp } = await request.json()
 
-    console.log('🔐 Admin Login API called with:', { deviceInfo, location, timestamp })
 
     const emailUser = process.env.EMAIL_USER
     const emailPass = process.env.EMAIL_PASS
 
-    console.log('📧 Email configuration check:')
-    console.log('EMAIL_USER:', emailUser)
-    console.log('EMAIL_PASS exists:', !!emailPass)
 
     if (!emailPass) {
       console.error('❌ Email API key not configured')
@@ -193,7 +188,6 @@ export async function POST(request: NextRequest) {
       </html>
     `
 
-    console.log('📧 Sending admin login notification via Gmail SMTP...')
 
     // Send admin login notification email
     const mailOptions = {
@@ -203,15 +197,9 @@ export async function POST(request: NextRequest) {
       html: adminLoginEmailContent,
     }
 
-    console.log('📧 Mail options:', {
-      from: emailUser,
-      to: emailUser,
-      subject: mailOptions.subject
-    })
 
     try {
       const info = await transporter.sendMail(mailOptions)
-      console.log('📧 Admin login notification sent successfully:', info.messageId)
 
       return NextResponse.json({
         success: true,
