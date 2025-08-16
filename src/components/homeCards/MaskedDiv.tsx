@@ -3,66 +3,69 @@ import React, { useState, useEffect } from "react"
 import MaskedDiv from "../ui/masked-div"
 
 function MaskedDivDemo() {
-  const [currentTime, setCurrentTime] = useState(new Date())
-  const [isDesktop, setIsDesktop] = useState(false)
+  const [videoUrl, setVideoUrl] = useState("");
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-
-    // Check screen size on mount and resize
+      setCurrentTime(new Date());
+    }, 1000);
     const checkScreenSize = () => {
-      setIsDesktop(window.innerWidth >= 640)
-    }
-    
-    checkScreenSize()
-    window.addEventListener('resize', checkScreenSize)
-
+      setIsDesktop(window.innerWidth >= 640);
+    };
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    fetch("/api/herovideo")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.videos) && data.videos.length > 0) {
+          setVideoUrl(data.videos[0].url);
+        }
+      });
     return () => {
-      clearInterval(timer)
-      window.removeEventListener('resize', checkScreenSize)
-    }
-  }, [])
+      clearInterval(timer);
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
 
   const getDayName = (date: Date) => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    return days[date.getDay()]
-  }
-
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[date.getDay()];
+  };
   const getMonthName = (date: Date) => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    return months[date.getMonth()]
-  }
-
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[date.getMonth()];
+  };
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: true 
-    })
-  }
+      hour12: true
+    });
+  };
 
   return (
-    <>
     <div className="container">
       <div className="masked-video-container">
         <MaskedDiv maskType="type-3" className="masked-video">
-          <div className="video-wrapper">
-            <video
-              className="video-element"
-              autoPlay
-              loop
-              muted
-            >
-              <source
-                src="https://videos.pexels.com/video-files/18069166/18069166-uhd_2560_1440_24fps.mp4"
-                type="video/mp4"
+          <div className="w-full h-full video-wrapper">
+            {videoUrl ? (
+              <video
+                src={videoUrl}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="object-cover w-full h-full"
               />
-            </video>
+            ) : (
+              <div className="flex justify-center items-center w-full h-full bg-gray-400">
+                <span className="text-lg font-bold text-white">No Video added by Nuisbat</span>
+              </div>
+            )}
           </div>
         </MaskedDiv>
-
         {/* Date Time Rectangle positioned outside masked div at top center */}
         {isDesktop && (
           <div className="datetime-container">
@@ -73,7 +76,6 @@ function MaskedDivDemo() {
             </div>
           </div>
         )}
-
         {/* Orange Circle Button positioned at bottom-left of masked video */}
         <div className="button-container">
           <div className="button-wrapper">
@@ -95,7 +97,6 @@ function MaskedDivDemo() {
           </div>
         </div>
       </div>
-
       <style jsx>{`
         .container {
           display: flex;
@@ -104,38 +105,30 @@ function MaskedDivDemo() {
           justify-content: center;
           margin: 0 auto;
           margin-top: 0;
-         
           max-width: 100vw;
           width: 100%;
           margin-bottom: 8.75rem;
           align-items: center;
           overflow-x: hidden;
         }
-
         .masked-video-container {
           display: flex;
           position: relative;
           flex-direction: column;
           align-items: center;
         }
-
         .masked-video {
           margin: 1rem 0;
         }
-
         .video-wrapper {
           position: relative;
           width: 100%;
           height: 100%;
         }
-
         .video-element {
           transition: all 0.3s;
           cursor: pointer;
         }
-
-        
-
         .datetime-container {
           position: absolute;
           left: 51.5%;
@@ -144,7 +137,6 @@ function MaskedDivDemo() {
           margin-bottom: 5rem;
           border-radius: 15rem;
         }
-
         .datetime-rectangle {
           background: #f97316;
           border-radius: 8px;
@@ -156,38 +148,31 @@ function MaskedDivDemo() {
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
           backdrop-filter: blur(10px);
         }
-
         .time-display {
           font-size: 0.4rem;
           font-weight: 800;
           color: white;
           margin-top: -0.1rem;
         }
-
         .day-display {
           font-size: 0.29rem;
           font-weight: 800;
           color: white;
-         
         }
-
         .date-display {
           font-size: 0.25rem;
           color: white;
           font-weight: 800;
           margin-top: -0.2rem;
         }
-
         .button-container {
           position: absolute;
           bottom: 0.95rem;
           left: 0.1rem;
         }
-
         .button-wrapper {
           position: relative;
         }
-
         .orange-button {
           display: flex;
           flex-direction: column;
@@ -199,14 +184,11 @@ function MaskedDivDemo() {
           border-radius: 50%;
           box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
           transition: all 0.3s;
-          
           cursor: pointer;
         }
-
         .orange-button:hover {
           transform: scale(1.1);
         }
-
         .arrow-icon {
           width: 0.75rem;
           height: 0.75rem;
@@ -214,11 +196,9 @@ function MaskedDivDemo() {
           transition: transform 0.7s;
           transform: rotate(-120deg);
         }
-
         .orange-button:hover .arrow-icon {
           transform: rotate(0deg);
         }
-
         @keyframes pulse {
           0%, 100% {
             opacity: 1;
@@ -227,7 +207,6 @@ function MaskedDivDemo() {
             opacity: 0.5;
           }
         }
-
         /* Desktop Styles */
         @media (min-width: 640px) {
           .datetime-rectangle {
@@ -237,32 +216,26 @@ function MaskedDivDemo() {
             border-radius: 15rem !important;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6) !important;
           }
-
           .time-display {
             font-size: 1.5rem !important;
             margin-top: -0.3rem !important;
           }
-
           .day-display {
             font-size: 1.125rem !important;
           }
-
           .date-display {
             font-size: 0.875rem !important;
             margin-top: -0.2rem !important;
           }
-
           .button-container {
             left: 0rem !important;
             bottom: 3rem !important;
             right: auto !important;
           }
-
           .orange-button {
             width: 8rem !important;
             height: 8rem !important;
           }
-
           .arrow-icon {
             width: 2.5rem !important;
             height: 2.5rem !important;
@@ -270,10 +243,9 @@ function MaskedDivDemo() {
         }
       `}</style>
     </div>
-    </>
-  )
+  );
 }
 
-export default MaskedDivDemo
+export default MaskedDivDemo;
 
 

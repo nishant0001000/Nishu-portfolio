@@ -6,34 +6,68 @@ interface DbProject {
   title: string
   imageUrl: string
   link?: string
+  category?: string
 }
 
 const CardCarouselParent = () => {
-  const [images, setImages] = useState<{ src: string; alt: string; href?: string }[]>([])
+  const [projects, setProjects] = useState<DbProject[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
 
   useEffect(() => {
-    const load = async () => {
+    const loadProjects = async () => {
       try {
         const res = await fetch('/api/projects', { cache: 'no-store' })
         const json = await res.json()
         if (json?.success && Array.isArray(json.data)) {
-          const latest = (json.data as DbProject[]).slice(0, 4)
-          setImages(
-            latest.map(p => ({ src: p.imageUrl, alt: p.title || 'Project', href: p.link }))
-          )
+          setProjects(json.data as DbProject[])
         } else {
-          setImages([])
+          setProjects([])
         }
       } catch (e) {
-        setImages([])
+        setProjects([])
       }
     }
-    load()
+    const loadCategories = async () => {
+      try {
+        const res = await fetch('/api/categories', { cache: 'no-store' })
+        const json = await res.json()
+        if (json?.success && Array.isArray(json.data)) {
+          setCategories(json.data)
+        } else {
+          setCategories([])
+        }
+      } catch (e) {
+        setCategories([])
+      }
+    }
+    loadProjects()
+    loadCategories()
   }, [])
 
+  const filteredProjects = selectedCategory === 'ALL'
+    ? projects
+    : projects.filter(p => p.category === selectedCategory)
+
+  const images = filteredProjects.map(p => ({ src: p.imageUrl, alt: p.title || 'Project', href: p.link }))
+
+  const title = selectedCategory === 'ALL' ? 'ALL Projects' : `${selectedCategory} Projects`
+  const subtitle = selectedCategory === 'ALL'
+    ? 'Our ALL Projects'
+    : `${selectedCategory} Projects (${filteredProjects.length} of ${projects.length})`
+
   return (
-    <div>
-        <CardCarousel images={images} showPagination={false} />
+    <div className="w-full">
+      <CardCarousel
+        images={images}
+        showPagination={false}
+        autoplayDelay={1000}
+        title={title}
+        subtitle={subtitle}
+        categories={categories.map((c: any) => c.name)}
+        selectedCategory={selectedCategory}
+        onChangeCategory={setSelectedCategory}
+      />
     </div>
   )
 }

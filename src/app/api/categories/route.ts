@@ -123,20 +123,32 @@ export async function DELETE(req: NextRequest) {
     const db = client.db(DB_NAME)
     const { ObjectId } = await import('mongodb')
     
-    // Check if category is being used by any projects
+    // First get the category name to check if it's being used
+    const categoryToDelete = await db.collection(COLLECTION).findOne({ _id: new ObjectId(String(id)) })
+    if (!categoryToDelete) {
+      return NextResponse.json({ success: false, error: 'Category not found' }, { status: 404 })
+    }
+    
+    // Check if this specific category is being used by any projects
     const projectsUsingCategory = await db.collection('projects').countDocuments({ 
-      category: { $exists: true, $ne: null } 
+      category: categoryToDelete.name 
     })
     
     if (projectsUsingCategory > 0) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Cannot delete category that is being used by projects' 
+        error: `Cannot delete category "${categoryToDelete.name}" because it is being used by ${projectsUsingCategory} project(s). Please reassign or delete those projects first.` 
       }, { status: 400 })
     }
     
-    await db.collection(COLLECTION).deleteOne({ _id: new ObjectId(String(id)) })
-    return NextResponse.json({ success: true })
+    // Delete the category
+    const result = await db.collection(COLLECTION).deleteOne({ _id: new ObjectId(String(id)) })
+    
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ success: false, error: 'Category not found or already deleted' }, { status: 404 })
+    }
+    
+    return NextResponse.json({ success: true, message: `Category "${categoryToDelete.name}" deleted successfully` })
   } catch (e) {
     console.error('DELETE /api/categories error:', e)
     const message = e instanceof Error ? e.message : String(e)

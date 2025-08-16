@@ -23,14 +23,32 @@ interface CarouselProps {
   autoplayDelay?: number
   showPagination?: boolean
   showNavigation?: boolean
+  title?: string
+  subtitle?: string
+  categories?: string[]
+  selectedCategory?: string
+  onChangeCategory?: (value: string) => void
 }
 
 export const CardCarousel: React.FC<CarouselProps> = ({
   images,
-  autoplayDelay = 1500,
+  autoplayDelay = 1000,
   showPagination = true,
   showNavigation = true,
+  title,
+  subtitle,
+  categories,
+  selectedCategory,
+  onChangeCategory,
 }) => {
+  // Ensure loop works with very few slides by repeating in order
+  const baseImages = Array.isArray(images) ? images : []
+  const minSlides = 4
+  const effectiveImages = baseImages.length === 0
+    ? []
+    : baseImages.length < minSlides
+      ? Array.from({ length: Math.ceil(minSlides / baseImages.length) }).flatMap(() => baseImages)
+      : baseImages
   const css = `
   .swiper {
     width: 100%;
@@ -92,13 +110,27 @@ export const CardCarousel: React.FC<CarouselProps> = ({
             <SparklesIcon className="fill-[#EEBDE0] stroke-1 text-neutral-800" />{" "}
             Latest
           </Badge>
+          {categories && categories.length > 0 && onChangeCategory && (
+            <div className="absolute top-4 left-1/2 z-10 -translate-x-1/2">
+              <select
+                value={selectedCategory ?? 'ALL'}
+                onChange={(e) => onChangeCategory(e.target.value)}
+                className="px-4 py-2 text-sm border border-border rounded-lg bg-white dark:bg-neutral-800 text-foreground focus:ring-2 focus:ring-ring focus:border-transparent min-w-[220px]"
+              >
+                <option value="ALL">ALL</option>
+                {categories.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="flex flex-col justify-center pt-14 pb-2 pl-4 md:items-center">
             <div className="flex gap-2">
               <div>
                 <h3 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl opacity-85">
-                  Latest Projects
+                  {title ?? 'Latest Projects'}
                 </h3>
-                <p className="text-sm sm:text-base">Our latest projects</p>
+                <p className="text-sm sm:text-base">{subtitle ?? 'Our latest projects'}</p>
               </div>
             </div>
           </div>
@@ -106,29 +138,30 @@ export const CardCarousel: React.FC<CarouselProps> = ({
           <div className="flex gap-4 justify-center items-center w-full">
             <div className="w-full">
               <Swiper
-                key={`carousel-${images.length}`}
+                dir="rtl"
+                key={`carousel-${effectiveImages.length}`}
                 spaceBetween={50}
                 autoplay={{
+                  // Step-wise autoplay so after last slide, it shows the first slide next
                   delay: autoplayDelay,
                   disableOnInteraction: false,
                   pauseOnMouseEnter: false,
                   stopOnLastSlide: false,
+                  reverseDirection: true,
                 }}
                 effect={"coverflow"}
                 grabCursor={true}
                 centeredSlides={true}
                 loop={true}
+                loopAdditionalSlides={Math.max(2, effectiveImages.length)}
+                loopPreventsSliding={false}
                 observer={true}
                 observeParents={true}
-                watchOverflow={true}
+                watchOverflow={false}
                 speed={700}
                 slidesPerView={"auto"}
-                coverflowEffect={{
-                  rotate: 0,
-                  stretch: 0,
-                  depth: 100,
-                  modifier: 2.5,
-                }}
+                allowTouchMove={true}
+                simulateTouch={true}
                 pagination={showPagination}
                 navigation={
                   showNavigation
@@ -162,7 +195,7 @@ export const CardCarousel: React.FC<CarouselProps> = ({
                   }
                 }}
               >
-                {images.map((image, index) => (
+                {effectiveImages.map((image, index) => (
                   <SwiperSlide key={index}>
                     <div className="rounded-3xl size-full">
                       {image.href ? (
