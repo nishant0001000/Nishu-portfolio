@@ -150,7 +150,7 @@ const AdminPanel = () => {
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
   const [showEditCategoryModal, setShowEditCategoryModal] = useState(false)
   const [newCategory, setNewCategory] = useState({ name: '', color: 'bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-300/30' })
-  const [editingCategory, setEditingCategory] = useState<Category>(null)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
   // State for dropdowns
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
@@ -213,7 +213,7 @@ const AdminPanel = () => {
     fetchHeroVideos();
   }, []);
 
-  async function handleDeleteHeroVideo(id, public_id) {
+  async function handleDeleteHeroVideo(id: string, public_id: string) {
     setDeleteVideoId(id);
     try {
       const res = await fetch('/api/herovideo', {
@@ -919,14 +919,14 @@ const AdminPanel = () => {
       .then(data => {
         if (data && data.success && Array.isArray(data.contactForms)) {
           setAllForms(data.contactForms);
-          setFormsChartData(groupForms(data.contactForms, 'date'));
+          setFormsChartData(groupForms(data.contactForms, 'date', formsCustomFrom, formsCustomTo));
         }
       });
   }, []);
 
   useEffect(() => {
     if (formsViewType !== 'custom') {
-      setFormsChartData(groupForms(allForms, formsViewType));
+      setFormsChartData(groupForms(allForms, formsViewType, formsCustomFrom, formsCustomTo));
     }
   }, [formsViewType, allForms]);
 
@@ -1186,7 +1186,7 @@ const AdminPanel = () => {
     )
   }
 
-  const openEditCategory = (category: unknown) => {
+  const openEditCategory = (category: Category) => {
     setEditingCategory(category)
     setShowEditCategoryModal(true)
   }
@@ -1234,7 +1234,7 @@ const AdminPanel = () => {
     return arr;
   }
 
-  function groupForms(forms, viewType, customFrom, customTo) {
+  function groupForms(forms: unknown[], viewType: string, customFrom: string, customTo: string) {
     if (!Array.isArray(forms)) return { labels: [], datasets: [] };
     const counts: Record<string, number> = {};
     if (viewType === 'date') {

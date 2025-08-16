@@ -263,7 +263,7 @@ const TemplateCard = () => {
                                             }}
                                             className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground first:rounded-t-lg last:rounded-b-lg"
                                         >
-                                            {cat.name}
+                                            {cat.name as string}
                                         </button>
                                     ))}
                                 </div>
