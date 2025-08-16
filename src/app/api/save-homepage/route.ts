@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
     const collection = db.collection('homepage')
 
     // Update or insert the homepage content
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await collection.updateOne(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       { _id: 'homepage' } as any,
       {
         $set: {
@@ -48,7 +48,8 @@ export async function GET() {
     const collection = db.collection('homepage')
 
     // Get the homepage content
-    const homepage = await collection.findOne({ _id: 'homepage' as unknown as string })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const homepage = await collection.findOne({ _id: 'homepage' } as any)
 
     return NextResponse.json({
       success: true,

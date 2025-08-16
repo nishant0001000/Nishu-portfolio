@@ -255,7 +255,7 @@ const TemplateCard = () => {
                                     </button>
                                     {categories.map((cat) => (
                                         <button
-                                            key={cat._id}
+                                            key={cat._id as string}
                                             type="button"
                                             onClick={() => {
                                                 setSelectedCategory(cat.name as string)
