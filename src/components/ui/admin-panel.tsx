@@ -82,7 +82,7 @@ interface Client {
 
 // Add at the top:
 type HeroVideo = { _id: string; url: string; public_id: string };
-type Category = { name: string; [key: string]: any };
+type Category = { name: string; [key: string]: unknown };
 type ChartData = {
   labels: string[];
   datasets: {
@@ -952,7 +952,7 @@ const AdminPanel = () => {
         showError(`Upload failed: ${text}`)
         return
       }
-      let result: any
+      let result: unknown
       try { result = JSON.parse(text) } catch { result = {} }
       if (!result.success) {
         showError(`Upload failed: ${result.error || 'Unknown error'}`)
@@ -1018,7 +1018,7 @@ const AdminPanel = () => {
     }
   }
 
-  const openEditProject = (p: any) => {
+  const openEditProject = (p: unknown) => {
     setEditProject({
       _id: p._id,
       title: p.title || '',
@@ -1186,7 +1186,7 @@ const AdminPanel = () => {
     )
   }
 
-  const openEditCategory = (category: any) => {
+  const openEditCategory = (category: unknown) => {
     setEditingCategory(category)
     setShowEditCategoryModal(true)
   }
@@ -1198,7 +1198,7 @@ const AdminPanel = () => {
       const data = await response.json()
       if (data.success && data.data) {
         const counts: Record<string, number> = {}
-        data.data.forEach((project: any) => {
+        (data.data as any[]).forEach((project) => {
           if (project.category) {
             counts[project.category] = (counts[project.category] || 0) + 1
           }
@@ -1224,7 +1224,7 @@ const AdminPanel = () => {
   // Helper to get all dates between two dates (inclusive)
   function getDateRangeArray(start, end) {
     const arr = [];
-    let dt = new Date(start);
+    const dt = new Date(start);
     const endDt = new Date(end);
     while (dt <= endDt) {
       arr.push(dt.toISOString().slice(0, 10));
@@ -1235,7 +1235,7 @@ const AdminPanel = () => {
 
   function groupForms(forms, viewType, customFrom, customTo) {
     if (!Array.isArray(forms)) return { labels: [], datasets: [] };
-    let counts = {};
+    const counts: Record<string, number> = {};
     if (viewType === 'date') {
       forms.forEach(f => {
         const date = f.timestamp ? f.timestamp.slice(0, 10) : 'Unknown';
@@ -1305,8 +1305,8 @@ const AdminPanel = () => {
     setUploadedHeroVideoUrls([]);
     if (!selectedHeroVideos.length) return setHeroVideoMessage('Please select video files.');
     setUploadingHeroVideo(true);
-    let uploadedUrls = [];
-    for (let file of selectedHeroVideos) {
+    const uploadedUrls = [];
+    for (const file of selectedHeroVideos) {
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -3375,7 +3375,7 @@ const AdminPanel = () => {
                   className="px-3 py-2 w-full text-sm rounded border"
                   placeholder="Category name"
                   value={editingCategory.name}
-                  onChange={e => setEditingCategory((v: any) => ({ ...v, name: e.target.value }))}
+                  onChange={e => setEditingCategory((v: Category) => ({ ...v, name: e.target.value }))}
                 />
 
                 {/* Color Selection */}
@@ -3400,7 +3400,7 @@ const AdminPanel = () => {
                       <button
                         key={color.name}
                         type="button"
-                        onClick={() => setEditingCategory((v: any) => ({ ...v, color: color.value }))}
+                        onClick={() => setEditingCategory((v: Category) => ({ ...v, color: color.value }))}
                         className={`p-2 rounded border transition-all ${editingCategory.color === color.value
                           ? 'ring-2 ring-blue-500 border-blue-500'
                           : 'border-gray-200 hover:border-gray-300'
@@ -3424,7 +3424,7 @@ const AdminPanel = () => {
                         if (colorValue.startsWith('#') || colorValue.startsWith('rgb')) {
                           // Convert to Tailwind-like classes
                           const customColor = `bg-[${colorValue}] text-white border-[${colorValue}]`
-                          setEditingCategory((v: any) => ({ ...v, color: customColor }))
+                          setEditingCategory((v: Category) => ({ ...v, color: customColor }))
                         }
                       }}
                     />
@@ -3436,7 +3436,7 @@ const AdminPanel = () => {
                         const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9']
                         const randomColor = colors[Math.floor(Math.random() * colors.length)]
                         const customColor = `bg-[${randomColor}] text-white border-[${randomColor}]`
-                        setEditingCategory((v: any) => ({ ...v, color: customColor }))
+                        setEditingCategory((v: Category) => ({ ...v, color: customColor }))
                       }}
                     >
                       🎨 Random
